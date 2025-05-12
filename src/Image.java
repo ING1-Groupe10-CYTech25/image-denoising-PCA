@@ -13,9 +13,28 @@ public class Image {
 	public void setImage(BufferedImage img) {
 		this.img = img;
 	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public void setExt(String ext) {
+		this.ext = ext;
+	}
+	public void setPath(String path) {
+		this.path = path;
+	}
 	public BufferedImage getImage() {
 		return this.img;
 	}
+	public String getName() {
+		return this.name;
+	}
+	public String getExt() {
+		return this.ext;
+	}
+	public String getPath() {
+		return this.path;
+	}
+	
 	
 	
 	public void saveImage(String filePath) {
