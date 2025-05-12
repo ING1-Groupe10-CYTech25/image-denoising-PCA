@@ -1,10 +1,11 @@
+//Importation des Librairies Java utiles
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
-
 import javax.imageio.ImageIO;
 
+//Implémentation de la classe Image
 public class Image {
 	private BufferedImage img;
 	private String name;
@@ -64,7 +65,7 @@ public class Image {
 	public void setPixel(int x, int y, int grey) {
 		assert(x < this.getWidth() && y < this.getHeight());
 		grey = (grey > 255 ? 255 : (grey < 0 ? 0 : grey)); // restreint la valeur aux entiers entre 0 et 255
-		this.getRaster().setSample(x, y, 0, grey);
+		this.getRaster().setSample(x, y, 0, grey); 
 	}
 	private void splitFilePath(String filePath) {
 		String[] splitPath = filePath.split("[/\\.]");
