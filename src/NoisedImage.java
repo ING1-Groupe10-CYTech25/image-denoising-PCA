@@ -3,7 +3,7 @@ import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import java.util.Random;
-
+//Commentaire
 public class NoisedImage extends Image{
 	private BufferedImage img = null;
 	private int sigma;
