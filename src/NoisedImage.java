@@ -5,14 +5,12 @@ import javax.imageio.ImageIO;
 import java.util.Random;
 //Commentaire
 public class NoisedImage extends Image{
-	private BufferedImage img = null;
 	private int sigma;
 	public NoisedImage(Image img, int sigma) {
 		try {
-		    this.setImage(img);
 		    this.setSigma(sigma);
 		    noisify(this.getSigma());
-		    super.setName(super.getName() + '_' + sigma);
+		    this.setName(this.getName() + '_' + sigma);
 		} catch (IOException e) {
 		    e.printStackTrace();
 		}
@@ -29,9 +27,9 @@ public class NoisedImage extends Image{
 		Random r = new Random();
 		for (int y = 0; y < h; y ++) {
 			for (int x = 0; x < w; x ++) {
-				int gray = (int) (this.getImage().getRaster().getSample(x, y, 0) + r.nextGaussian() * sigma);
+				int gray = (int) (this.getRaster().getSample(x, y, 0) + r.nextGaussian() * sigma);
 				gray = (gray > 255 ? 255 : (gray < 0 ? 0 : gray)); // correction pour eviter overflow
-				this.getImage().getRaster().setSample(x, y, 0, gray);
+				this.getRaster().setSample(x, y, 0, gray);
 			}
 		}
 	}
