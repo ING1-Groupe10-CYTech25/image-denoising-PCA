@@ -22,7 +22,7 @@
             "name": "Main(1)",
             "request": "launch",
             "mainClass": "cli.Main",
-            "args": "noise --input ./a.png --sigma 30",
+            "args": "",
             "projectName": "image-denoising-PCA2"
         }
     ]

@@ -29,7 +29,7 @@ public final class NoiseArgs {
     private final Path input;
     private final Path output;
 
-    private NoiseArgs(int sigma, Path input, Path output) {
+    public NoiseArgs(Path input, int sigma, Path output) {
         this.sigma  = sigma;
         this.input  = input;
         this.output = output;
@@ -73,6 +73,6 @@ public final class NoiseArgs {
         if (sigma < 0) throw new IllegalArgumentException("--sigma est obligatoire");
         if (input == null) throw new IllegalArgumentException("--input est obligatoire");
         if (output == null) output = CliUtil.defaultOutNoise(input, sigma);
-        return new NoiseArgs(sigma, input, output);
+        return new NoiseArgs(input, sigma,  output);
     }
 }
