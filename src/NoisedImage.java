@@ -1,5 +1,11 @@
+// Bruitage d'une image
+
+import java.io.File;
+import java.io.IOException;
 import java.util.Random;
-//Commentaire
+
+import javax.imageio.ImageIO;
+//Héritage de la classe Image
 public class NoisedImage extends Image{
 	private int sigma;
 	public NoisedImage(String filePath, int sigma) {
@@ -14,6 +20,7 @@ public class NoisedImage extends Image{
 	public int getSigma() {
 		return this.sigma;
 	}
+	// Bruitage gaussien ( N(µ = 0, sigma²) )
 	public void noisify(int sigma) {
 		Random r = new Random();
 		for (int y = 0; y < this.getHeight(); y ++) {
@@ -21,5 +28,10 @@ public class NoisedImage extends Image{
 				this.setPixel(x, y, (int) (this.getPixel(x,y) + r.nextGaussian() * sigma));
 			}
 		}
+	}
+	@Override
+	// Sauvegarde de l'image
+	public void saveImage(String path) {
+	    super.saveImage((path == null ? path : "img") + "/noised" );
 	}
 }
