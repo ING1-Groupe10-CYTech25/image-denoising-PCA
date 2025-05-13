@@ -1,8 +1,4 @@
-import java.io.File;
-import java.io.IOException;
 import java.util.Random;
-
-import javax.imageio.ImageIO;
 //Commentaire
 public class NoisedImage extends Image{
 	private int sigma;
@@ -25,9 +21,5 @@ public class NoisedImage extends Image{
 				this.setPixel(x, y, (int) (this.getPixel(x,y) + r.nextGaussian() * sigma));
 			}
 		}
-	}
-	@Override
-	public void saveImage(String path) {
-	    super.saveImage((path == null ? path : "img") + "/noised" );
 	}
 }

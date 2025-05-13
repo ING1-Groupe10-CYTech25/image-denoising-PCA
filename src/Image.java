@@ -22,7 +22,7 @@ public class Image {
 	public void setExt(String ext) {
 		this.ext = ext;
 	}
-	public void setPath(String path) {
+	public void setDir(String path) {
 		this.path = path;
 	}
 	private void setRaster(WritableRaster raster) {
@@ -37,8 +37,11 @@ public class Image {
 	public String getExt() {
 		return this.ext;
 	}
-	public String getPath() {
+	public String getDir() {
 		return this.path;
+	}
+	public String getPath() {
+		return this.getDir() + "/" + this.getName() + this.getExt();
 	}
 	public WritableRaster getRaster() {
 		return this.raster;
@@ -70,12 +73,12 @@ public class Image {
 	private void splitFilePath(String filePath) {
 		String[] splitPath = filePath.split("[/\\.]");
 		this.setExt("." + splitPath[splitPath.length - 1]);
-		this.setName(splitPath[splitPath.length - 1]);
-		String path = "";
-		for(int i = 0; i < splitPath.length - 2; i ++) {
-			path += splitPath[i];
+		this.setName(splitPath[splitPath.length - 2]);
+		String dir = "";
+		for(int i = 1; i < splitPath.length - 2; i ++) {
+			dir += "/" + splitPath[i];
 		}
-		this.setPath(path);
+		this.setDir(dir);
 	}
 	public void saveImage(String path) {
 	    try {
