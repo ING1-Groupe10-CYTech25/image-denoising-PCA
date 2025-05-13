@@ -5,7 +5,19 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Scanner;
 
+/**
+ * Classe principale de l'application en ligne de commande pour le traitement d'images.
+ * Permet d'ajouter du bruit aux images, de les débruiter et d'évaluer la qualité du débruitage.
+ * Supporte à la fois le mode ligne de commande et un mode interactif.
+ */
 public class Main {
+    /**
+     * Point d'entrée principal de l'application.
+     * Si aucun argument n'est fourni, lance le mode interactif.
+     * Sinon, traite les arguments de la ligne de commande.
+     * 
+     * @param args Arguments de la ligne de commande
+     */
     public static void main(String[] args) {
         if (args.length == 0) {
             runInteractiveMode();
@@ -28,6 +40,11 @@ public class Main {
         }
     }
 
+    /**
+     * Lance le mode interactif de l'application.
+     * Affiche un menu permettant à l'utilisateur de choisir une action et collecte
+     * les arguments nécessaires pour cette action.
+     */
     private static void runInteractiveMode() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Bienvenue dans l'application image-denoising-PCA");
@@ -45,6 +62,15 @@ public class Main {
         }
     }
     
+    /**
+     * Obtient un choix valide de l'utilisateur dans une plage spécifiée.
+     * Continue à demander jusqu'à ce qu'un nombre valide dans la plage soit entré.
+     * 
+     * @param scanner Scanner pour lire l'entrée utilisateur
+     * @param min Valeur minimale acceptée
+     * @param max Valeur maximale acceptée
+     * @return Le choix valide entré par l'utilisateur
+     */
     private static int getValidChoice(Scanner scanner, int min, int max) {
         int choice = 0;
         boolean validInput = false;
@@ -66,6 +92,12 @@ public class Main {
         return choice;
     }
     
+    /**
+     * Collecte les arguments nécessaires pour ajouter du bruit à une image.
+     * Demande à l'utilisateur le chemin d'entrée, l'intensité du bruit et le chemin de sortie.
+     * 
+     * @param scanner Scanner pour lire l'entrée utilisateur
+     */
     private static void collectNoiseArgs(Scanner scanner) {
         System.out.println("\n== Ajout de bruit à une image ==");
         System.out.print("Chemin de l'image d'entrée: ");
@@ -89,6 +121,12 @@ public class Main {
         }
     }
     
+    /**
+     * Collecte les arguments nécessaires pour débruiter une image.
+     * Demande à l'utilisateur le chemin de l'image à débruiter et le chemin de sortie.
+     * 
+     * @param scanner Scanner pour lire l'entrée utilisateur
+     */
     private static void collectDenoiseArgs(Scanner scanner) {
         System.out.println("\n== Débruitage d'une image ==");
         System.out.print("Chemin de l'image à débruiter: ");
@@ -103,6 +141,12 @@ public class Main {
         // TODO: Implémenter quand DenoiseArgs sera disponible
     }
     
+    /**
+     * Collecte les arguments nécessaires pour évaluer la qualité du débruitage.
+     * Demande à l'utilisateur le chemin de l'image originale et celui de l'image débruitée.
+     * 
+     * @param scanner Scanner pour lire l'entrée utilisateur
+     */
     private static void collectEvalArgs(Scanner scanner) {
         System.out.println("\n== Évaluation du débruitage ==");
         System.out.print("Chemin de l'image originale: ");
@@ -117,7 +161,24 @@ public class Main {
         // TODO: Implémenter quand EvalArgs sera disponible
     }
 
+    /**
+     * Exécute l'opération d'ajout de bruit à une image.
+     * 
+     * @param a Arguments pour l'opération de bruit
+     */
     private static void runNoise(NoiseArgs a) { /* appel à core.Noiser */ }
+    
+    /**
+     * Exécute l'opération de débruitage d'une image.
+     * 
+     * @param a Arguments pour l'opération de débruitage
+     */
     // private static void runDenoise(DenoiseArgs a) { /* appel à core.Denoiser */ }
+    
+    /**
+     * Exécute l'évaluation de la qualité du débruitage.
+     * 
+     * @param a Arguments pour l'opération d'évaluation
+     */
     // private static void runEval(EvalArgs a) { /* appel à core.Evaluator */ }
 }
