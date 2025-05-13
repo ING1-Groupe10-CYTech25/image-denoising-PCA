@@ -1,18 +1,18 @@
 /**
- * Class representing a square patch extracted from an image.
- * A patch is a small s × s region of the image and stores its pixel values
- * along with its original position in the source image.
+ * Classe représentant un patch carré tiré d'une image.
+ * Un "patch" est une petite zone de taille s x s de l'image qui retient ses valeurs de pixels 
+ * et sa position initiale dans l'image source.
  */
 public class Patch {
 
-    private int[][] pixels; // 2D array of grayscale values (size s x s)
-    private int xOrigin;   // X-coordinate of the top-left corner of the patch in the original image
-    private int yOrigin;  // Y-coordinate of the top-left corner of the patch in the original image
+    private int[][] pixels; // 2D tableau de valeurs de Gris (taille s x s)
+    private int xOrigin;   // abscisse du coin gauche supérieur du patch dans l'image d'origine
+    private int yOrigin;  // ordonnée du coin gauche supérieur du patch dans l'image d'origine
     /**
-     * Constructor for the Patch class
-     * @param pixels 2D pixel matrix (size s x s)
-     * @param xOrigin X position in the original image
-     * @param yOrigin Y position in the original image
+     * Constructeur de la Classe Patch 
+     * @param pixels 2D pixel de matrice (taille s x s)
+     * @param xOrigin Abscisse dans l'image d'origine
+     * @param yOrigin Ordonnée dans l'image d'origine the original image
      */
     public Patch(int[][] pixels, int xOrigin, int yOrigin) {
         this.pixels = pixels;
@@ -21,27 +21,27 @@ public class Patch {
     }
 
     /**
-     * Returns the full 2D pixel matrix of the patch.
-     * @return A 2D array containing grayscale values.
+     * Retourne la matrice (2D) de pixels du patch
+     * @return Un tableau 2D contenant les valeurs de gris
      */
     public int[][] getPixels() {
         return pixels;
     }
 
     /**
-     * Returns the grayscale value of a specific pixel in the patch.
-     * @param x Column index in the patch (0 to s-1)
-     * @param y Row index in the patch (0 to s-1)
-     * @return Grayscale value (0–255)
+     * Retourne la valeur de gris d'un pixel particulier du patch 
+     * @param x Colonne index dans le patch (de 0 à s-1)
+     * @param y Ligne index dans le patch (de 0 à s-1)
+     * @return Valeur Gris (0–255)
      */
     public int getPixel(int x, int y) {
         return pixels[y][x];
     }
 
     /**
-     * Converts the patch into a 1D vector (used for PCA).
-     * Values are ordered row-by-row (row-major).
-     * @return A 1D array of length s² containing grayscale values.
+     * Convertit le patch en un vecteur (1D) pour l'A.C.P. .
+     * Les valeurs sont rangées coordonnée par coordonnée
+     * @return un tableau 1D  de length s² contenant des valeurs de gris.
      */
     public int[] toVector() {
         int s = pixels.length;
@@ -55,7 +55,7 @@ public class Patch {
     }
 
     /**
-     * Returns the original X position of the patch in the image.
+     * Retourne l'abscisse originale du patch dans l'image .
      * @return X-coordinate in the original image.
      */
     public int getXOrigin() {
@@ -63,7 +63,7 @@ public class Patch {
     }
 
     /**
-     * Returns the original Y position of the patch in the image.
+     * Retourne l'ordonnée originale du patch dans l'image. 
      * @return Y-coordinate in the original image.
      */
     public int getYOrigin() {
@@ -71,7 +71,7 @@ public class Patch {
     }
 
     /**
-     * Useful method to print a quick summary of the patch.
+     * Procédé utile pour décrire un patch.
      */
     @Override
     public String toString() {
