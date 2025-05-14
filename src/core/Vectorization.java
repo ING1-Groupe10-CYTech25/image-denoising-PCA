@@ -2,7 +2,6 @@ package core;
 
 import java.util.List; 
 import java.util.ArrayList; 
-import core.Patch;
 
 /**
  * Class responsible for converting patches to vectors and vice versa.
@@ -69,7 +68,7 @@ public class Vectorization {
      * @return A list of Patch objects
      */
     public static List<Patch> matrixToPatches(int[][] matrix, int size, List<int[]> origins) {
-        List<Patch> patches = new java.util.ArrayList<>();
+        List<Patch> patches = new ArrayList<>();
 
         for (int i = 0; i < matrix.length; i++) {
             int[] vector = matrix[i];

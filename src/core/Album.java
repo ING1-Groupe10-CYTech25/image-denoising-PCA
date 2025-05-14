@@ -1,19 +1,20 @@
 package core;
+import java.util.List;
 import java.util.ArrayList;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
 public class Album {
-	private ArrayList<ImageFile> album;
-	public ArrayList<ImageFile> getAlbum() {
+	private List<ImageFile> album;
+	public List<ImageFile> getAlbum() {
 		return this.album;
 	}
-	public void setAlbum(ArrayList<ImageFile> album) {
+	public void setAlbum(List<ImageFile> album) {
 		this.album = album;
 	}
 	public Album(String path) throws IOException {
-		this.setAlbum(new ArrayList<ImageFile>());					// album vide
+		this.setAlbum(new ArrayList<>());					// album vide
 		File file = new File(path);							// chemin donné
 		if (file.isFile() && ImageIO.read(file) != null) {	// si le chemin désigne une image 
 			this.getAlbum().add(new ImageFile(path));			// on ajoute a l'album
