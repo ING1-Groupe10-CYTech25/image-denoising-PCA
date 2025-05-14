@@ -6,7 +6,8 @@ package core.patch;
  */
 public class Patch {
 
-    private int[][] pixels; // 2D tableau de valeurs de Gris (taille s x s)
+    private int side;
+    private int[] pixels; // 2D tableau de valeurs de Gris (taille s x s)
     private int xOrigin;   // abscisse du coin gauche supérieur du patch dans l'image d'origine
     private int yOrigin;  // ordonnée du coin gauche supérieur du patch dans l'image d'origine
     /**
@@ -15,17 +16,19 @@ public class Patch {
      * @param xOrigin Abscisse dans l'image d'origine
      * @param yOrigin Ordonnée dans l'image d'origine the original image
      */
-    public Patch(int[][] pixels, int xOrigin, int yOrigin) {
-        this.pixels = pixels;
-        this.xOrigin = xOrigin;
-        this.yOrigin = yOrigin;
+    public Patch(int[] pixels, int xOrigin, int yOrigin, int side) {
+        this.setPixels(pixels);
+        this.setXOrigin(xOrigin);
+        this.setYOrigin(yOrigin);
+        this.setSide(side);
+
     }
 
     /**
      * Retourne la matrice (2D) de pixels du patch
      * @return Un tableau 2D contenant les valeurs de gris
      */
-    public int[][] getPixels() {
+    public int[] getPixels() {
         return pixels;
     }
 
@@ -36,23 +39,13 @@ public class Patch {
      * @return Valeur Gris (0–255)
      */
     public int getPixel(int x, int y) {
-        return pixels[y][x];
+        return pixels[y * this.getSide() + x];
     }
-
-    /**
-     * Convertit le patch en un vecteur (1D) pour l'A.C.P. .
-     * Les valeurs sont rangées coordonnée par coordonnée
-     * @return un tableau 1D  de length s² contenant des valeurs de gris.
-     */
-    public int[] toVector() {
-        int s = pixels.length;
-        int[] vector = new int[s * s];
-        for (int i = 0; i < s; i++) {
-            for (int j = 0; j < s; j++) {
-                vector[i * s + j] = pixels[i][j];
-            }
-        }
-        return vector;
+    public int getSide() {
+        return this.side;
+    }
+    public int getSize() {
+        return this.getSide() * this.getSide();
     }
 
     /**
@@ -70,12 +63,24 @@ public class Patch {
     public int getYOrigin() {
         return yOrigin;
     }
+    public void setPixels(int[] pixels) {
+        this.pixels = pixels;
+    }
+    public void setXOrigin(int xOrigin) {
+        this.xOrigin = xOrigin;
+    }
+    public void setYOrigin(int yOrigin) {
+        this.yOrigin = yOrigin;
+    }
+    public void setSide(int side) {
+        this.side = side;
+    }
 
     /**
      * Procédé utile pour décrire un patch.
      */
     @Override
     public String toString() {
-        return "Patch (" + xOrigin + ", " + yOrigin + ") size " + pixels.length + "x" + pixels.length;
+        return "Patch (" + this.getXOrigin() + ", " + this.getYOrigin() + ") size " + this.getSize() + "x" + this.getSize();
     }
 }

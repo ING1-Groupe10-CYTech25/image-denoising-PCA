@@ -19,7 +19,7 @@ public class PatchExtractor {
 			List<Patch> patchList = new ArrayList<>();
 			for (int i = 0; i < countX; i ++) {
 				for (int j = 0; i < countY; j ++) {
-					//int[] vector = img.getRaster().getPixels((rangeX * i)/countX , (rangeY * j)/countY,s,s,(int[]) null);
+					patchList.add(new Patch(img.getRaster().getPixels((rangeX * i)/countX , (rangeY * j)/countY,s,s,(int[]) null),(rangeX * i)/countX , (rangeY * j)/countY, s));
 				}
 			}
 			return patchList;
