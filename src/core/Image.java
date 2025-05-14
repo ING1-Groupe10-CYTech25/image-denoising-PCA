@@ -2,29 +2,14 @@ package core;
 //Importation des Librairies Java utiles
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
-import java.io.File;
-import java.io.IOException;
-import javax.imageio.ImageIO;
 
 //Implémentation de la classe Image
-public class Image {
+public class Image{
 	private BufferedImage img;
-	private String name;
-	private String ext;
-	private String dir;
 	private WritableRaster raster;
 	
 	public void setImage(BufferedImage img) {
 		this.img = img;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public void setExt(String ext) {
-		this.ext = ext;
-	}
-	public void setDir(String dir) {
-		this.dir = dir;
 	}
 	private void setRaster(WritableRaster raster) {
 		this.raster = raster;
@@ -32,37 +17,12 @@ public class Image {
 	public BufferedImage getImage() {
 		return this.img;
 	}
-	public String getName() {
-		return this.name;
-	}
-	public String getExt() {
-		return this.ext;
-	}
-	public String getDir() {
-		return this.dir;
-	}
-	public String getPath() {
-		return this.getDir() + "/" + this.getName() + this.getExt();
-	}
 	public WritableRaster getRaster() {
 		return this.raster;
 	}
-	public Image(String filePath) {
-		try {
-		    this.setImage(ImageIO.read(new File(filePath)));		
-		} catch (IOException e) {
-			
-		    e.printStackTrace();
-		}
-		this.setRaster(this.getImage().getRaster());
-		splitFilePath(filePath);
-	}
-	public Image(BufferedImage img, int x, int y) {
+	public Image(BufferedImage img) {
 		this.setImage(img);
 		this.setRaster(this.getImage().getRaster());
-		this.setName(x + "," + y);
-		this.setExt(null);
-		this.setDir(null);
 	}
 	public int getWidth() {
 		return this.getImage().getWidth();
@@ -78,25 +38,5 @@ public class Image {
 		assert(x < this.getWidth() && y < this.getHeight());
 		grey = (grey > 255 ? 255 : (grey < 0 ? 0 : grey)); // restreint la valeur aux entiers entre 0 et 255
 		this.getRaster().setSample(x, y, 0, grey); 
-	}
-	private void splitFilePath(String filePath) {
-		String[] splitPath = filePath.split("[/\\.]");
-		this.setExt("." + splitPath[splitPath.length - 1]);
-		this.setName(splitPath[splitPath.length - 2]);
-		String dir = "";
-		for(int i = 1; i < splitPath.length - 2; i ++) {
-			dir += "/" + splitPath[i];
-		}
-		this.setDir(dir);
-	}
-	public void saveImage(String path) {
-	    try {
-	    	String filePath = path + this.getName() + ".png";
-	        File outputFile = new File(filePath);
-	        ImageIO.write(this.getImage(), "PNG", outputFile);
-	        System.out.println("Image sauvegardée à : " + filePath);
-	    } catch (IOException e) {
-	        e.printStackTrace();
-	    }
 	}
 }

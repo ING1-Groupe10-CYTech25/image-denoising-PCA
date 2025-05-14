@@ -1,10 +1,11 @@
 package core;
+import java.io.IOException;
 // Bruitage d'une image
 import java.util.Random;
 //Héritage de la classe Image
-public class NoisedImage extends Image{
+public class NoisedImage extends ImageFile{
 	private int sigma;
-	public NoisedImage(String filePath, int sigma) {
+	public NoisedImage(String filePath, int sigma) throws IOException{
 		super(filePath);
 		this.setSigma(sigma);
 		noisify(this.getSigma());

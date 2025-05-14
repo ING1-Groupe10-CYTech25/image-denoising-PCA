@@ -1,5 +1,6 @@
 package core;
 import java.io.File;
+import java.io.IOException;
 
 public class AlbumTest {
 	public static void main(String[] args) {
@@ -7,7 +8,13 @@ public class AlbumTest {
 		for(File f : file.listFiles()) {
 			System.out.println(f.getPath());
 		}
-		Album album = new Album(System.getProperty("user.dir") + "/img");
-		System.out.println(album);
+		try {
+			Album album = new Album(System.getProperty("user.dir") + "/img");
+			System.out.println(album);
+
+		}
+		catch(IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
