@@ -10,7 +10,7 @@ public class Image {
 	private BufferedImage img;
 	private String name;
 	private String ext;
-	private String path;
+	private String dir;
 	private WritableRaster raster;
 	
 	public void setImage(BufferedImage img) {
@@ -22,8 +22,8 @@ public class Image {
 	public void setExt(String ext) {
 		this.ext = ext;
 	}
-	public void setDir(String path) {
-		this.path = path;
+	public void setDir(String dir) {
+		this.dir = dir;
 	}
 	private void setRaster(WritableRaster raster) {
 		this.raster = raster;
@@ -38,7 +38,7 @@ public class Image {
 		return this.ext;
 	}
 	public String getDir() {
-		return this.path;
+		return this.dir;
 	}
 	public String getPath() {
 		return this.getDir() + "/" + this.getName() + this.getExt();
@@ -50,10 +50,18 @@ public class Image {
 		try {
 		    this.setImage(ImageIO.read(new File(filePath)));		
 		} catch (IOException e) {
+			
 		    e.printStackTrace();
 		}
 		this.setRaster(this.getImage().getRaster());
 		splitFilePath(filePath);
+	}
+	public Image(BufferedImage img, int x, int y) {
+		this.setImage(img);
+		this.setRaster(this.getImage().getRaster());
+		this.setName(x + "," + y);
+		this.setExt(null);
+		this.setDir(null);
 	}
 	public int getWidth() {
 		return this.getImage().getWidth();
