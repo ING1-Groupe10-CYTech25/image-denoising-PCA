@@ -1,3 +1,4 @@
+package core;
 // Bruitage d'une image
 import java.util.Random;
 //Héritage de la classe Image

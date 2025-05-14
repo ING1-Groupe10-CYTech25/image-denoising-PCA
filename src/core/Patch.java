@@ -1,3 +1,4 @@
+package core;
 /**
  * Classe représentant un patch carré tiré d'une image.
  * Un "patch" est une petite zone de taille s x s de l'image qui retient ses valeurs de pixels 
