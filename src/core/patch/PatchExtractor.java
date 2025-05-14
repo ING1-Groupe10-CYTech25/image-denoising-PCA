@@ -8,22 +8,36 @@ import core.image.Image;
 import core.image.ImageExtract;
 
 public class PatchExtractor {
-	public static int targetOverlap = 5; // en pixels
-	public static List<Patch> ExtractPatchs(Image img, int s) {
+	public static int minOverlap = 5; // en pixels
+	public static List<Patch> extractPatchs(Image img, int side) {
 		try {
-			int rangeX = img.getWidth() - s;
-			int rangeY = img.getHeight() - s;
-			if (rangeX < 0 || rangeY < 0) {
+			if (img.getWidth() < 0 || img.getHeight() < 0) {
 				throw(new PatchException());
 			}
-			int countX = rangeX/(s - targetOverlap) + 1;
-			int countY = rangeX/(s - targetOverlap) + 1;
+			// Calcul du nombre de patchs et stride en X
+			int minStrideX = side - minOverlap;
+			int countX = (int) Math.ceil((double)(img.getWidth() - side) / minStrideX) + 1;
+			int strideX = (img.getWidth() - side) / (countX - 1);
+		
+			// Calcul du nombre de patchs et stride en Y
+			int minStrideY = side - minOverlap;
+			int countY = (int) Math.ceil((double)(img.getHeight() - side) / minStrideY) + 1;
+			int strideY = (img.getHeight() - side) / (countY - 1);
+		
 			List<Patch> patchList = new ArrayList<>();
-			for (int i = 0; i < countX; i ++) {
-				for (int j = 0; i < countY; j ++) {
-					patchList.add(new Patch(img.getRaster().getPixels((rangeX * i)/countX , (rangeY * j)/countY,s,s,(int[]) null),(rangeX * i)/countX , (rangeY * j)/countY, s));
+		
+			for (int j = 0; j < countY; j++) {
+				int y = j * strideY;
+				for (int i = 0; i < countX; i++) {
+					int x = i * strideX;
+					x = Math.min(x, img.getWidth() - side);
+					y = Math.min(y, img.getHeight() - side);
+					int[] pixels = new int[side * side];
+					img.getRaster().getPixels(x, y, side, side, pixels);
+					patchList.add(new Patch(pixels, x, y, side));
 				}
 			}
+		
 			return patchList;
 		}
 		catch(PatchException e) {
@@ -32,16 +46,19 @@ public class PatchExtractor {
 			return null;
 		}
 	}
-	public static Image ReconstructPatchs(List<Patch> patchList, int l, int c) {
+	public static Image reconstructPatchs(List<Patch> patchList, int width, int height) {
 		try {
 			if (patchList.isEmpty()) {
 				throw(new PatchException());
 			}
 			else {
-				Image img = new Image(new BufferedImage(l, c, 10));
-				// determination du nombre de patchs en longueur et en largeur
+				Image img = new Image(new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY));
 				for(Patch patch : patchList) {
-					img.getRaster().setPixels(patch.getXOrigin(),patch.getYOrigin(),patch.getSide(), patch.getSide(), patch.getPixels());
+					int x = patch.getXOrigin();
+                	int y = patch.getYOrigin();
+                	int side = patch.getSide();
+
+					img.getRaster().setPixels(x, y, side, side, patch.getPixels());
 				}
 				return img;
 			}
@@ -52,7 +69,7 @@ public class PatchExtractor {
 			return null;
 		}
 	}
-	public static List<ImageExtract> DecoupeImage(Image img, int w, int n) {
+	public static List<ImageExtract> decoupeImage(Image img, int w, int n) {
 		 List<ImageExtract> ImageList = new ArrayList<>();
 		 return ImageList;
 	}

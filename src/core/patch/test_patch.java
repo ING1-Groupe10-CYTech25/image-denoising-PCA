@@ -1,0 +1,36 @@
+package core.patch;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import core.image.ImageFile;
+import core.image.NoisedImage;
+
+public class test_patch {
+    public static void main(String[] args) {
+        try {
+            ImageFile img = new NoisedImage(System.getProperty("user.dir") + "/img/original/512x512 PNG Greyscale/1.png", 30);
+            List<Patch> patchList1 = PatchExtractor.extractPatchs(img, 256);
+            List<Patch> patchList2 = PatchExtractor.extractPatchs(img, 256);
+            List<Patch> patchListfinal1 = new ArrayList<>();
+            patchListfinal1.add(patchList1.get(0));
+            patchListfinal1.add(patchList2.get(1));
+            patchListfinal1.add(patchList1.get(2));
+            patchListfinal1.add(patchList2.get(3));
+            patchListfinal1.add(patchList1.get(4));
+            patchListfinal1.add(patchList2.get(5));
+            patchListfinal1.add(patchList1.get(6));
+            patchListfinal1.add(patchList2.get(7));
+            patchListfinal1.add(patchList1.get(8));
+            ImageFile result = new ImageFile(PatchExtractor.reconstructPatchs(patchListfinal1, 512, 512));
+            result.saveImage(result.getDir());
+
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+}
+// si je me plante pas, vu que le résultat 

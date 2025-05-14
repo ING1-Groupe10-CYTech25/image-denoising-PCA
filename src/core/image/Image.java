@@ -11,7 +11,7 @@ public class Image{
 	public void setImage(BufferedImage img) {
 		this.img = img;
 	}
-	private void setRaster(WritableRaster raster) {
+	protected void setRaster(WritableRaster raster) {
 		this.raster = raster;
 	}
 	public BufferedImage getImage() {
@@ -23,6 +23,10 @@ public class Image{
 	public Image(BufferedImage img) {
 		this.setImage(img);
 		this.setRaster(this.getImage().getRaster());
+	}
+	public Image() {
+		this.setImage(null);
+		this.setRaster(null);
 	}
 	public int getWidth() {
 		return this.getImage().getWidth();

@@ -35,6 +35,13 @@ public class ImageFile extends Image {
 	    super(ImageIO.read(new File(filePath)));		
 		splitFilePath(filePath);
 	}
+	public ImageFile(Image img) {
+		this.setImage(img.getImage());
+		this.setRaster(img.getRaster());
+		this.setName("unnamed_image");
+		this.setExt("png");
+		this.setDir(System.getProperty("user.dir") + "/img");
+	}
     private void splitFilePath(String filePath) {
 		String[] splitPath = filePath.split("[/\\.]");
 		this.setExt("." + splitPath[splitPath.length - 1]);
@@ -47,7 +54,7 @@ public class ImageFile extends Image {
 	}
     public void saveImage(String path) {
 	    try {
-	    	String filePath = path + this.getName() + ".png";
+	    	String filePath = path + "/" + this.getName() + ".png";
 	        File outputFile = new File(filePath);
 	        ImageIO.write(this.getImage(), "PNG", outputFile);
 	        System.out.println("Image sauvegardée à : " + filePath);
