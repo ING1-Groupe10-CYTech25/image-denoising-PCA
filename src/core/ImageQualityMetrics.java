@@ -2,6 +2,16 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import javax.imageio.ImageIO;
 
+/**
+  * Calcule la MSE (Mean Square Error) et le PSNR (Peak Signal-to-Noise Ratio) associés
+  * à une image d'origine et son image bruitée 
+  *
+  * MSE (Mean Square Error) est une abréviation pour "Erreur Moyenne quadratique"  
+  * PSNR (Peak Signal-to-Noise Ratio) est une abréviation pour "Rapport du Pic du Signal sur le Bruit"
+  *
+  * Le code renvoie une erreur si les deux images ne sont pas de la même dimension/taille
+  */
+
 
 public class ImageQualityMetrics {
     public static double calculateMSE(BufferedImage img1, BufferedImage img2) {
@@ -30,7 +40,7 @@ public class ImageQualityMetrics {
             }
         }
 
-        double mse = (double) sumError / (width * height * 3); // 3 for RGB channels
+        double mse = (double) sumError / (width * height * 3); // 3 pour les chaînes Rouge/Vert/Bleu
         return mse;
     }
 
@@ -49,7 +59,7 @@ public class ImageQualityMetrics {
         }
 
         double mse = calculateMSE(original, compressed);
-        double psnr = calculatePSNR(mse, 255); // 255 for 8-bit images
+        double psnr = calculatePSNR(mse, 255); // 255 pour les images par octet 
 
         System.out.printf("MSE: %.2f\n", mse);
         System.out.printf("PSNR: %.2f dB\n", psnr);
