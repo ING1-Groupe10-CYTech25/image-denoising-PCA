@@ -1,9 +1,18 @@
 package cli;
 
 import cli.parse.*;
+
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Scanner;
+import java.util.List;
+import java.io.File;
+
+import core.Album;
+import core.Image;
+import core.ImageFile;
+import core.NoisedImage;
 
 /**
  * Classe principale de l'application en ligne de commande pour le traitement d'images.
@@ -17,8 +26,9 @@ public class Main {
      * Sinon, traite les arguments de la ligne de commande.
      * 
      * @param args Arguments de la ligne de commande
+     * @throws IOException 
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         if (args.length == 0) {
             runInteractiveMode();
         } else {
@@ -165,9 +175,46 @@ public class Main {
      * Exécute l'opération d'ajout de bruit à une image.
      * 
      * @param a Arguments pour l'opération de bruit
+     * @throws IOException 
      */
-    private static void runNoise(NoiseArgs a) { /* appel à core.Noiser */ }
-    
+    private static void runNoise(NoiseArgs a) throws IOException { 
+        String pathStr = a.getInput().toString();
+        Album album = new Album(pathStr);
+        System.out.println(album);
+
+        List<ImageFile> imgArray = album.getAlbum();
+        
+        // Créer le répertoire de sortie s'il n'existe pas
+        File outputDir = new File(a.getOutput().getParent().toString());
+        if (!outputDir.exists()) {
+            outputDir.mkdirs();
+        }
+        
+        // Pour chaque image de l'album, ajouter du bruit et l'enregistrer
+        for (ImageFile img : imgArray) {
+            try {
+                // Créer une image bruitée avec le sigma spécifié
+                NoisedImage noisedImg = new NoisedImage(img.getPath(), a.getSigma());
+                
+                // Chemin de sortie pour cette image
+                String outputName = a.getOutput().getFileName().toString();
+                String outputPath = a.getOutput().getParent().toString() + File.separator + outputName;
+                
+                // Si l'entrée contenait plusieurs images, ajuster les noms de sorties
+                if (imgArray.size() > 1) {
+                    outputPath = a.getOutput().getParent().toString() + File.separator + 
+                                 noisedImg.getName() + "." + noisedImg.getExt();
+                }
+                
+                // Sauvegarder l'image bruitée
+                noisedImg.saveImage(outputPath);
+                System.out.println("Image bruitée sauvegardée: " + outputPath);
+            } catch (IOException e) {
+                System.err.println("Erreur lors du traitement de l'image " + img.getPath() + ": " + e.getMessage());
+            }
+        }
+    }
+
     /**
      * Exécute l'opération de débruitage d'une image.
      * 
