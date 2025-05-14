@@ -1,4 +1,4 @@
-package core;
+package core.image;
 import java.io.IOException;
 // Bruitage d'une image
 import java.util.Random;

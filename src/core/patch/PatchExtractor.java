@@ -1,12 +1,16 @@
-package core;
+package core.patch;
 import java.util.ArrayList;
 import java.util.List;
+
+import core.image.Image;
+import core.image.ImageExtract;
 
 public class PatchExtractor {
 	public static List<Patch> ExtractPatchs(Image img, int s) {
 		int overlap = 5; // en pixels
 		int rangeX = img.getWidth() - s;
 		int rangeY = img.getHeight() - s;
+
 		List<Patch> patchList = new ArrayList<>();
 		return patchList;
 	}

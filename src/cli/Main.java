@@ -9,10 +9,10 @@ import java.util.Scanner;
 import java.util.List;
 import java.io.File;
 
-import core.Album;
-import core.Image;
-import core.ImageFile;
-import core.NoisedImage;
+import core.image.Album;
+import core.image.Image;
+import core.image.ImageFile;
+import core.image.NoisedImage;
 
 /**
  * Classe principale de l'application en ligne de commande pour le traitement d'images.

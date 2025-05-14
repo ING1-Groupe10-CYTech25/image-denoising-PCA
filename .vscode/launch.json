@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "AlbumTest",
+            "request": "launch",
+            "mainClass": "core.AlbumTest",
+            "projectName": "image-denoising-PCA"
+        },
+        {
+            "type": "java",
             "name": "Current File",
             "request": "launch",
             "mainClass": "${file}"

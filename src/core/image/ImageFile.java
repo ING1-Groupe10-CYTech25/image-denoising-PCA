@@ -1,4 +1,4 @@
-package core;
+package core.image;
 
 import java.io.File;
 import java.io.IOException;

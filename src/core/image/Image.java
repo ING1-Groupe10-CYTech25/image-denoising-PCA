@@ -1,4 +1,4 @@
-package core;
+package core.image;
 //Importation des Librairies Java utiles
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;

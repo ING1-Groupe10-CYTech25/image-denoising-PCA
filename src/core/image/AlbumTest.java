@@ -1,4 +1,4 @@
-package core;
+package core.image;
 import java.io.File;
 import java.io.IOException;
 
@@ -11,7 +11,6 @@ public class AlbumTest {
 		try {
 			Album album = new Album(System.getProperty("user.dir") + "/img");
 			System.out.println(album);
-
 		}
 		catch(IOException e) {
 			e.printStackTrace();

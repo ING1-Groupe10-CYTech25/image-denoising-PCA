@@ -1,4 +1,4 @@
-package core;
+package core.image;
 
 public class ImageException extends Exception {
     @Override

@@ -1,4 +1,4 @@
-package core;
+package core.image;
 
 import java.awt.image.BufferedImage;
 
