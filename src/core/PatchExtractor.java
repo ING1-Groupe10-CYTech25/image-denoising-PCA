@@ -4,6 +4,9 @@ import java.util.List;
 
 public class PatchExtractor {
 	public static List<Patch> ExtractPatchs(Image img, int s) {
+		int overlap = 5; // en pixels
+		int rangeX = img.getWidth() - s;
+		int rangeY = img.getHeight() - s;
 		List<Patch> patchList = new ArrayList<>();
 		return patchList;
 	}
