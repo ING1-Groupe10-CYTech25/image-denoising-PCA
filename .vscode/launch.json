@@ -29,7 +29,7 @@
             "name": "Main",
             "request": "launch",
             "mainClass": "Main",
-            "projectName": "image-denoising-PCA2"
+            "projectName": "image-denoising-PCA"
         },
         {
             "type": "java",
@@ -37,7 +37,7 @@
             "request": "launch",
             "mainClass": "cli.Main",
             "args": "",
-            "projectName": "image-denoising-PCA2"
+            "projectName": "image-denoising-PCA"
         }
     ]
 }
