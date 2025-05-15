@@ -2,6 +2,7 @@ package core.patch;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import core.image.Image;
@@ -31,15 +32,18 @@ public class test_patch {
             // ImageFile result = new ImageFile(PatchExtractor.reconstructPatchs(patchListfinal1, 512, 512));
             // result.saveImage(System.getProperty("user.dir") + "/test.png");
 
-            List<ImageTile> tileList = PatchExtractor.decoupeImage(img1, 10);
-            Image result1 = new Image(new BufferedImage(img1.getWidth(), img1.getHeight(), BufferedImage.TYPE_BYTE_GRAY));	// création d'une image vide
-            for (ImageTile img : tileList) {
-                int[] pixels = new int[img.getWidth() * img.getHeight()];
-                img.getRaster().getPixels(0, 0, img.getWidth(), img.getHeight(), pixels);
-                result1.getRaster().setPixels(img.getPosX(), img.getPosY(), img.getWidth(), img.getHeight(), pixels);
+            List<ImageTile> tileList = PatchExtractor.decoupeImage(img1, 72);
+            List<ImageTile> reconstructTileList = new ArrayList<>();
+            List<Patch> patches = PatchExtractor.extractPatchs(img1, 100);
+            ImageFile result2 = new ImageFile(PatchExtractor.reconstructPatchs(patches, img1.getWidth(), img1.getHeight()), "testPatch");
+            for (ImageTile tile : tileList) {
+                List<Patch> patchList = PatchExtractor.extractPatchs(tile, 10);
+                reconstructTileList.add(PatchExtractor.reconstructPatchs(patchList, tile.getWidth(), tile.getHeight(), tile.getPosX(), tile.getPosY()));
             }
-            ImageFile result = new ImageFile(result1);
+            ImageFile result = new ImageFile(PatchExtractor.reconstructImageTiles(reconstructTileList, img1.getWidth(), img1.getHeight()), "testTilePatch");
             result.saveImage(System.getProperty("user.dir") + "/test.png");
+            result2.saveImage(System.getProperty("user.dir") + "/" + result2.getName() + ".png");
+            
 
 
         }

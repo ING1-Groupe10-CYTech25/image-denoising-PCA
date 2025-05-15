@@ -24,33 +24,24 @@ public class PatchExtractor {
 	 */
 	public static List<Patch> extractPatchs(Image img, int side) {
 		try {
-			if (img.getWidth() < side || img.getHeight() < side) {									//	vérification de la taille du patch
+			if (img.getWidth() < side || img.getHeight() < side) {				// vérification de la taille du patch
 				throw(new PatchException());
 			}
-			// Calcul du nombre de patchs et stride en X
-			int minStrideX = side - minOverlap;													// pas minimum entre deux patchs sur l'axe des abscisses
-			int countX = (int) Math.ceil((double)(img.getWidth() - side) / minStrideX) + 1;		// nombre de patchs sur l'axe des abscisses
-			int strideX = (img.getWidth() - side) / (countX - 1);								// pas effectif entre les patchs sur l'axe des abscisses
-		
-			// Calcul du nombre de patchs et stride en Y
-			int minStrideY = side - minOverlap;													// pas minimum entre deux patch sur l'axe des ordonnées
-			int countY = (int) Math.ceil((double)(img.getHeight() - side) / minStrideY) + 1;	// nombre de patchs sur l'axe des ordonnées
-			int strideY = (img.getHeight() - side) / (countY - 1);								// pas effectif entre les patchs sur l'axe des ordonnées
-		
-			List<Patch> patchList = new ArrayList<>();											// liste des patchs
-		
-			for (int j = 0; j < countY; j++) {													// Parcours de la grille de patchs
-				int y = j * strideY;															// coordonnée sur l'axe des ordonnées
+			int countX = (int) Math.ceil((double)(img.getWidth()) / side);		// Calcul du nombre de patchs nécessaire sur l'axe des abscisses
+			int countY = (int) Math.ceil((double)(img.getHeight()) / side);		// Calcul du nombre de patchs nécessaire sur l'axe des ordonnées
+			List<Patch> patchList = new ArrayList<>();							// liste des patchs
+
+			for (int j = 0; j < countY; j++) {									// Parcours de la grille de patchs
+				int y = (j * (img.getHeight() - side)) / (countY - 1);			// Calcul de la coordonnée sur l'axe des ordonnées
 				for (int i = 0; i < countX; i++) {												
-					int x = i * strideX;														// coordonnée sur l'axe des abscisses
-					x = Math.min(x, img.getWidth() - side);										// verification des coordonnées pour eviter dépassement
+					int x = (i * (img.getWidth() - side)) / (countX - 1);		// Calcul de la coordonnée sur l'axe des abscisses
+					x = Math.min(x, img.getWidth() - side);						// Verification des coordonnées pour eviter que le patch dépasse de l'image
 					y = Math.min(y, img.getHeight() - side);
-					int[] pixels = new int[side * side];										// création du tableau de valeurs a extraire
-					img.getRaster().getPixels(x, y, side, side, pixels);						// obtention des données
-					patchList.add(new Patch(pixels, x, y, side));								// ajout a la liste de patchs
+					int[] pixels = new int[side * side];						// création du tableau de valeurs a extraire
+					img.getRaster().getPixels(x, y, side, side, pixels);		// obtention des données
+					patchList.add(new Patch(pixels, x, y, side));				// ajout a la liste de patchs
 				}
-			}
-		
+			}		
 			return patchList;
 		}
 		catch(PatchException e) {
