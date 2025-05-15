@@ -1,5 +1,4 @@
 package core.image;
-import java.util.List;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -32,15 +31,25 @@ public class ImageFile extends Image {
 	}
 
     /**
+     * Construit une instance de {@code ImageFile} à partir d'une instance de {@link Image} et d'un nom (Downcast) 
+     * @param img {@code Image} a convertir en {@code ImageFile}
+     * @param name nom de l'image a créer
+     * @see Image
+     */
+    public ImageFile(Image img, String name) {
+		this.setImage(img.getImage());
+		this.setName(name);
+		this.setExt("png");
+		this.setDir(System.getProperty("user.dir"));   // emplacement actuel
+	}
+
+    /**
      * Construit une instance de {@code ImageFile} à partir d'une instance de {@link Image} (Downcast) 
      * @param img {@code Image} a convertir en {@code ImageFile}
      * @see Image
      */
     public ImageFile(Image img) {
-		this.setImage(img.getImage());
-		this.setName("unnamed_image");
-		this.setExt("png");
-		this.setDir(System.getProperty("user.dir"));   // emplacement actuel
+		this(img, null);
 	}
 
     /**

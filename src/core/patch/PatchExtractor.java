@@ -3,7 +3,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.awt.image.BufferedImage;
 import core.image.Image;
-import core.image.ImageFile;
 import core.image.ImageTile;
 
 /**
