@@ -47,7 +47,13 @@ public final class CliUtil {
     /** Pour la sous‑commande {@code noise}. */
     public static Path defaultOutNoise(Path input, int sigma) {
         String sigmaStr = String.valueOf(sigma);
-        String fileName = baseName(input) + "_" + sigmaStr + ".png";
+        
+        // Obtenir le nom de base sans extension et garantir qu'il ne contient pas de points
+        String baseName = baseName(input);
+        
+        // Construire le nom de fichier avec l'extension
+        String fileName = baseName + "_" + sigmaStr + ".png";
+        
         Path dir = Paths.get("img", "img_noised");         // racine projet
         return dir.resolve(fileName);
     }
@@ -59,11 +65,12 @@ public final class CliUtil {
         return dir.resolve(fileName);
     }
 
-    private static String baseName(Path p) {
+    public static String baseName(Path p) {
         String f = p.getFileName().toString();
         int dot = f.lastIndexOf('.');
         return dot == -1 ? f : f.substring(0, dot);
     }
+
 
     /* ------------------------------------------------------------------ */
     /* Commandes de type help                                             */

@@ -9,7 +9,6 @@ public class NoisedImage extends ImageFile {
 		super(filePath);
 		this.setSigma(sigma);
 		noisify(this.getSigma());
-		this.setName(this.getName() + '_' + sigma);
 	}
 	public void setSigma(int sigma) {
 		this.sigma = sigma;

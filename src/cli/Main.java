@@ -119,10 +119,10 @@ public class Main {
         
         System.out.print("Chemin de sortie (laissez vide pour la valeur par défaut): ");
         String outputStr = scanner.nextLine().trim();
-        Path output = outputStr.isEmpty() ? null : Paths.get(outputStr);
+        Path output = outputStr.isEmpty() ? 
+                      CliUtil.defaultOutNoise(input, sigma) : Paths.get(outputStr);
         
         try {
-            // Construire manuellement un objet NoiseArgs ou appeler une méthode statique
             NoiseArgs args = new NoiseArgs(input, sigma, output);
             runNoise(args);
         } catch (Exception e) {
@@ -197,13 +197,15 @@ public class Main {
                 NoisedImage noisedImg = new NoisedImage(img.getPath(), a.getSigma());
                 
                 // Chemin de sortie pour cette image
-                String outputName = a.getOutput().getFileName().toString();
+                // Convertir String en Path avant d'appeler baseName
+                String outputName = CliUtil.baseName(Paths.get(img.getPath())) + "_noised_" + a.getSigma() + ".png";
                 String outputPath = a.getOutput().getParent().toString() + File.separator + outputName;
                 
                 // Si l'entrée contenait plusieurs images, ajuster les noms de sorties
                 if (imgArray.size() > 1) {
+                    // Utiliser une autre approche pour générer le nom de fichier de sortie
                     outputPath = a.getOutput().getParent().toString() + File.separator + 
-                                 noisedImg.getName() + "." + noisedImg.getExt();
+                                noisedImg.getName() + "_noised_" + a.getSigma() + ".png";
                 }
                 
                 // Sauvegarder l'image bruitée
