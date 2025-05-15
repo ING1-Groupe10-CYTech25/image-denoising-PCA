@@ -46,4 +46,37 @@ public class Vectorization {
         }
         return patches;
     }
+
+    /**
+ * Centers the data by subtracting the mean of each column.
+ * This is often used as a preprocessing step for PCA (Principal Component Analysis).
+ * 
+ * @param data 2D matrix (n x s²) where n is the number of patches, and s² is the number of pixels per patch.
+ * @return A new 2D matrix where each column has been centered (mean subtracted).
+ */
+public static double[][] centerData(int[][] data) {
+    int rows = data.length;         // Number of rows (patches)
+    int cols = data[0].length;      // Number of columns (pixels per patch)
+    
+    double[][] centered = new double[rows][cols]; // Matrix to store centered data
+    double[] mean = new double[cols];  // Array to store the mean of each column
+
+    // Calculate the mean of each column
+    for (int j = 0; j < cols; j++) {
+        for (int i = 0; i < rows; i++) {
+            mean[j] += data[i][j];  // Sum up all values in the column
+        }
+        mean[j] /= rows;  // Compute the mean by dividing by the number of rows
+    }
+
+    // Subtract the mean from each element in the matrix to center the data
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            centered[i][j] = data[i][j] - mean[j];  // Subtract the column mean
+        }
+    }
+
+    return centered;  // Return the centered data
+}
+
 }
