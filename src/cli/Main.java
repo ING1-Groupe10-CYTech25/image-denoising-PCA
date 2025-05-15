@@ -57,7 +57,7 @@ public class Main {
      */
     private static void runInteractiveMode() {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Bienvenue dans l'application image-denoising-PCA");
+        System.out.println("// image-denoising-PCA //");
         System.out.println("Que voulez-vous faire ?");
         System.out.println("1. Ajouter du bruit à une image (noise)");
         System.out.println("2. Débruiter une image (denoise)");
