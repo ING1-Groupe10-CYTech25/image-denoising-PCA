@@ -184,12 +184,6 @@ public class Main {
 
         List<ImageFile> imgArray = album.getAlbum();
         
-        // Créer le répertoire de sortie s'il n'existe pas
-        File outputDir = new File(a.getOutput().getParent().toString());
-        if (!outputDir.exists()) {
-            outputDir.mkdirs();
-        }
-        
         // Pour chaque image de l'album, ajouter du bruit et l'enregistrer
         for (ImageFile img : imgArray) {
             try {
@@ -197,19 +191,39 @@ public class Main {
                 NoisedImage noisedImg = new NoisedImage(img.getPath(), a.getSigma());
                 
                 // Chemin de sortie pour cette image
-                // Convertir String en Path avant d'appeler baseName
-                String outputName = CliUtil.baseName(Paths.get(img.getPath())) + "_noised_" + a.getSigma() + ".png";
-                String outputPath = a.getOutput().getParent().toString() + File.separator + outputName;
+                Path outputPath;
                 
-                // Si l'entrée contenait plusieurs images, ajuster les noms de sorties
                 if (imgArray.size() > 1) {
-                    // Utiliser une autre approche pour générer le nom de fichier de sortie
-                    outputPath = a.getOutput().getParent().toString() + File.separator + 
-                                noisedImg.getName() + "_noised_" + a.getSigma() + ".png";
+                    // Si plusieurs images, créer un nom unique basé sur le nom de l'image originale
+                    // sans inclure le chemin complet dans le nom du fichier
+                    String baseName = noisedImg.getName();
+                    String fileName = baseName + "_noised_" + a.getSigma() + ".png";
+                    
+                    // Déterminer le répertoire de sortie
+                    Path outputDir;
+                    if (a.getOutput().toString().endsWith(".png")) {
+                        // Si l'utilisateur a spécifié un fichier de sortie, utiliser son répertoire parent
+                        outputDir = a.getOutput().getParent();
+                    } else {
+                        // Si l'utilisateur a spécifié un dossier, l'utiliser directement
+                        outputDir = a.getOutput();
+                    }
+                    
+                    // Construire le chemin complet
+                    outputPath = outputDir.resolve(fileName);
+                } else {
+                    // Si une seule image, utiliser le chemin de sortie directement
+                    outputPath = a.getOutput();
+                }
+                
+                // Créer le répertoire parent si nécessaire
+                File outputDir = outputPath.getParent().toFile();
+                if (!outputDir.exists()) {
+                    outputDir.mkdirs();
                 }
                 
                 // Sauvegarder l'image bruitée
-                noisedImg.saveImage(outputPath);
+                noisedImg.saveImage(outputPath.toString());
                 System.out.println("Image bruitée sauvegardée: " + outputPath);
             } catch (IOException e) {
                 System.err.println("Erreur lors du traitement de l'image " + img.getPath() + ": " + e.getMessage());
