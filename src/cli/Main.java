@@ -8,11 +8,14 @@ import java.nio.file.Paths;
 import java.util.Scanner;
 import java.util.List;
 import java.io.File;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
 
 import core.image.Album;
 import core.image.Image;
 import core.image.ImageFile;
 import core.image.NoisedImage;
+import core.eval.ImageQualityMetrics;
 
 /**
  * Classe principale de l'application en ligne de commande pour le traitement d'images.
@@ -39,7 +42,7 @@ public class Main {
                 switch (cmd) {
                     case "noise" -> runNoise(NoiseArgs.parse(rest));
                     // case "denoise" -> runDenoise(DenoiseArgs.parse(rest));
-                    // case "eval" -> runEval(EvalArgs.parse(rest));
+                    case "eval" -> runEval(EvalArgs.parse(rest));  // Décommenter cette ligne
                     case "--help", "-h" -> CliUtil.printGlobalHelp();
                     default -> throw new IllegalArgumentException("Commande inconnue : " + cmd);
                 }
@@ -159,16 +162,30 @@ public class Main {
      */
     private static void collectEvalArgs(Scanner scanner) {
         System.out.println("\n== Évaluation du débruitage ==");
+        
+        // Demander le chemin de la première image
         System.out.print("Chemin de l'image originale: ");
         String originalStr = scanner.nextLine().trim();
         Path original = Paths.get(originalStr);
         
+        // Demander le chemin de la deuxième image
         System.out.print("Chemin de l'image débruitée: ");
         String denoisedStr = scanner.nextLine().trim();
         Path denoised = Paths.get(denoisedStr);
         
-        System.out.println("Fonctionnalité en cours de développement");
-        // TODO: Implémenter quand EvalArgs sera disponible
+        // Demander la métrique à utiliser
+        System.out.print("Métrique à utiliser (mse/psnr/both, défaut: both): ");
+        String metricStr = scanner.nextLine().trim();
+        // Si vide, utiliser "both" comme valeur par défaut
+        String metric = metricStr.isEmpty() ? "both" : metricStr;
+        
+        try {
+            EvalArgs args = new EvalArgs(original, denoised, metric);
+            runEval(args);
+        } catch (Exception e) {
+            System.err.println("Erreur: " + e.getMessage());
+            System.exit(1);
+        }
     }
 
     /**
@@ -246,8 +263,73 @@ public class Main {
     
     /**
      * Exécute l'évaluation de la qualité du débruitage.
+     * Compare deux images en utilisant les métriques MSE, PSNR ou les deux.
      * 
      * @param a Arguments pour l'opération d'évaluation
      */
-    // private static void runEval(EvalArgs a) { /* appel à core.Evaluator */ }
+    private static void runEval(EvalArgs a) {
+        try {
+            // Charger les images
+            BufferedImage image1 = ImageIO.read(a.getImage1().toFile());
+            BufferedImage image2 = ImageIO.read(a.getImage2().toFile());
+            
+            // Vérifier que les dimensions correspondent
+            if (image1.getWidth() != image2.getWidth() || image1.getHeight() != image2.getHeight()) {
+                System.err.println("Erreur: Les images doivent avoir les mêmes dimensions");
+                System.err.println("Image 1: " + image1.getWidth() + "x" + image1.getHeight());
+                System.err.println("Image 2: " + image2.getWidth() + "x" + image2.getHeight());
+                return;
+            }
+            
+            // Afficher les informations sur les images
+            System.out.println("\n== Évaluation de la qualité d'image ==");
+            System.out.println("Image 1: " + a.getImage1());
+            System.out.println("Image 2: " + a.getImage2());
+            System.out.println("Dimensions: " + image1.getWidth() + "x" + image1.getHeight() + " pixels");
+            
+            // Évaluer en fonction de la métrique choisie
+            String metric = a.getMetric();
+            double mse = 0;
+            double psnr = 0;
+            
+            // Calculer MSE si demandé
+            if (metric.equals("mse") || metric.equals("both")) {
+                mse = ImageQualityMetrics.calculateMSE(image1, image2);
+                System.out.printf("\nMSE (Mean Square Error): %.4f\n", mse);
+                System.out.println("Plus la valeur est basse, plus les images sont similaires.");
+            }
+            
+            // Calculer PSNR si demandé
+            if (metric.equals("psnr") || metric.equals("both")) {
+                // Si MSE n'a pas été calculé mais qu'on veut le PSNR, calculer MSE d'abord
+                if (mse == 0 && !metric.equals("mse")) {
+                    mse = ImageQualityMetrics.calculateMSE(image1, image2);
+                }
+                
+                psnr = ImageQualityMetrics.calculatePSNR(mse, 255);
+                if (Double.isInfinite(psnr)) {
+                    System.out.println("\nPSNR (Peak Signal-to-Noise Ratio): Infini (images identiques)");
+                } else {
+                    System.out.printf("\nPSNR (Peak Signal-to-Noise Ratio): %.2f dB\n", psnr);
+                    System.out.println("Plus la valeur est élevée, meilleure est la qualité.");
+                    
+                    // Aide à l'interprétation
+                    if (psnr > 40) {
+                        System.out.println("Interprétation: Excellent (différences imperceptibles)");
+                    } else if (psnr > 30) {
+                        System.out.println("Interprétation: Très bon (différences difficilement perceptibles)");
+                    } else if (psnr > 20) {
+                        System.out.println("Interprétation: Bon (légères différences visibles)");
+                    } else {
+                        System.out.println("Interprétation: Qualité moyenne à faible (différences notables)");
+                    }
+                }
+            }
+            
+        } catch (IOException e) {
+            System.err.println("Erreur lors du chargement des images: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Erreur lors de l'évaluation: " + e.getMessage());
+        }
+    }
 }

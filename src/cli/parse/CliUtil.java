@@ -100,4 +100,20 @@ public final class CliUtil {
         System.out.println("noise --sigma <double> --input <path> [--output <path>]\n" +
                 "Si --output est omis, le résultat est écrit dans ./img/img_noised/<img>_<σ>.png");
     }
+
+    /**
+     * Affiche l'aide pour la commande eval.
+     */
+    public static void printEvalHelp() {
+        System.out.println("eval --image1 <path> --image2 <path> [--metric <type>]\n" +
+                "Compare deux images et calcule des métriques de qualité.\n" +
+                "  --image1, -i1 : chemin de la première image (original)\n" +
+                "  --image2, -i2 : chemin de la deuxième image (traitée)\n" +
+                "  --metric, -m  : métrique à utiliser ('mse', 'psnr' ou 'both', défaut: 'both')\n" +
+                "    mse  : Mean Square Error (Erreur Quadratique Moyenne)\n" +
+                "    psnr : Peak Signal-to-Noise Ratio (Rapport Signal/Bruit de Crête)\n" +
+                "    both : Calcule les deux métriques\n" +
+                "Plus la valeur MSE est basse, plus les images sont similaires.\n" +
+                "Plus la valeur PSNR est élevée, meilleure est la qualité de l'image.");
+    }
 }

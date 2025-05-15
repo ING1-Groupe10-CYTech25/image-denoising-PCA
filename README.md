@@ -108,3 +108,99 @@ Toutes les images du dossier `img/original/` seront bruitées avec un sigma de 2
 - `--input est obligatoire` : Vous devez spécifier le chemin d'une image source
 - `Valeur manquante pour --sigma` : L'option --sigma a été spécifiée sans valeur
 - `Option inconnue : X` : L'option X n'est pas reconnue par la commande noise
+
+
+
+# Manuel d'utilisation - Commande EVAL
+
+Cette documentation détaille l'utilisation de la commande `eval` de l'outil image-denoising-PCA. Cette commande permet d'évaluer la qualité entre deux images en utilisant des métriques objectives comme MSE et PSNR.
+
+## Utilisation en ligne de commande
+
+### Syntaxe
+
+```bash
+mvn exec:java -Dexec.mainClass="cli.Main" -Dexec.args="eval [options]"
+```
+
+### Options
+
+| Option | Format court | Description | Statut |
+|--------|-------------|-------------|--------|
+| `--image1 <chemin>` | `-i1 <chemin>` | Chemin vers la première image (généralement l'original) | **Obligatoire** |
+| `--image2 <chemin>` | `-i2 <chemin>` | Chemin vers la deuxième image (généralement l'image traitée) | **Obligatoire** |
+| `--metric <type>` | `-m <type>` | Type de métrique à utiliser: 'mse', 'psnr' ou 'both' | *Facultatif* (défaut: 'both') |
+| `--help` | `-h` | Affiche l'aide de la commande eval | *Facultatif* |
+
+### Métriques disponibles
+
+- **MSE** (Mean Square Error / Erreur Quadratique Moyenne): Mesure la différence moyenne des carrés des erreurs entre pixels. Plus la valeur est basse, plus les images sont similaires.
+- **PSNR** (Peak Signal-to-Noise Ratio / Rapport Signal/Bruit de Crête): Évalue la qualité de reconstruction d'une image compressée ou altérée. Plus la valeur est élevée, meilleure est la qualité.
+
+### Exemples
+
+1. Évaluer deux images en utilisant les deux métriques (MSE et PSNR) :
+   ```bash
+   mvn exec:java -Dexec.mainClass="cli.Main" -Dexec.args="eval --image1 img/original/lena.png --image2 img/img_noised/lena_10.png"
+   ```
+
+2. Calculer uniquement l'erreur quadratique moyenne (MSE) :
+   ```bash
+   mvn exec:java -Dexec.mainClass="cli.Main" -Dexec.args="eval -i1 img/original/lena.png -i2 img/img_noised/lena_10.png -m mse"
+   ```
+
+3. Calculer uniquement le rapport signal/bruit (PSNR) :
+   ```bash
+   mvn exec:java -Dexec.mainClass="cli.Main" -Dexec.args="eval -i1 img/original/lena.png -i2 img/img_noised/lena_10.png -m psnr"
+   ```
+
+4. Afficher l'aide de la commande eval :
+   ```bash
+   mvn exec:java -Dexec.mainClass="cli.Main" -Dexec.args="eval --help"
+   ```
+
+## Utilisation en mode interactif
+
+Pour une utilisation guidée, lancez le programme sans arguments :
+
+```bash
+mvn exec:java -Dexec.mainClass="cli.Main"
+```
+
+1. Choisissez l'option 3 : "Évaluer la qualité du débruitage (eval)"
+2. Suivez les instructions pour spécifier :
+   - Le chemin de l'image originale
+   - Le chemin de l'image débruitée
+   - La métrique à utiliser
+
+## Interprétation des résultats
+
+### MSE (Mean Square Error)
+- **Valeur idéale** : 0 (images identiques)
+- **Interprétation** :
+  - 0-10 : Différences très faibles
+  - 10-50 : Différences perceptibles mais limitées
+  - 50-100 : Différences notables
+  - >100 : Différences importantes
+
+### PSNR (Peak Signal-to-Noise Ratio)
+- **Valeur idéale** : ∞ (images identiques)
+- **Interprétation** :
+  - >40 dB : Excellent (différences imperceptibles)
+  - 30-40 dB : Très bon (différences difficilement perceptibles)
+  - 20-30 dB : Bon (légères différences visibles)
+  - <20 dB : Qualité moyenne à faible (différences notables)
+
+## Limitations
+
+- Les images à comparer doivent avoir exactement les mêmes dimensions
+- L'évaluation porte sur les différences pixel par pixel et ne reflète pas nécessairement la perception visuelle humaine
+- Pour les images couleur, l'erreur est calculée séparément sur les canaux R, G et B puis moyennée
+
+## Messages d'erreur courants
+
+- `--image1 est obligatoire` : Vous devez spécifier le chemin de la première image
+- `--image2 est obligatoire` : Vous devez spécifier le chemin de la deuxième image
+- `Les images doivent avoir les mêmes dimensions` : Les dimensions des deux images ne correspondent pas
+- `Format d'image non supporté` : L'extension du fichier n'est pas reconnue
+- `Métrique non supportée` : La métrique spécifiée n'est pas valide (utilisez 'mse', 'psnr' ou 'both')
