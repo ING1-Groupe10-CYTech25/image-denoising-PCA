@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage;
  * @version 1.0
  * @see Image
  */
-public class ImageExtract extends Image {
+public class ImageTile extends Image {
     private int posX;   // position de l'imagette dans l'image
     private int posY;
 
@@ -19,7 +19,7 @@ public class ImageExtract extends Image {
      * @param posX Abscisse de l'imagette
      * @param posY Ordonnée de l'imagette
      */
-    public ImageExtract(BufferedImage img, int posX, int posY) {
+    public ImageTile(BufferedImage img, int posX, int posY) {
         super(img);
         this.setPosX(posX);
         this.setPosY(posY);
