@@ -41,7 +41,6 @@ public class ImageFile extends Image {
 	}
 	public ImageFile(Image img) {
 		this.setImage(img.getImage());
-		this.setRaster(img.getRaster());
 		this.setName("unnamed_image");
 		this.setExt("png");
 		this.setDir(System.getProperty("user.dir") + "/img");
