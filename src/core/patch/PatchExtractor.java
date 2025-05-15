@@ -24,7 +24,7 @@ public class PatchExtractor {
 	 */
 	public static List<Patch> extractPatchs(Image img, int side) {
 		try {
-			if (img.getWidth() < 0 || img.getHeight() < 0) {									//	vérification de la taille du patch
+			if (img.getWidth() < side || img.getHeight() < side) {									//	vérification de la taille du patch
 				throw(new PatchException());
 			}
 			// Calcul du nombre de patchs et stride en X
