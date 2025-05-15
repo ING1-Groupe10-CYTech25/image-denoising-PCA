@@ -1,7 +1,10 @@
 package core.image;
+import java.util.List;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+
 
 /**
  * Représente un fichier d'image et définis toutes les méthodes utiles a sa manipulation
@@ -27,6 +30,7 @@ public class ImageFile extends Image {
 	    super(ImageIO.read(new File(filePath)));    // lecture du fichier et construction de l'instance
 		splitFilePath(filePath);                    // traitement du chemin du fichier pour le séparer en chemin de dossier, nom et extension
 	}
+
     /**
      * Construit une instance de {@code ImageFile} à partir d'une instance de {@link Image} (Downcast) 
      * @param img {@code Image} a convertir en {@code ImageFile}

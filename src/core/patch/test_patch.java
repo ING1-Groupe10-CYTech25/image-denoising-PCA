@@ -31,16 +31,10 @@ public class test_patch {
             // patchListfinal1.add(patchList1.get(8));
             // ImageFile result = new ImageFile(PatchExtractor.reconstructPatchs(patchListfinal1, 512, 512));
             // result.saveImage(System.getProperty("user.dir") + "/test.png");
+
             List<ImageTile> tileList = PatchExtractor.decoupeImage(img1, 10);
-            // List<Patch> patchList = new ArrayList<>();
             Image result1 = new Image(new BufferedImage(img1.getWidth(), img1.getHeight(), BufferedImage.TYPE_BYTE_GRAY));	// création d'une image vide
             for (ImageTile img : tileList) {
-                // List<Patch> patchs = PatchExtractor.extractPatchs(img, 10);
-                // for (Patch patch : patchs) {
-                //     patch.setXOrigin(patch.getXOrigin() + img.getPosX());
-                //     patch.setYOrigin(patch.getYOrigin() + img.getPosY());
-                // }
-                // patchList.addAll(patchs);
                 int[] pixels = new int[img.getWidth() * img.getHeight()];
                 img.getRaster().getPixels(0, 0, img.getWidth(), img.getHeight(), pixels);
                 result1.getRaster().setPixels(img.getPosX(), img.getPosY(), img.getWidth(), img.getHeight(), pixels);
@@ -56,4 +50,3 @@ public class test_patch {
     }
 
 }
-// si je me plante pas, vu que le résultat 

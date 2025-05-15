@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.awt.image.BufferedImage;
 import core.image.Image;
+import core.image.ImageFile;
 import core.image.ImageTile;
 
 /**
@@ -91,6 +92,38 @@ public class PatchExtractor {
 		}
 	}
 	/**
+	 * Reconstruit une imagette a partir d'une liste de patchs, de ses dimensions et de sa position dans l'image globale
+	 * @param patchList	liste de patchs couvrant l'image
+	 * @param width largeur de l'imagette
+	 * @param height hauteur de l'imagette
+	 * @param posX abscisse de l'imagette
+	 * @param posY ordonnée de l'imagette
+	 * @return une imagette reconstruite
+	 * @see ImageTile
+	 */
+	public static ImageTile reconstructPatchs(List<Patch> patchList, int width, int height, int posX, int posY) {
+		try {
+			if (patchList.isEmpty()) {																	// vérification de la validité de la liste de patchs
+				throw(new PatchException());
+			}
+			else {
+				ImageTile img = new ImageTile(new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY), posX, posY);	// création d'une image vide
+				for(Patch patch : patchList) {															// parcours des patchs
+					int x = patch.getXOrigin();
+                	int y = patch.getYOrigin();
+                	int side = patch.getSide();
+					img.getRaster().setPixels(x, y, side, side, patch.getPixels());						// ajout du patch a l'image
+				}
+				return img;
+			}
+		}
+		catch (PatchException e) {
+			System.err.println("Patch list is empty");
+			e.printStackTrace();
+			return null;
+		}
+	}
+	/**
 	 * Découpe l'image {@code img} donnée en une grille d'imagettes aussi carrées que possible, en visant un nombre d'imagettes aussi proche de {@code n} que possible
 	 * @param img image à découper
 	 * @param n nombre d'imagettes cible
@@ -99,30 +132,31 @@ public class PatchExtractor {
 	 * @see List
 	 */
 	public static List<ImageTile> decoupeImage(Image img, int n) {
+		// etape 1 : calcul des colonnes et lignes optimales
+
 		int bestRows = 1;
 		int bestCols = n;
-		double bestAspectDiff = Double.MAX_VALUE;
+		double bestAspectDiff = Double.MAX_VALUE;														// Cible : minimiser bestAspectDiff
 	
-		for (int rows = 1; rows <= n; rows++) {
+		for (int rows = 1; rows <= n; rows++) {															// parcours des combinaisons de lignes et colonnes possibles
 			int cols = (int) Math.ceil((double)n / rows);
 			if (rows * cols >= n) {
-				double cellWidth = (double) img.getWidth() / cols;
+				double cellWidth = (double) img.getWidth() / cols;										// calcul des dimensions d'une case
 				double cellHeight = (double) img.getHeight() / rows;
-				double aspectRatio = cellWidth / cellHeight;
-				double aspectDiff = Math.abs(Math.log(aspectRatio)); // proche de 0 = presque carré
+				double aspectRatio = cellWidth / cellHeight;											// Calcul du format de la case
+				double aspectDiff = Math.abs(Math.log(aspectRatio)); 									// proche de 0 = presque carré
 	
-				if ((rows * cols < bestRows * bestCols) || 
-					(rows * cols == bestRows * bestCols && aspectDiff < bestAspectDiff)) {
-					bestRows = rows;
+				if ((rows * cols < bestRows * bestCols) || (rows * cols == bestRows * bestCols && aspectDiff < bestAspectDiff)) {
+					bestRows = rows;																	// si la combinaison de colonnes et lignes est préférable, on la modifie
 					bestCols = cols;
 					bestAspectDiff = aspectDiff;
 				}
 			}
 		}
 
-		int[] colStarts = new int[bestCols + 1];
-		int[] rowStarts = new int[bestRows + 1];
-
+		int[] colStarts = new int[bestCols + 1];														// Stocke les positions des colonnes
+		int[] rowStarts = new int[bestRows + 1];														// Stocke les position des lignes
+																										// Remplissage des deux tableaux
 		for (int col = 0; col <= bestCols; col ++) {
 			colStarts[col] = (int) Math.round((double) col * img.getWidth() / bestCols);
 		}
@@ -130,16 +164,33 @@ public class PatchExtractor {
 			rowStarts[row] = (int) Math.round((double) row * img.getHeight() / bestRows);
 		}
 
-		List<ImageTile> imageList = new ArrayList<>();
-		for (int row = 0; row < bestRows; row ++) {
+		List<ImageTile> imageList = new ArrayList<>();													// Liste des imagettes
+		for (int row = 0; row < bestRows; row ++) {														// parcours des cases
 			for (int col = 0; col < bestCols; col ++) {
 				int x = colStarts[col];
 				int y = rowStarts[row];
 				int w = colStarts[col + 1];
 				int h = rowStarts[row + 1];
-				imageList.add(new ImageTile(img.getImage().getSubimage(x, y, w - x, h - y), x, y));
+				imageList.add(new ImageTile(img.getImage().getSubimage(x, y, w - x, h - y), x, y));		// ajout de l'imagette correspondant a la case
 			}
 		}
 		return imageList;
+	}
+
+	/**
+	 * Reconstruit une image a partir de ses imagettes et de ses dimensions.
+	 * @param tileList liste des imagettes
+	 * @param width largeur de l'image a reconstruire
+	 * @param height hauteur de l'image a reconstruire
+	 * @return l'image obtenue en recollant les imagettes
+	 */
+	public static Image reconstructImageTiles(List<ImageTile> tileList, int width, int height) {
+		Image result = new Image(new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY));	    				// création d'une image vide aux bonnes dimensions
+        for (ImageTile tile : tileList) {																				// parcours des imagettes
+            int[] pixels = new int[tile.getWidth() * tile.getHeight()];													// tableau des pixels de l'imagette
+            tile.getRaster().getPixels(0, 0, tile.getWidth(), tile.getHeight(), pixels);								// obtention des valeurs des pixels
+            result.getRaster().setPixels(tile.getPosX(), tile.getPosY(), tile.getWidth(), tile.getHeight(), pixels);	// ecriture des valeurs au bon endroit sur l'image
+        }
+		return result;
 	}
 }
