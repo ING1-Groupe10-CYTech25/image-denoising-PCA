@@ -1,5 +1,5 @@
 # image-denoising-PCA
-Projet réalisé dans le cadre d’une SAE à CY Tech Pau. Implémentation en Java d’un algorithme de débruitage d’image basé sur l’Analyse en Composantes Principales (ACP / PCA).
+Projet réalisé dans le cadre d'une SAE à CY Tech Pau. Implémentation en Java d'un algorithme de débruitage d'image basé sur l'Analyse en Composantes Principales (ACP / PCA).
 
 # Manuel d'utilisation - Commande NOISE
 
@@ -8,31 +8,32 @@ Cette documentation détaille l'utilisation de la commande `noise` de l'outil im
 ## Prérequis
 
 - Java 17 ou supérieur
+- Maven 3.6 ou supérieur
 - Structure de dossiers recommandée :
   ```
   image-denoising-PCA/
+  ├── src/                    # Code source Java
+  │   └── cli/               # Classes de l'interface en ligne de commande
   ├── img/                    # Répertoire pour les images
   │   ├── original/           # Images originales
   │   └── img_noised/         # Images bruitées (sortie de noise)
-  └── bin/                    # Classes Java compilées
+  └── target/                 # Classes Java compilées (généré par Maven)
   ```
 
-## Principe de fonctionnement
+## Compilation
 
-La commande `noise` applique un bruit gaussien de moyenne 0 et d'écart-type `sigma` à chaque pixel de l'image. La formule utilisée est :
+Pour compiler le projet, utilisez la commande Maven suivante :
 
+```bash
+mvn clean compile
 ```
-pixel_bruité = pixel_original + bruit_gaussien(0, sigma)
-```
-
-Plus la valeur de `sigma` est élevée, plus le bruit sera perceptible dans l'image résultante.
 
 ## Utilisation en ligne de commande
 
 ### Syntaxe
 
 ```bash
-java -cp bin cli.Main noise [options]
+mvn exec:java -Dexec.mainClass="cli.Main" -Dexec.args="noise [options]"
 ```
 
 ### Options
@@ -50,25 +51,25 @@ Si l'option `--output` est omise, l'image sera automatiquement sauvegardée dans
 
 1. Ajouter un bruit faible (sigma=10) à une image :
    ```bash
-   java -cp bin cli.Main noise --sigma 10 --input img/original/lena.png
+   mvn exec:java -Dexec.mainClass="cli.Main" -Dexec.args="noise --sigma 10 --input img/original/lena.png"
    ```
    Résultat : `img/img_noised/lena_10.png`
 
 2. Ajouter un bruit moyen (sigma=25) avec chemin de sortie personnalisé :
    ```bash
-   java -cp bin cli.Main noise -s 25 -i img/original/lena.png -o img/lena_bruit_moyen.png
+   mvn exec:java -Dexec.mainClass="cli.Main" -Dexec.args="noise -s 25 -i img/original/lena.png -o img/lena_bruit_moyen.png"
    ```
    Résultat : `img/lena_bruit_moyen.png`
 
 3. Ajouter un bruit fort (sigma=50) :
    ```bash
-   java -cp bin cli.Main noise -s 50 -i img/original/lena.png
+   mvn exec:java -Dexec.mainClass="cli.Main" -Dexec.args="noise -s 50 -i img/original/lena.png"
    ```
    Résultat : `img/img_noised/lena_50.png`
 
 4. Afficher l'aide de la commande noise :
    ```bash
-   java -cp bin cli.Main noise --help
+   mvn exec:java -Dexec.mainClass="cli.Main" -Dexec.args="noise --help"
    ```
 
 ## Utilisation en mode interactif
@@ -76,7 +77,7 @@ Si l'option `--output` est omise, l'image sera automatiquement sauvegardée dans
 Pour une utilisation guidée, lancez le programme sans arguments :
 
 ```bash
-java -cp bin cli.Main
+mvn exec:java -Dexec.mainClass="cli.Main"
 ```
 
 1. Choisissez l'option 1 : "Ajouter du bruit à une image (noise)"
@@ -90,7 +91,7 @@ java -cp bin cli.Main
 La commande `noise` peut également traiter un dossier entier d'images. Si le chemin spécifié avec `--input` est un dossier, l'application ajoutera du bruit à toutes les images qu'il contient.
 
 ```bash
-java -cp bin cli.Main noise -s 20 -i img/original/
+mvn exec:java -Dexec.mainClass="cli.Main" -Dexec.args="noise -s 20 -i img/original/"
 ```
 
 Toutes les images du dossier `img/original/` seront bruitées avec un sigma de 20, et les résultats seront enregistrés dans `img/img_noised/`.

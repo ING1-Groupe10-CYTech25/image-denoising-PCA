@@ -1,0 +1,17 @@
+/home/sylv1/image-denoising-PCA/src/core/patch/PatchException.java
+/home/sylv1/image-denoising-PCA/src/cli/Main.java
+/home/sylv1/image-denoising-PCA/src/core/image/ImageException.java
+/home/sylv1/image-denoising-PCA/src/core/patch/PatchExtractor.java
+/home/sylv1/image-denoising-PCA/src/core/image/ImageExtract.java
+/home/sylv1/image-denoising-PCA/src/cli/parse/CliUtil.java
+/home/sylv1/image-denoising-PCA/src/core/ImageQualityMetrics.java
+/home/sylv1/image-denoising-PCA/src/core/image/Album.java
+/home/sylv1/image-denoising-PCA/src/core/image/NoisedImage.java
+/home/sylv1/image-denoising-PCA/src/core/image/Image.java
+/home/sylv1/image-denoising-PCA/src/core/patch/Vectorization.java
+/home/sylv1/image-denoising-PCA/src/core/image/ImageFile.java
+/home/sylv1/image-denoising-PCA/src/core/image/AlbumTest.java
+/home/sylv1/image-denoising-PCA/src/core/patch/test_patch.java
+/home/sylv1/image-denoising-PCA/src/core/ACP.java
+/home/sylv1/image-denoising-PCA/src/cli/parse/NoiseArgs.java
+/home/sylv1/image-denoising-PCA/src/core/patch/Patch.java
