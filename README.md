@@ -111,6 +111,93 @@ Toutes les images du dossier `img/original/` seront bruitées avec un sigma de 2
 
 
 
+# Manuel d'utilisation - Commande DENOISE
+
+Cette documentation détaille l'utilisation de la commande `denoise` de l'outil image-denoising-PCA. Cette commande permet de débruiter une image en utilisant la méthode de débruitage par Analyse en Composantes Principales (ACP/PCA).
+
+## Utilisation en ligne de commande
+
+### Syntaxe
+
+```bash
+mvn exec:java -Dexec.mainClass="cli.Main" -Dexec.args="denoise [options]"
+```
+
+### Options
+
+| Option | Format court | Description | Statut |
+|--------|-------------|-------------|--------|
+| `--input <chemin>` | `-i <chemin>` | Chemin vers l'image à débruiter | **Obligatoire** |
+| `--output <chemin>` | `-o <chemin>` | Chemin de destination pour l'image débruitée | *Facultatif* |
+| `--global` | `-g` | Utilise la méthode de débruitage globale | *Facultatif* |
+| `--local` | `-l` | Utilise la méthode de débruitage locale | *Facultatif* (défaut) |
+| `--threshold <type>` | `-t <type>` | Type de seuillage: 'hard' ou 'soft' | *Facultatif* (défaut: 'hard') |
+| `--shrink <type>` | `-s <type>` | Type de seuillage adaptatif: 'v' (VisuShrink) (défaut) ou 'b' (BayesShrink) | *Facultatif* |
+| `--help` | `-h` | Affiche l'aide de la commande denoise | *Facultatif* |
+
+### Méthodes de débruitage
+
+- **Globale** : Analyse l'image entière avec une approche globale par ACP.
+- **Locale** : Analyse des patches locaux dans l'image, offrant généralement de meilleurs résultats pour préserver les détails.
+
+### Types de seuillage
+
+- **Hard** (dur) : Les composantes inférieures au seuil sont mises à zéro, les autres restent inchangées.
+- **Soft** (doux) : Les composantes inférieures au seuil sont mises à zéro, les autres sont réduites par la valeur du seuil.
+
+### Types de seuillage adaptatif
+
+- **VisuShrink (v)** : Méthode basée sur le principe de réduction du bruit minimal.
+- **BayesShrink (b)** : Méthode basée sur l'estimation bayésienne, généralement plus efficace pour les bruits variables.
+
+### Exemples
+
+1. Débruiter une image avec la méthode locale (par défaut) et seuillage hard (par défaut) :
+   ```bash
+   mvn exec:java -Dexec.mainClass="cli.Main" -Dexec.args="denoise --input img/img_noised/lena_20.png"
+   ```
+
+2. Débruiter avec la méthode globale et seuillage soft :
+   ```bash
+   mvn exec:java -Dexec.mainClass="cli.Main" -Dexec.args="denoise -i img/img_noised/lena_20.png -g -t soft"
+   ```
+
+3. Débruiter avec la méthode locale, seuillage hard et technique BayesShrink :
+   ```bash
+   mvn exec:java -Dexec.mainClass="cli.Main" -Dexec.args="denoise -i img/img_noised/lena_20.png -l -t hard -s b"
+   ```
+
+4. Spécifier un chemin de sortie personnalisé :
+   ```bash
+   mvn exec:java -Dexec.mainClass="cli.Main" -Dexec.args="denoise -i img/img_noised/lena_20.png -o img/lena_denoised.png"
+   ```
+
+## Utilisation en mode interactif
+
+Pour une utilisation guidée, lancez le programme sans arguments :
+
+```bash
+mvn exec:java -Dexec.mainClass="cli.Main"
+```
+
+1. Choisissez l'option 2 : "Débruiter une image (denoise)"
+2. Suivez les instructions pour spécifier :
+   - Le chemin de l'image à débruiter
+   - La méthode à utiliser (globale ou locale)
+   - Le type de seuillage
+   - Le type de seuillage adaptatif (facultatif)
+   - Le chemin de sortie (facultatif)
+
+## Traitement par lots
+
+La commande `denoise` peut également traiter un dossier entier d'images. Si le chemin spécifié avec `--input` est un dossier, l'application débruitera toutes les images qu'il contient.
+
+## Limitations
+
+- Pour les très grandes images, la méthode globale peut nécessiter beaucoup de mémoire
+- La méthode locale utilise des patches (blocs d'image) et peut créer des artefacts aux frontières
+- L'efficacité du débruitage dépend de l'intensité et du type de bruit présent dans l'image
+
 # Manuel d'utilisation - Commande EVAL
 
 Cette documentation détaille l'utilisation de la commande `eval` de l'outil image-denoising-PCA. Cette commande permet d'évaluer la qualité entre deux images en utilisant des métriques objectives comme MSE et PSNR.

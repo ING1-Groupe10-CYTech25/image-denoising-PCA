@@ -39,8 +39,8 @@ public class Main {
             try {
                 switch (cmd) {
                     case "noise" -> runNoise(NoiseArgs.parse(rest));
-                    // case "denoise" -> runDenoise(DenoiseArgs.parse(rest));
-                    case "eval" -> runEval(EvalArgs.parse(rest));  // Décommenter cette ligne
+                    case "denoise" -> runDenoise(DenoiseArgs.parse(rest));
+                    case "eval" -> runEval(EvalArgs.parse(rest));
                     case "--help", "-h" -> CliUtil.printGlobalHelp();
                     default -> throw new IllegalArgumentException("Commande inconnue : " + cmd);
                 }
@@ -140,16 +140,52 @@ public class Main {
      */
     private static void collectDenoiseArgs(Scanner scanner) {
         System.out.println("\n== Débruitage d'une image ==");
+        
+        // Demander le chemin d'entrée
         System.out.print("Chemin de l'image à débruiter: ");
         String inputStr = scanner.nextLine().trim();
         Path input = Paths.get(inputStr);
         
+        // Demander le type de méthode (globale ou locale)
+        System.out.print("Méthode à utiliser (G:globale/L:locale, défaut: locale): ");
+        String methodStr = scanner.nextLine().trim().toLowerCase();
+        boolean isGlobal = methodStr.startsWith("g");
+        
+        // Demander le type de seuillage
+        System.out.print("Type de seuillage (hard/soft, défaut: hard): ");
+        String thresholdStr = scanner.nextLine().trim();
+        String threshold = thresholdStr.isEmpty() ? "hard" : thresholdStr;
+        
+        // Demander le type de seuillage adaptatif, peu importe la méthode
+        System.out.print("Type de seuillage adaptatif (v:VisuShrink/b:BayesShrink, vide: aucun): ");
+        String shrinkStr = scanner.nextLine().trim().toLowerCase();
+        String shrink = shrinkStr.isEmpty() ? null : shrinkStr;
+        
+        // Demander le chemin de sortie
         System.out.print("Chemin de sortie (laissez vide pour la valeur par défaut): ");
         String outputStr = scanner.nextLine().trim();
-        Path output = outputStr.isEmpty() ? null : Paths.get(outputStr);
+        Path output = null;
         
-        System.out.println("Fonctionnalité en cours de développement");
-        // TODO: Implémenter quand DenoiseArgs sera disponible
+        if (!outputStr.isEmpty()) {
+            output = Paths.get(outputStr);
+        } else {
+            // Générer le chemin par défaut
+            String method = isGlobal ? "global" : "local";
+            String shrinkSuffix = (shrink != null) ? "_" + shrink : "";
+            String extension = DenoiseArgs.getFileExtension(input);
+            if (extension.isEmpty() || !DenoiseArgs.isImageFile(input)) {
+                extension = ".png";
+            }
+            output = CliUtil.defaultOutDenoise(input, method, threshold, shrinkSuffix, extension);
+        }
+        
+        try {
+            DenoiseArgs args = new DenoiseArgs(input, output, isGlobal, threshold, shrink);
+            runDenoise(args);
+        } catch (Exception e) {
+            System.err.println("Erreur: " + e.getMessage());
+            System.exit(1);
+        }
     }
     
     /**
@@ -252,8 +288,84 @@ public class Main {
      * Exécute l'opération de débruitage d'une image.
      * 
      * @param a Arguments pour l'opération de débruitage
+     * @throws IOException En cas d'erreur de lecture/écriture des images
      */
-    // private static void runDenoise(DenoiseArgs a) { /* appel à core.Denoiser */ }
+    private static void runDenoise(DenoiseArgs a) throws IOException {
+        String pathStr = a.getInput().toString();
+        Album album = new Album(pathStr);
+        System.out.println(album);
+
+        List<ImageFile> imgArray = album.getAlbum();
+        
+        // Pour chaque image de l'album, débruiter et l'enregistrer
+        for (ImageFile img : imgArray) {
+            try {
+                // Afficher les informations sur le type de débruitage
+                System.out.println("\n== Débruitage d'image ==");
+                System.out.println("Image: " + img.getPath());
+                System.out.println("Méthode: " + (a.isGlobal() ? "Globale" : "Locale"));
+                System.out.println("Type de seuillage: " + a.getThreshold());
+                
+                if (!a.isGlobal() && a.getShrink() != null) {
+                    String shrinkName = a.getShrink().equals("v") ? "VisuShrink" : "BayesShrink";
+                    System.out.println("Méthode de seuillage adaptatif: " + shrinkName);
+                }
+                
+
+                // Cette partie sera remplacée par l'algo de débruitage
+                System.out.println("Application du débruitage en cours...");
+                //
+
+                
+                // Chemin de sortie pour cette image
+                Path outputPath;
+                
+                if (imgArray.size() > 1) {
+                    // Si plusieurs images, créer un nom unique basé sur le nom de l'image originale
+                    String baseName = img.getName();
+                    String method = a.isGlobal() ? "global" : "local";
+                    String shrinkStr = (!a.isGlobal() && a.getShrink() != null) ? "_" + a.getShrink() : "";
+                    String fileName = baseName + "_denoised_" + method + "_" + a.getThreshold() + shrinkStr + ".png";
+                    
+                    // Déterminer le répertoire de sortie
+                    Path outputDir;
+                    
+                    // Vérifier si le chemin de sortie est un fichier image
+                    if (DenoiseArgs.isImageFile(a.getOutput())) {
+                        // Si l'utilisateur a spécifié un fichier, utiliser son répertoire parent
+                        outputDir = a.getOutput().getParent();
+                        
+                        // Si le répertoire parent est null, utiliser le répertoire courant
+                        if (outputDir == null) {
+                            outputDir = Paths.get(".");
+                        }
+                    } else {
+                        // Si l'utilisateur a spécifié un dossier, l'utiliser directement
+                        outputDir = a.getOutput();
+                    }
+                    
+                    // Construire le chemin complet
+                    outputPath = outputDir.resolve(fileName);
+                } else {
+                    // Si une seule image, utiliser le chemin de sortie directement
+                    outputPath = a.getOutput();
+                }
+                
+                // Assurer que le répertoire de sortie existe
+                File outputDir = outputPath.getParent().toFile();
+                if (!outputDir.exists()) {
+                    outputDir.mkdirs();
+                }
+                
+                // Pour l'instant, simuler la sauvegarde
+                System.out.println("L'image débruitée serait sauvegardée à: " + outputPath);
+                
+            } catch (Exception e) {
+                System.err.println("Erreur lors du traitement de l'image " + img.getPath() + ": " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
     
     /**
      * Exécute l'évaluation de la qualité du débruitage.

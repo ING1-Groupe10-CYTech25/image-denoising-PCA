@@ -72,11 +72,30 @@ public final class CliUtil {
         return defaultOutNoise(input, sigma, ".png");
     }
 
-    /** Pour la sous‑commande {@code denoise}. */
-    public static Path defaultOutDenoise(Path input) {
-        String fileName = baseName(input) + "_denoised.png";
+    /** 
+     * Pour la sous‑commande {@code denoise}.
+     *
+     * @param input chemin d'entrée 
+     * @param method méthode de débruitage ("global" ou "local")
+     * @param threshold type de seuillage ("hard" ou "soft")
+     * @param shrink type de seuillage adaptatif (ou chaîne vide si non applicable)
+     * @param extension extension du fichier à utiliser (avec le point, ex: ".png")
+     * @return chemin de sortie par défaut
+     */
+    public static Path defaultOutDenoise(Path input, String method, String threshold, String shrink, String extension) {
+        // Obtenir le nom de base sans extension
+        String baseName = baseName(input);
+        
+        // Construire le nom de fichier avec la méthode et le type de seuillage
+        String fileName = baseName + "_denoised_" + method + "_" + threshold + shrink + extension;
+        
         Path dir = Paths.get("img", "img_denoised");       // racine projet
         return dir.resolve(fileName);
+    }
+    
+    /** Pour la sous‑commande {@code denoise}. Version simplifiée. */
+    public static Path defaultOutDenoise(Path input) {
+        return defaultOutDenoise(input, "local", "hard", "", ".png");
     }
 
     public static String baseName(Path p) {
@@ -99,6 +118,21 @@ public final class CliUtil {
     public static void printNoiseHelp() {
         System.out.println("noise --sigma <double> --input <path> [--output <path>]\n" +
                 "Si --output est omis, le résultat est écrit dans ./img/img_noised/<img>_<σ>.png");
+    }
+    
+    /**
+     * Affiche l'aide pour la commande denoise.
+     */
+    public static void printDenoiseHelp() {
+        System.out.println("denoise --input <path> [--output <path>] [--global | --local] [--threshold <type>] [--shrink <type>]\n" +
+                "Débruite une image en appliquant la méthode PCA.\n" +
+                "  --input, -i      : chemin de l'image à débruiter\n" +
+                "  --output, -o     : chemin de destination (facultatif)\n" +
+                "  --global, -g     : utilise la méthode globale (défaut: locale si ni global ni local spécifié)\n" +
+                "  --local, -l      : utilise la méthode locale (défaut: locale si ni global ni local spécifié)\n" +
+                "  --threshold, -t  : type de seuillage ('hard' ou 'soft', défaut: 'hard')\n" +
+                "  --shrink, -s     : type de seuillage adaptatif ('v' pour VisuShrink, 'b' pour BayesShrink)\n" +
+                "Si --output est omis, le résultat est écrit dans ./img/img_denoised/<img>_denoised_<method>_<threshold>[_<shrink>].png");
     }
 
     /**

@@ -57,10 +57,18 @@
         },
         {
             "type": "java",
-            "name": "noise -i img/unnamed_image.png -s 30 -o ~/unnamed_noise.png",
+            "name": "noise -i img/unnamed_image.png -s 100 -o ~/unnamed_noise.png",
             "request": "launch",
             "mainClass": "cli.Main",
             "args": "noise -i img/unnamed_image.png -s 100 -o ~/unnamed_noise.png",
+            "projectName": "image-denoising-PCA"
+        },
+        {
+            "type": "java",
+            "name": "denoise -i img/img_noised",
+            "request": "launch",
+            "mainClass": "cli.Main",
+            "args": "denoise -i img/img_noised",
             "projectName": "image-denoising-PCA"
         }
     ]
