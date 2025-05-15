@@ -12,6 +12,23 @@ public class Image{
 	private BufferedImage img;			// Image sous forme de BufferedImage
 	
 	/**
+	 * Connstruit une instance de {@code Image} à partir d'une image sous forme de {@link BufferedImage}
+	 * @param img image
+	 * @see BufferedImage
+	 */
+	public Image(BufferedImage img) {
+		this.setImage(img);
+	}
+
+	/**
+	 * Construit une instance de {@code Image} vide
+	 * Ce constructeur a pour but de permettre le downcast vers la classe {@link ImageFile}
+	 */
+	public Image() {
+		this.setImage(null);
+	}
+	
+	/**
 	 * Setter pour la variable d'instance img
 	 * @param img
 	 */
@@ -54,7 +71,7 @@ public class Image{
 	/**
 	 * Permet d'obtenir l'intensité du pixel aux coordonnés données en paramètre
 	 * @param x abscisse du pixel recherché
-	 * @param y oordonnée du pixel recherché
+	 * @param y ordonnée du pixel recherché
 	 * @return intensité du pixel désigné si il existe, -1 sinon.
 	 */
 	public int getPixel(int x, int y) {
@@ -75,7 +92,7 @@ public class Image{
 	/**
 	 * change/définis l'intensité du pixel aux coordonnées en paramètre à la valeur de gris en paramètre
 	 * @param x abscisse du pixel
-	 * @param y	oordonnée du pixel
+	 * @param y	ordonnée du pixel
 	 * @param grey valeur de gris à donner au pixel désigné
 	 */
 	public void setPixel(int x, int y, int grey) {
@@ -91,22 +108,5 @@ public class Image{
 		catch (ImageException e) {
 			e.printStackTrace();
 		}
-	}
-
-	/**
-	 * Connstruit une instance de {@code Image} à partir d'une image sous forme de {@link BufferedImage}
-	 * @param img image
-	 * @see BufferedImage
-	 */
-	public Image(BufferedImage img) {
-		this.setImage(img);
-	}
-
-	/**
-	 * Construit une instance de {@code Image} vide
-	 * Ce constructeur a pour but de permettre le downcast vers la classe {@link ImageFile}
-	 */
-	public Image() {
-		this.setImage(null);
 	}
 }

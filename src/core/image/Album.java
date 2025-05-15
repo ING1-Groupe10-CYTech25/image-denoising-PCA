@@ -13,23 +13,6 @@ import javax.imageio.ImageIO;
 public class Album {
 	private List<ImageFile> album;		// Album sous forme de List<ImageFile>
 	
-
-	/**
-	 * Getter pour l'album
-	 * @return Liste d'images
-	 */
-	public List<ImageFile> getAlbum() {
-		return this.album;
-	}
-
-	/**
-	 * Setter pour l'album
-	 * @param album Liste d'images
-	 */
-	public void setAlbum(List<ImageFile> album) {
-		this.album = album;
-	}
-
 	/**
 	 * Construit une instance de {@code Album} a partir d'un chemin de dossier ou de fichier
 	 * <p>
@@ -49,6 +32,22 @@ public class Album {
 				this.getAlbum().addAll((new Album(f.getPath())).getAlbum());	// et on ajoute le résultat a l'album
 			}
 		};
+	}
+
+	/**
+	 * Getter pour l'album
+	 * @return Liste d'images
+	 */
+	public List<ImageFile> getAlbum() {
+		return this.album;
+	}
+
+	/**
+	 * Setter pour l'album
+	 * @param album Liste d'images
+	 */
+	public void setAlbum(List<ImageFile> album) {
+		this.album = album;
 	}
 
 	/**
