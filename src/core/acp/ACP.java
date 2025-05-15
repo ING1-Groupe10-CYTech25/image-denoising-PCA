@@ -1,3 +1,4 @@
+package core.acp;
 // ============================================================================
 // Classe ACP.java : Analyse en Composantes Principales (PCA) pour patchs d'image
 // Utilise Apache Commons Math pour simplifier les calculs matriciels et spectraux
