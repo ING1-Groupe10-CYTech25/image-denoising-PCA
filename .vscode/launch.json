@@ -33,10 +33,34 @@
         },
         {
             "type": "java",
-            "name": "Main(1)",
+            "name": "Mode interactif",
             "request": "launch",
             "mainClass": "cli.Main",
             "args": "",
+            "projectName": "image-denoising-PCA"
+        },
+        {
+            "type": "java",
+            "name": "noise -i img/original -s 30",
+            "request": "launch",
+            "mainClass": "cli.Main",
+            "args": "noise -i img/original -s 30",
+            "projectName": "image-denoising-PCA"
+        },
+        {
+            "type": "java",
+            "name": "noise -i img/original -s 30 -o ~/images_bruites",
+            "request": "launch",
+            "mainClass": "cli.Main",
+            "args": "noise -i img/original -s 30 -o ~/images_bruites",
+            "projectName": "image-denoising-PCA"
+        },
+        {
+            "type": "java",
+            "name": "noise -i img/unnamed_image.png -s 30 -o ~/unnamed_noise.png",
+            "request": "launch",
+            "mainClass": "cli.Main",
+            "args": "noise -i img/unnamed_image.png -s 100 -o ~/unnamed_noise.png",
             "projectName": "image-denoising-PCA"
         }
     ]
