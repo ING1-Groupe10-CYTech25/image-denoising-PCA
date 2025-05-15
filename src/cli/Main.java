@@ -12,9 +12,7 @@ import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 
 import core.image.Album;
-import core.image.Image;
 import core.image.ImageFile;
-import core.image.ImageNoiser;
 import core.eval.ImageQualityMetrics;
 
 /**
@@ -204,7 +202,7 @@ public class Main {
         // Pour chaque image de l'album, ajouter du bruit et l'enregistrer
         for (ImageFile img : imgArray) {
             // Créer une image bruitée avec le sigma spécifié
-            ImageNoiser.noisify(img, a.getSigma());
+            img.noisify(a.getSigma());
             
             // Chemin de sortie pour cette image
             Path outputPath;

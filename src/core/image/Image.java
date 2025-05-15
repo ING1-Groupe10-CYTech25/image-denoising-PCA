@@ -1,6 +1,7 @@
 package core.image;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
+import java.util.Random;
 
 /**
  * Simplification de la classe {@link BufferedImage} pour nos besoins (images greyscale)
@@ -107,6 +108,18 @@ public class Image{
 		}
 		catch (ImageException e) {
 			e.printStackTrace();
+		}
+	}
+	/**
+	 * Modifie l'image en lui ajoutant un bruit Gaussien paramétré par son écart type
+	 * @param sigma écart type du bruit Gaussien
+	 */
+	public void noisify(int sigma) {
+		Random r = new Random();
+		for (int y = 0; y < this.getHeight(); y ++) {
+			for (int x = 0; x < this.getWidth(); x ++) {
+				this.setPixel(x, y, (int) (this.getPixel(x,y) + r.nextGaussian() * sigma));		// ajout du bruit Gaussien. un dépassement de la valeur au dessus de 255 ou end essous de 0 est géré par la methode setPixel
+			}
 		}
 	}
 }
