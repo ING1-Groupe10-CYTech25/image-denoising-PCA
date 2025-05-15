@@ -6,15 +6,16 @@ package core.patch;
  */
 public class Patch {
 
-    private int side;
-    private int[] pixels; // 2D tableau de valeurs de Gris (taille s x s)
-    private int xOrigin;   // abscisse du coin gauche supérieur du patch dans l'image d'origine
-    private int yOrigin;  // ordonnée du coin gauche supérieur du patch dans l'image d'origine
+    private int side;       // taille du coté des patchs
+    private int[] pixels;   // tableau de valeurs de Gris (taille side²)
+    private int xOrigin;    // abscisse du coin gauche supérieur du patch dans l'image d'origine
+    private int yOrigin;    // ordonnée du coin gauche supérieur du patch dans l'image d'origine
     /**
      * Constructeur de la Classe Patch 
-     * @param pixels 2D pixel de matrice (taille s x s)
+     * @param pixels tableau des pixels (taille side²)
      * @param xOrigin Abscisse dans l'image d'origine
      * @param yOrigin Ordonnée dans l'image d'origine the original image
+     * @param side coté des patchs en pixels
      */
     public Patch(int[] pixels, int xOrigin, int yOrigin, int side) {
         this.setPixels(pixels);
@@ -25,8 +26,8 @@ public class Patch {
     }
 
     /**
-     * Retourne la matrice (2D) de pixels du patch
-     * @return Un tableau 2D contenant les valeurs de gris
+     * Retourne le tableau de pixels du patch
+     * @return Un tableau contenant les valeurs de gris
      */
     public int[] getPixels() {
         return pixels;
@@ -41,9 +42,18 @@ public class Patch {
     public int getPixel(int x, int y) {
         return pixels[y * this.getSide() + x];
     }
+    /**
+     * Getter pour la taille du patch
+     * @return taille du coté du patch en pixels
+     */
     public int getSide() {
         return this.side;
     }
+
+    /**
+     * calcule la taille du tableau de valeurs {@code pixels}
+     * @return taille du tableu de valeurs {@code pixels}
+     */
     public int getSize() {
         return this.getSide() * this.getSide();
     }
@@ -63,15 +73,35 @@ public class Patch {
     public int getYOrigin() {
         return yOrigin;
     }
+
+    /**
+     * Setter pour le tableau des pixels
+     * @param pixels tableau des pixels
+     */
     public void setPixels(int[] pixels) {
         this.pixels = pixels;
     }
+
+    /**
+     * Setter pour l'abscisse de l'origine du patch
+     * @param xOrigin abscisse de l'origine du patch
+     */
     public void setXOrigin(int xOrigin) {
         this.xOrigin = xOrigin;
     }
+
+    /**
+     * Setter pour l'ordonnée de l'origine du patch
+     * @param yOrigin ordonnée de l'origine du patch
+     */
     public void setYOrigin(int yOrigin) {
         this.yOrigin = yOrigin;
     }
+
+    /**
+     * Setter pour la taille du patch
+     * @param side taille du patch
+     */
     public void setSide(int side) {
         this.side = side;
     }
