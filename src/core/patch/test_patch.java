@@ -27,6 +27,7 @@ public class test_patch {
             patchListfinal1.add(patchList1.get(8));
             ImageFile result = new ImageFile(PatchExtractor.reconstructPatchs(patchListfinal1, 512, 512));
             result.saveImage(System.getProperty("user.dir") + "/test.png");
+            PatchExtractor.decoupeImage(img1, 10);
 
 
         }

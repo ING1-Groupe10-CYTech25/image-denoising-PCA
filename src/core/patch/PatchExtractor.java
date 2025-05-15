@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.awt.image.BufferedImage;
 import core.image.Image;
-import core.image.ImageExtract;
+import core.image.ImageTile;
 
 /**
  * Cette classe permet de gérer les patchs (Stockés sous forme de liste) au sein d'une image.
@@ -90,9 +90,56 @@ public class PatchExtractor {
 			return null;
 		}
 	}
+	/**
+	 * Découpe l'image {@code img} donnée en une grille d'imagettes aussi carrées que possible, en visant un nombre d'imagettes aussi proche de {@code n} que possible
+	 * @param img image à découper
+	 * @param n nombre d'imagettes cible
+	 * @return une liste d'imagettes couvrant l'image
+	 * @see ImageTile
+	 * @see List
+	 */
+	public static List<ImageTile> decoupeImage(Image img, int n) {
+		int bestRows = 1;
+		int bestCols = n;
+		double bestAspectDiff = Double.MAX_VALUE;
 	
-	public static List<ImageExtract> decoupeImage(Image img, int w, int n) {
-		 List<ImageExtract> ImageList = new ArrayList<>();
-		 return ImageList;
+		for (int rows = 1; rows <= n; rows++) {
+			int cols = (int) Math.ceil((double)n / rows);
+			if (rows * cols >= n) {
+				double cellWidth = (double) img.getWidth() / cols;
+				double cellHeight = (double) img.getHeight() / rows;
+				double aspectRatio = cellWidth / cellHeight;
+				double aspectDiff = Math.abs(Math.log(aspectRatio)); // proche de 0 = presque carré
+	
+				if ((rows * cols < bestRows * bestCols) || 
+					(rows * cols == bestRows * bestCols && aspectDiff < bestAspectDiff)) {
+					bestRows = rows;
+					bestCols = cols;
+					bestAspectDiff = aspectDiff;
+				}
+			}
+		}
+
+		int[] colStarts = new int[bestCols + 1];
+		int[] rowStarts = new int[bestRows + 1];
+
+		for (int col = 0; col <= bestCols; col ++) {
+			colStarts[col] = (int) Math.round((double) col * img.getWidth() / bestCols);
+		}
+		for (int row = 0; row <= bestRows; row ++) {
+			rowStarts[row] = (int) Math.round((double) row * img.getHeight() / bestRows);
+		}
+
+		List<ImageTile> imageList = new ArrayList<>();
+		for (int row = 0; row < bestRows; row ++) {
+			for (int col = 0; col < bestCols; col ++) {
+				int x = colStarts[col];
+				int y = rowStarts[row];
+				int w = colStarts[col + 1];
+				int h = rowStarts[row + 1];
+				imageList.add(new ImageTile(img.getImage().getSubimage(x, y, w - x, h - y), x, y));
+			}
+		}
+		return imageList;
 	}
 }
