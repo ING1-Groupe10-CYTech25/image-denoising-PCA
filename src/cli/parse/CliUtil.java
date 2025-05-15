@@ -44,18 +44,32 @@ public final class CliUtil {
         };
     }
 
-    /** Pour la sous‑commande {@code noise}. */
-    public static Path defaultOutNoise(Path input, int sigma) {
+    /** 
+     * Pour la sous‑commande {@code noise}.
+     *
+     * @param input chemin d'entrée 
+     * @param sigma intensité du bruit
+     * @param extension extension du fichier à utiliser (avec le point, ex: ".png")
+     * @return chemin de sortie par défaut
+     */
+    public static Path defaultOutNoise(Path input, int sigma, String extension) {
         String sigmaStr = String.valueOf(sigma);
         
-        // Obtenir le nom de base sans extension et garantir qu'il ne contient pas de points
+        // Obtenir le nom de base sans extension
         String baseName = baseName(input);
         
-        // Construire le nom de fichier avec l'extension
-        String fileName = baseName + "_" + sigmaStr + ".png";
+        // Construire le nom de fichier avec l'extension spécifiée
+        String fileName = baseName + "_" + sigmaStr + extension;
         
         Path dir = Paths.get("img", "img_noised");         // racine projet
         return dir.resolve(fileName);
+    }
+
+    /**
+     * Version simplifiée utilisant .png par défaut
+     */
+    public static Path defaultOutNoise(Path input, int sigma) {
+        return defaultOutNoise(input, sigma, ".png");
     }
 
     /** Pour la sous‑commande {@code denoise}. */

@@ -195,15 +195,21 @@ public class Main {
                 
                 if (imgArray.size() > 1) {
                     // Si plusieurs images, créer un nom unique basé sur le nom de l'image originale
-                    // sans inclure le chemin complet dans le nom du fichier
                     String baseName = noisedImg.getName();
                     String fileName = baseName + "_noised_" + a.getSigma() + ".png";
                     
                     // Déterminer le répertoire de sortie
                     Path outputDir;
-                    if (a.getOutput().toString().endsWith(".png")) {
-                        // Si l'utilisateur a spécifié un fichier de sortie, utiliser son répertoire parent
+                    
+                    // Vérifier si le chemin de sortie est un fichier image (quelle que soit l'extension)
+                    if (NoiseArgs.isImageFile(a.getOutput())) {
+                        // Si l'utilisateur a spécifié un fichier, utiliser son répertoire parent
                         outputDir = a.getOutput().getParent();
+                        
+                        // Si le répertoire parent est null, utiliser le répertoire courant
+                        if (outputDir == null) {
+                            outputDir = Paths.get(".");
+                        }
                     } else {
                         // Si l'utilisateur a spécifié un dossier, l'utiliser directement
                         outputDir = a.getOutput();
@@ -216,7 +222,7 @@ public class Main {
                     outputPath = a.getOutput();
                 }
                 
-                // Créer le répertoire parent si nécessaire
+                // Assurer que le répertoire de sortie existe
                 File outputDir = outputPath.getParent().toFile();
                 if (!outputDir.exists()) {
                     outputDir.mkdirs();
