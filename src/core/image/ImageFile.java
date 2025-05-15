@@ -29,8 +29,12 @@ public class ImageFile extends Image {
 		return this.dir;
 	}
     public String getPath() {
-		return this.getDir() + "/" + this.getName() + this.getExt();
-	}
+        if (this.getDir() == null || this.getDir().isEmpty()) {
+            return this.getName() + this.getExt();
+        } else {
+            return this.getDir() + "/" + this.getName() + this.getExt();
+        }
+    }
     public ImageFile(String filePath) throws IOException {
 	    super(ImageIO.read(new File(filePath)));		
 		splitFilePath(filePath);
@@ -43,23 +47,27 @@ public class ImageFile extends Image {
 		this.setDir(System.getProperty("user.dir") + "/img");
 	}
     private void splitFilePath(String filePath) {
-		String[] splitPath = filePath.split("[/\\.]");
-		this.setExt("." + splitPath[splitPath.length - 1]);
-		this.setName(splitPath[splitPath.length - 2]);
-		String dir = "";
-		for(int i = 1; i < splitPath.length - 2; i ++) {
-			dir += "/" + splitPath[i];
-		}
-		this.setDir(dir);
-	}
+        String[] splitPath = filePath.split("[/\\.]");
+        this.setExt("." + splitPath[splitPath.length - 1]);
+        this.setName(splitPath[splitPath.length - 2]);
+        StringBuilder dir = new StringBuilder();
+        for(int i = 0; i < splitPath.length - 2; i++) {
+            if (i > 0) dir.append("/");
+            dir.append(splitPath[i]);
+        }
+        this.setDir(dir.toString());
+    }
     public void saveImage(String path) {
-	    try {
-	    	String filePath = path + "/" + this.getName() + ".png";
-	        File outputFile = new File(filePath);
-	        ImageIO.write(this.getImage(), "PNG", outputFile);
-	        System.out.println("Image sauvegardée à : " + filePath);
-	    } catch (IOException e) {
-	        e.printStackTrace();
-	    }
-	}
+        try {
+            File outputFile = new File(path);
+            File parentDir = outputFile.getParentFile();
+            if (parentDir != null && !parentDir.exists()) {
+                parentDir.mkdirs();
+            }
+            ImageIO.write(this.getImage(), "PNG", outputFile);
+            System.out.println("Image sauvegardée à : " + path);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
