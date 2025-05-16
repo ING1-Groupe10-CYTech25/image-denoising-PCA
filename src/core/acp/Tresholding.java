@@ -25,5 +25,4 @@ public class Tresholding {
     public static double softTresholding(double lambda, double alpha) {
         return (alpha > lambda ? alpha - lambda : (alpha >= -lambda ? 0 : alpha + lambda));
     }
-     
 }

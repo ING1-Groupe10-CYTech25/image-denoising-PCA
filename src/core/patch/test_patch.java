@@ -43,8 +43,6 @@ public class test_patch {
             ImageFile result = new ImageFile(PatchExtractor.reconstructImageTiles(reconstructTileList, img1.getWidth(), img1.getHeight()), "testTilePatch");
             result.saveImage(System.getProperty("user.dir") + "/test.png");
             result2.saveImage(System.getProperty("user.dir") + "/" + result2.getName() + ".png");
-            
-
 
         }
         catch(IOException e) {
