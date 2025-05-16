@@ -30,7 +30,7 @@ public class DenoiseTest {
             
             // Paramètres de débruitage
             int patchSize = 15;
-            double sigma = 10; // Écart type du bruit
+            double sigma = 30; // Écart type du bruit
             
             // Tester toutes les combinaisons de méthodes
             testAllConfigurations(originalImage, noisedImage, outputDir, patchSize, sigma);

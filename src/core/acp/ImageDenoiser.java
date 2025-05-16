@@ -180,8 +180,8 @@ public class ImageDenoiser {
         if (isGlobal) {
             return denoiseGlobal(image, patchSize, threshold, shrinkType, sigma);
         } else {
-            // Pour la méthode locale, on vise environ 16-25 imagettes pour une image standard
-            int numImagettes = 20;
+            // Pour la méthode locale, on vise environ 8-16 imagettes pour une image standard
+            int numImagettes = 16;
             return denoiseLocal(image, patchSize, numImagettes, threshold, shrinkType, sigma);
         }
     }

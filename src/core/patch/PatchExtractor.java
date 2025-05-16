@@ -1,10 +1,11 @@
 package core.patch;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.awt.image.BufferedImage;
+
 import core.image.Image;
 import core.image.ImageTile;
 
@@ -17,7 +18,7 @@ import core.image.ImageTile;
  * @see Image
  */
 public class PatchExtractor {
-	public static double patchCountMultiplier = 1.5; // multiplicateur du nombre de patchs en ordonnée et en abscisse. par exemple si 4x4 patch couvrent l'image, avec patchCountMultiplier=1.5 on utilisera une grille de (4x1.5)x(4x1.5)
+	public static double patchCountMultiplier = 2.0; // multiplicateur du nombre de patchs en ordonnée et en abscisse. par exemple si 4x4 patch couvrent l'image, avec patchCountMultiplier=1.5 on utilisera une grille de (4x1.5)x(4x1.5)
 
 	/**
 	 * Cette methode créée une liste de patchs carrés, couvrant toute l'image. la taille des patchs est déterminé par le paramtètre {@code side}
