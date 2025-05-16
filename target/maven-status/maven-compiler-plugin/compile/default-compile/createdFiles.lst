@@ -1,9 +1,6 @@
 cli/parse/CliUtil.class
-core/image/ImageExtract.class
-ACP$Triple.class
-core/image/ImageFile.class
 cli/Main.class
-ImageQualityMetrics.class
+core/image/ImageFile.class
 core/patch/PatchException.class
 core/image/Image.class
 core/patch/Vectorization.class
@@ -13,6 +10,4 @@ core/patch/test_patch.class
 core/image/Album.class
 cli/parse/NoiseArgs.class
 core/patch/PatchExtractor.class
-core/image/NoisedImage.class
-ACP.class
 core/image/ImageException.class
