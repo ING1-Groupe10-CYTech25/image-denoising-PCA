@@ -2,7 +2,6 @@ package cli.parse;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;

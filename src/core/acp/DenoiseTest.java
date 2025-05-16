@@ -24,8 +24,8 @@ public class DenoiseTest {
         try {
             // Définir le chemin des images
             String basePath = System.getProperty("user.dir") + "/img/";
-            String originalImage = basePath + "original/1.png";
-            String noisedImage = basePath + "img_noised/1_noised_30.png";
+            String originalImage = basePath + "original/lena.png";
+            String noisedImage = basePath + "img_noised/lena_noised_30.png";
             String outputDir = basePath + "img_denoised/";
             
             // Paramètres de débruitage
