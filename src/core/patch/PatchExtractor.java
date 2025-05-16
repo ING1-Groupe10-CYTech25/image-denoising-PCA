@@ -1,6 +1,9 @@
 package core.patch;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.awt.image.BufferedImage;
 import core.image.Image;
 import core.image.ImageTile;
@@ -14,10 +17,10 @@ import core.image.ImageTile;
  * @see Image
  */
 public class PatchExtractor {
-	public static int minOverlap = 5; 		// superposition minimale entre deux patchs en pixels
+	public static double overlap = 1.5; // densité des patchs (1.2 signifie qu'il y aura 120% du nombre minimal couvrant de patchs en abscisse et 120% du nombre minimal couvrant de patchs en ordonnée)
 
 	/**
-	 * Cette methode créée une liste de patchs carrés qui se superposent d'au moins {@code minOverlap} pixel, couvrant toute l'image. la taille des patchs est déterminé par le paramtètre {@code side}
+	 * Cette methode créée une liste de patchs carrés, couvrant toute l'image. la taille des patchs est déterminé par le paramtètre {@code side}
 	 * @param img image à découper en patchs
 	 * @param side taille du coté des patchs
 	 * @return liste de patchs couvrant toute l'image
@@ -27,8 +30,9 @@ public class PatchExtractor {
 			if (img.getWidth() < side || img.getHeight() < side) {				// vérification de la taille du patch
 				throw(new PatchException());
 			}
-			int countX = (int) Math.ceil((double)(img.getWidth()) / side);		// Calcul du nombre de patchs nécessaire sur l'axe des abscisses
-			int countY = (int) Math.ceil((double)(img.getHeight()) / side);		// Calcul du nombre de patchs nécessaire sur l'axe des ordonnées
+			int countX = (int) (Math.ceil((double)(img.getWidth()) / side) * overlap);		// Calcul du nombre de patchs nécessaire sur l'axe des abscisses
+			int countY = (int) (Math.ceil((double)(img.getHeight()) / side) * overlap);		// Calcul du nombre de patchs nécessaire sur l'axe des ordonnées
+			
 			List<Patch> patchList = new ArrayList<>();							// liste des patchs
 
 			for (int j = 0; j < countY; j++) {									// Parcours de la grille de patchs
@@ -65,14 +69,60 @@ public class PatchExtractor {
 				throw(new PatchException());
 			}
 			else {
-				Image img = new Image(new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY));	// création d'une image vide
-				for(Patch patch : patchList) {															// parcours des patchs
-					int x = patch.getXOrigin();
-                	int y = patch.getYOrigin();
-                	int side = patch.getSide();
-					img.getRaster().setPixels(x, y, side, side, patch.getPixels());						// ajout du patch a l'image
+				Map<Integer, List<Patch>> rowMap = new TreeMap<>();
+				int side = patchList.getFirst().getSide();
+				
+				for (Patch patch : patchList) {
+					int yOrigin = patch.getYOrigin();
+					rowMap.computeIfAbsent(yOrigin, k -> new ArrayList<>()).add(patch);
 				}
-				return img;
+				
+				List<List<Patch>> patchRows = new ArrayList<>();
+				
+				for (List<Patch> row : rowMap.values()) {
+					row.sort(Comparator.comparingInt(Patch::getXOrigin));
+					patchRows.add(row);
+				}
+				
+				List<ImageTile> tileRows = new ArrayList<>();
+				
+				for (List<Patch> row : patchRows) {
+
+					tileRows.addLast(new ImageTile(new BufferedImage(width, side, BufferedImage.TYPE_BYTE_GRAY), row.get(0).getXOrigin(), row.get(0).getYOrigin()));
+					tileRows.getLast().getRaster().setPixels(row.get(0).getXOrigin(), 0, side, side, row.get(0).getPixels());
+					for (int i = 0; i < row.size() - 1; i ++) {
+						Patch left = row.get(i);
+						Patch right = row.get(i + 1);
+						int overlapStart = right.getXOrigin();
+						int overlapWidth = left.getXOrigin() + side - overlapStart;
+						tileRows.getLast().getRaster().setPixels(overlapStart, 0, side, side, right.getPixels());
+						for (int x = 0; x <= overlapWidth; x ++) {
+							for (int y = 0; y < side; y ++) {
+								int leftPixel = left.getPixel(side - 1 - overlapWidth + x,y);
+								int rightPixel = right.getPixel(x, y);
+								int grey = ((overlapWidth - x) * leftPixel + x * rightPixel) / overlapWidth;
+								tileRows.getLast().setPixel(overlapStart + x, y, grey);
+							}
+						}
+					}
+				}
+				System.out.println("merging rows");
+				for (int row = 0; row < tileRows.size() - 1; row ++) {
+					ImageTile top = tileRows.get(row);
+					ImageTile bottom = tileRows.get(row + 1);
+					int overlapStart = bottom.getPosY();
+					int overlapHeight = top.getPosY() + side - overlapStart;
+					for (int y = 0; y <= overlapHeight; y ++) {
+						for (int x = 0; x < width; x ++) {
+							int topPixel = top.getPixel(x, side - 1 - overlapHeight + y);
+							int bottomPixel = bottom.getPixel(x, y);
+							int grey = ((overlapHeight - y) * topPixel + y * bottomPixel) / overlapHeight;
+							top.setPixel(x, side - 1 - overlapHeight + y, grey);
+							bottom.setPixel(x, y, grey);
+						}
+					}
+				}
+				return reconstructImageTiles(tileRows, width, height);
 			}
 		}
 		catch (PatchException e) {

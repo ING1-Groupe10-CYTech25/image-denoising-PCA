@@ -29,8 +29,8 @@ public class DenoiseTest {
             String outputDir = basePath + "img_denoised/";
             
             // Paramètres de débruitage
-            int patchSize = 4;
-            double sigma = 30; // Écart type du bruit
+            int patchSize = 15;
+            double sigma = 10; // Écart type du bruit
             
             // Tester toutes les combinaisons de méthodes
             testAllConfigurations(originalImage, noisedImage, outputDir, patchSize, sigma);
