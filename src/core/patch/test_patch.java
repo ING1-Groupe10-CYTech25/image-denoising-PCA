@@ -9,35 +9,11 @@ import core.image.Image;
 import core.image.ImageFile;
 import core.image.ImageTile;
 
-/**
- * Classe de test pour les fonctionnalités de gestion des patchs.
- * Cette classe teste les différentes opérations sur les patchs :
- * - Extraction de patchs d'une image
- * - Reconstruction d'image à partir de patchs
- * - Découpage en imagettes et reconstruction
- * - Combinaison des approches imagettes et patchs
- * 
- * @author p-cousin
- * @version 1.1
- * @see Patch
- * @see PatchExtractor
- * @see ImageTile
- */
+
 public class test_patch {
 
-    /**
-     * Point d'entrée du programme de test.
-     * Effectue plusieurs tests sur les patchs et les imagettes :
-     * 1. Extraction de patchs d'une image complète
-     * 2. Découpage de l'image en imagettes
-     * 3. Extraction de patchs de chaque imagette
-     * 4. Reconstruction des imagettes et de l'image finale
-     * 
-     * @param args Arguments de la ligne de commande (non utilisés)
-     */
     public static void main(String[] args) {
         try {
-            // Chargement de l'image de test
             ImageFile img1 = new ImageFile(System.getProperty("user.dir") + "/img/original/1.png");
             // img1.noisify(30);
             // ImageFile img2 = new ImageFile(System.getProperty("user.dir") + "/img/original/1.png");
@@ -57,43 +33,15 @@ public class test_patch {
             // ImageFile result = new ImageFile(PatchExtractor.reconstructPatchs(patchListfinal1, 512, 512));
             // result.saveImage(System.getProperty("user.dir") + "/test.png");
 
-            // Test 1 : Extraction et reconstruction directe avec des patchs
+            List<ImageTile> tileList = PatchExtractor.decoupeImage(img1, 72);
+            List<ImageTile> reconstructTileList = new ArrayList<>();
             List<Patch> patches = PatchExtractor.extractPatchs(img1, 100);
-            ImageFile result2 = new ImageFile(
-                PatchExtractor.reconstructPatchs(patches, img1.getWidth(), img1.getHeight()), 
-                "testPatch"
-            );
-
-            // Test 2 : Découpage en imagettes puis traitement par patchs
-            // Étape 2.1 : Découpage de l'image en 72 imagettes
-            List<ImageTile> imagetteList = PatchExtractor.decoupeImage(img1, 72);
-            List<ImageTile> reconstructImagetteList = new ArrayList<>();
-
-            // Étape 2.2 : Pour chaque imagette, extraction et reconstruction de patchs
-            for (ImageTile imagette : imagetteList) {
-                List<Patch> patchList = PatchExtractor.extractPatchs(imagette, 10);
-                reconstructImagetteList.add(
-                    PatchExtractor.reconstructPatchs(
-                        patchList, 
-                        imagette.getWidth(), 
-                        imagette.getHeight(), 
-                        imagette.getPosX(), 
-                        imagette.getPosY()
-                    )
-                );
+            ImageFile result2 = new ImageFile(PatchExtractor.reconstructPatchs(patches, img1.getWidth(), img1.getHeight()), "testPatch");
+            for (ImageTile tile : tileList) {
+                List<Patch> patchList = PatchExtractor.extractPatchs(tile, 10);
+                reconstructTileList.add(PatchExtractor.reconstructPatchs(patchList, tile.getWidth(), tile.getHeight(), tile.getPosX(), tile.getPosY()));
             }
-
-            // Étape 2.3 : Reconstruction finale de l'image à partir des imagettes
-            ImageFile result = new ImageFile(
-                PatchExtractor.reconstructImageTiles(
-                    reconstructImagetteList, 
-                    img1.getWidth(), 
-                    img1.getHeight()
-                ), 
-                "testImagettePatch"
-            );
-
-            // Sauvegarde des résultats
+            ImageFile result = new ImageFile(PatchExtractor.reconstructImageTiles(reconstructTileList, img1.getWidth(), img1.getHeight()), "testTilePatch");
             result.saveImage(System.getProperty("user.dir") + "/test.png");
             result2.saveImage(System.getProperty("user.dir") + "/" + result2.getName() + ".png");
 
