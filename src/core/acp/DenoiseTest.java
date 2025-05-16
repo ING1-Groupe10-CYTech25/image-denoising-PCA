@@ -94,7 +94,7 @@ public class DenoiseTest {
                                      ", seuillage: " + threshold + 
                                      ", seuillage adaptatif: " + shrink);
                     
-                    ImageDenoiser.denoiseImageFile(noisedPath, outputName, patchSize, 
+                    ImageDenoiser.ImageDen(noisedPath, outputName, patchSize, 
                                                  isGlobal, threshold, shrink, sigma);
                     
                     // Évaluer le résultat

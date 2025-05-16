@@ -34,14 +34,14 @@ public class ImageDenoiser {
      */
     public static Image denoiseGlobal(Image image, int patchSize, String threshold, 
                                     String shrinkType, double sigma) {
-        // 1. Extraire les patchs de l'image
+        // Extraire les patchs de l'image
         List<Patch> patches = PatchExtractor.extractPatchs(image, patchSize);
         
         if (patches == null || patches.isEmpty()) {
             throw new IllegalStateException("Impossible d'extraire les patchs de l'image");
         }
         
-        // 2. Préparer les données pour le débruitage
+        // Préparer les données pour le débruitage
         int numPatches = patches.size();
         int patchLength = patchSize * patchSize;
         int[][] patchArray = new int[numPatches][patchLength];
@@ -52,11 +52,11 @@ public class ImageDenoiser {
             patchArray[i] = patch.getPixels();
         }
         
-        // 3. Appliquer le débruitage PCA global
+        // Appliquer le débruitage PCA global
         int[][] denoisedPatchArray = Denoiser.denoisePatches(
             patchArray, patchSize, threshold, shrinkType, sigma, true);
         
-        // 4. Reconvertir les patchs débruités en objets Patch
+        // Reconvertir les patchs débruités en objets Patch
         List<Patch> denoisedPatches = new ArrayList<>();
         for (int i = 0; i < numPatches; i++) {
             Patch originalPatch = patches.get(i);
@@ -69,7 +69,7 @@ public class ImageDenoiser {
             denoisedPatches.add(denoisedPatch);
         }
         
-        // 5. Reconstruire l'image à partir des patchs débruités
+        // Reconstruire l'image à partir des patchs débruités
         return PatchExtractor.reconstructPatchs(denoisedPatches, image.getWidth(), image.getHeight());
     }
     
@@ -198,7 +198,7 @@ public class ImageDenoiser {
      * @param sigma écart type du bruit (si connu, sinon sera estimé)
      * @throws java.io.IOException si une erreur survient lors de la lecture/écriture des fichiers
      */
-    public static void denoiseImageFile(String imagePath, String outputPath, int patchSize, 
+    public static void ImageDen(String imagePath, String outputPath, int patchSize, 
                                       boolean isGlobal, String threshold, String shrinkType, 
                                       double sigma) throws java.io.IOException {
         // Charger l'image
