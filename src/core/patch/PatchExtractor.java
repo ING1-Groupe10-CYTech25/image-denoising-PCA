@@ -70,7 +70,7 @@ public class PatchExtractor {
 			}
 			else {
 				Map<Integer, List<Patch>> rowMap = new TreeMap<>();													// Map des patchs classés par lignes
-				int side = patchList.getFirst().getSide();															// coté d'un patch : tous les patchs sont de même dimension
+				int side = patchList.get(0).getSide();															// coté d'un patch : tous les patchs sont de même dimension
 				
 				for (Patch patch : patchList) {																		// parcours des patchs
 					rowMap.computeIfAbsent(patch.getYOrigin(), k -> new ArrayList<>()).add(patch);					// classement du patch en fonction de son ordonnée
