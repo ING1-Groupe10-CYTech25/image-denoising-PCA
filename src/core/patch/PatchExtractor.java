@@ -57,7 +57,7 @@ public class PatchExtractor {
 
 	/**
 	 * Reconstruit une image a partir d'une liste de patchs et de ses dimensions
-	 * @param patchList	liste de patchs couvrant l'image
+	 * @param patchList	liste de patchs carrés couvrant l'image organisés en grille 
 	 * @param width largeur de l'image
 	 * @param height hauteur de l'image
 	 * @return une image reconstruite
@@ -65,64 +65,68 @@ public class PatchExtractor {
 	 */
 	public static Image reconstructPatchs(List<Patch> patchList, int width, int height) {
 		try {
-			if (patchList.isEmpty()) {																	// vérification de la validité de la liste de patchs
+			if (patchList.isEmpty()) {																				// vérification de la validité de la liste de patchs
 				throw(new PatchException());
 			}
 			else {
-				Map<Integer, List<Patch>> rowMap = new TreeMap<>();
-				int side = patchList.getFirst().getSide();
+				Map<Integer, List<Patch>> rowMap = new TreeMap<>();													// Map des patchs classés par lignes
+				int side = patchList.getFirst().getSide();															// coté d'un patch : tous les patchs sont de même dimension
 				
-				for (Patch patch : patchList) {
-					int yOrigin = patch.getYOrigin();
-					rowMap.computeIfAbsent(yOrigin, k -> new ArrayList<>()).add(patch);
+				for (Patch patch : patchList) {																		// parcours des patchs
+					rowMap.computeIfAbsent(patch.getYOrigin(), k -> new ArrayList<>()).add(patch);					// classement du patch en fonction de son ordonnée
 				}
 				
-				List<List<Patch>> patchRows = new ArrayList<>();
+				List<List<Patch>> patchRows = new ArrayList<>();													// liste de lignes de patchs représentés sous forme de liste
 				
-				for (List<Patch> row : rowMap.values()) {
+				for (List<Patch> row : rowMap.values()) {															// tri des patchs dans patchRows par abscisse croissante
 					row.sort(Comparator.comparingInt(Patch::getXOrigin));
 					patchRows.add(row);
 				}
 				
-				List<ImageTile> tileRows = new ArrayList<>();
+				List<ImageTile> tileRows = new ArrayList<>();														// liste des lignes completes sous forme d'imagettes
 				
-				for (List<Patch> row : patchRows) {
-
+				for (List<Patch> row : patchRows) {																	// parcours des lignes : on moyenne chaque ligne sur la jointure verticale des patchs
+					// création de l'imagette de la ligne et ajout du premier patch a celle-ci
 					tileRows.add(new ImageTile(new BufferedImage(width, side, BufferedImage.TYPE_BYTE_GRAY), row.get(0).getXOrigin(), row.get(0).getYOrigin()));
 					tileRows.get(tileRows.size() - 1).getRaster().setPixels(row.get(0).getXOrigin(), 0, side, side, row.get(0).getPixels());
-					for (int i = 0; i < row.size() - 1; i ++) {
-						Patch left = row.get(i);
-						Patch right = row.get(i + 1);
-						int overlapStart = right.getXOrigin();
-						int overlapWidth = left.getXOrigin() + side - overlapStart;
+					for (int i = 0; i < row.size() - 1; i ++) {														// parcours des patchs 2 a 2
+						Patch left = row.get(i);																	// patch "de gauche"
+						Patch right = row.get(i + 1);																// patch "de droite"
+						int overlapStart = right.getXOrigin();														// coordonée du début de la zone de superposition
+						int overlapWidth = left.getXOrigin() + side - overlapStart;									// largeur de la zone de superpositon
+						// ajout du patch de droite a l'imagette de la ligne (le patch de gauche a déja été ajouté au tour d'avant)
 						tileRows.get(tileRows.size() - 1).getRaster().setPixels(overlapStart, 0, side, side, right.getPixels());
-						for (int x = 0; x <= overlapWidth; x ++) {
-							for (int y = 0; y < side; y ++) {
-								int leftPixel = left.getPixel(side - 1 - overlapWidth + x,y);
-								int rightPixel = right.getPixel(x, y);
-								int grey = ((overlapWidth - x) * leftPixel + x * rightPixel) / overlapWidth;
-								tileRows.get(tileRows.size() - 1).setPixel(overlapStart + x, y, grey);
+						// moyennage de l'overlap seulement s'il existe
+						if (overlapWidth > 0) {																		// moyennage de zone de superposition seulement si elle existe
+							for (int x = 0; x <= overlapWidth; x ++) {												// parcours sur la largeur de la zone de superposition
+								for (int y = 0; y < side; y ++) {													// parcours sur la hauteur du patch
+									int leftPixel = left.getPixel(side - 1 - overlapWidth + x,y);					// valeurs des pixels qui se superposent
+									int rightPixel = right.getPixel(x, y);
+									int grey = ((overlapWidth - x) * leftPixel + x * rightPixel) / overlapWidth;	// valeur finale du pixel calculée par moyenne pondérée linéaire
+									tileRows.get(tileRows.size() - 1).setPixel(overlapStart + x, y, grey);			// ecriture de la valeur sur l'imagette
+								}
 							}
 						}
 					}
 				}
-				System.out.println("merging rows");
-				for (int row = 0; row < tileRows.size() - 1; row ++) {
-					ImageTile top = tileRows.get(row);
-					ImageTile bottom = tileRows.get(row + 1);
-					int overlapStart = bottom.getPosY();
-					int overlapHeight = top.getPosY() + side - overlapStart;
-					for (int y = 0; y <= overlapHeight; y ++) {
-						for (int x = 0; x < width; x ++) {
-							int topPixel = top.getPixel(x, side - 1 - overlapHeight + y);
-							int bottomPixel = bottom.getPixel(x, y);
-							int grey = ((overlapHeight - y) * topPixel + y * bottomPixel) / overlapHeight;
-							top.setPixel(x, side - 1 - overlapHeight + y, grey);
-							bottom.setPixel(x, y, grey);
+				for (int row = 0; row < tileRows.size() - 1; row ++) {												// parcours des lignes sous forme d'imagette 2 par 2
+					ImageTile top = tileRows.get(row);																// ligne "du dessus"
+					ImageTile bottom = tileRows.get(row + 1);														// ligne "du dessous"
+					int overlapStart = bottom.getPosY();															// ordonnée de début de la zone de superpostion
+					int overlapHeight = top.getPosY() + side - overlapStart;										// hauteur de la zone de superposition
+					if (overlapHeight > 0) {																		// moyennage de la zone de superpositon seulement si elle existe
+						for (int y = 0; y <= overlapHeight; y ++) {													// parcours sur la hauteur de la zone de superposition
+							for (int x = 0; x < width; x ++) {														// parcours sur la largeur de l'imagette
+								int topPixel = top.getPixel(x, side - 1 - overlapHeight + y);						// valeurs des pixels qui se superposent
+								int bottomPixel = bottom.getPixel(x, y);
+								int grey = ((overlapHeight - y) * topPixel + y * bottomPixel) / overlapHeight;		// valeur finale du pixel calculée par moyenne pondérée linéaire
+								top.setPixel(x, side - 1 - overlapHeight + y, grey);								// ecriture de la valeur sur les deux imagettes aux coordonnées correspondantes
+								bottom.setPixel(x, y, grey);
+							}
 						}
 					}
 				}
-				return reconstructImageTiles(tileRows, width, height);
+				return reconstructImageTiles(tileRows, width, height);												// fusion des imagettes pour obtenir l'image finale (la superposition des imagettes n'est plus un probleme car elles contiennent les memes valeurs sur ces zones)
 			}
 		}
 		catch (PatchException e) {
