@@ -88,20 +88,20 @@ public class PatchExtractor {
 				
 				for (List<Patch> row : patchRows) {
 
-					tileRows.addLast(new ImageTile(new BufferedImage(width, side, BufferedImage.TYPE_BYTE_GRAY), row.get(0).getXOrigin(), row.get(0).getYOrigin()));
-					tileRows.getLast().getRaster().setPixels(row.get(0).getXOrigin(), 0, side, side, row.get(0).getPixels());
+					tileRows.add(new ImageTile(new BufferedImage(width, side, BufferedImage.TYPE_BYTE_GRAY), row.get(0).getXOrigin(), row.get(0).getYOrigin()));
+					tileRows.get(tileRows.size() - 1).getRaster().setPixels(row.get(0).getXOrigin(), 0, side, side, row.get(0).getPixels());
 					for (int i = 0; i < row.size() - 1; i ++) {
 						Patch left = row.get(i);
 						Patch right = row.get(i + 1);
 						int overlapStart = right.getXOrigin();
 						int overlapWidth = left.getXOrigin() + side - overlapStart;
-						tileRows.getLast().getRaster().setPixels(overlapStart, 0, side, side, right.getPixels());
+						tileRows.get(tileRows.size() - 1).getRaster().setPixels(overlapStart, 0, side, side, right.getPixels());
 						for (int x = 0; x <= overlapWidth; x ++) {
 							for (int y = 0; y < side; y ++) {
 								int leftPixel = left.getPixel(side - 1 - overlapWidth + x,y);
 								int rightPixel = right.getPixel(x, y);
 								int grey = ((overlapWidth - x) * leftPixel + x * rightPixel) / overlapWidth;
-								tileRows.getLast().setPixel(overlapStart + x, y, grey);
+								tileRows.get(tileRows.size() - 1).setPixel(overlapStart + x, y, grey);
 							}
 						}
 					}
