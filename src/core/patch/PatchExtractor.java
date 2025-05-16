@@ -17,7 +17,7 @@ import core.image.ImageTile;
  * @see Image
  */
 public class PatchExtractor {
-	public static double overlap = 1.5; // densité des patchs (1.2 signifie qu'il y aura 120% du nombre minimal couvrant de patchs en abscisse et 120% du nombre minimal couvrant de patchs en ordonnée)
+	public static double patchCountMultiplier = 1.5; // multiplicateur du nombre de patchs en ordonnée et en abscisse. par exemple si 4x4 patch couvrent l'image, avec patchCountMultiplier=1.5 on utilisera une grille de (4x1.5)x(4x1.5)
 
 	/**
 	 * Cette methode créée une liste de patchs carrés, couvrant toute l'image. la taille des patchs est déterminé par le paramtètre {@code side}
@@ -30,8 +30,8 @@ public class PatchExtractor {
 			if (img.getWidth() < side || img.getHeight() < side) {				// vérification de la taille du patch
 				throw(new PatchException());
 			}
-			int countX = (int) (Math.ceil((double) img.getWidth() * overlap / side));		// Calcul du nombre de patchs nécessaire sur l'axe des abscisses
-			int countY = (int) (Math.ceil((double) img.getHeight() * overlap / side));		// Calcul du nombre de patchs nécessaire sur l'axe des ordonnées
+			int countX = (int) (Math.ceil((double) img.getWidth() * patchCountMultiplier / side));		// Calcul du nombre de patchs nécessaire sur l'axe des abscisses
+			int countY = (int) (Math.ceil((double) img.getHeight() * patchCountMultiplier / side));		// Calcul du nombre de patchs nécessaire sur l'axe des ordonnées
 			
 			List<Patch> patchList = new ArrayList<>();							// liste des patchs
 
