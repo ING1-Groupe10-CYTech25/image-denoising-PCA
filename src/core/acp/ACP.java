@@ -1,26 +1,8 @@
 package core.acp;
-// ============================================================================
-// Classe ACP.java : Analyse en Composantes Principales (PCA) pour patchs d'image
-// Utilise Apache Commons Math pour simplifier les calculs matriciels et spectraux
-// ============================================================================
-//
-// Dépendance Maven à ajouter dans pom.xml :
-// <dependency>
-//   <groupId>org.apache.commons</groupId>
-//   <artifactId>commons-math3</artifactId>
-//   <version>3.6.1</version>
-// </dependency>
-//
-// Cette classe fournit :
-//   - MoyCov : calcul du vecteur moyen, matrice de covariance, données centrées
-//   - ACP    : calcul des vecteurs propres, valeurs propres, projections
-//   - Proj   : projection des vecteurs centrés dans la base ACP
-//
-// Toutes les méthodes sont statiques et robustes (gestion d'erreurs explicite)
-// ============================================================================
 
-import org.apache.commons.math3.linear.*;
-import java.util.Arrays;
+import org.apache.commons.math3.linear.Array2DRowRealMatrix;
+import org.apache.commons.math3.linear.EigenDecomposition;
+import org.apache.commons.math3.linear.RealMatrix;
 
 public class ACP {
     // ==========================
@@ -124,44 +106,4 @@ public class ACP {
         public final C third;
         public Triple(A a, B b, C c) { this.first = a; this.second = b; this.third = c; }
     }
-
-    // ==========================
-    // Exemple d'utilisation
-    // ==========================
-    /*
-    // Supposons que vous ayez une matrice de patchs vectorisés V (s² x M)
-    double[][] V = ...;
-    // 1. Calcul du vecteur moyen, covariance, données centrées
-    ACP.Triple<double[], double[][], double[][]> res = ACP.MoyCov(V);
-    double[] mV = res.first;
-    double[][] cov = res.second;
-    double[][] Vc = res.third;
-    // 2. ACP complète (vecteurs propres, valeurs propres, projections)
-    ACP.Triple<double[][], double[], double[][]> acpRes = ACP.ACP(V);
-    double[][] U = acpRes.first;      // Vecteurs propres (base orthonormale)
-    double[] valPropres = acpRes.second; // Valeurs propres
-    double[][] alpha = acpRes.third;  // Projections (coefficients)
-    // 3. Projection seule (si besoin)
-    double[][] alpha2 = ACP.Proj(U, Vc);
-    */
-
-    // ==========================
-    // Raisonnement exhaustif suivi pour la conception de cette classe
-    // ==========================
-    /*
-    1. Librairie choisie : Apache Commons Math (facilite la manipulation de matrices, calculs spectraux, etc.)
-       - Ajoutée via Maven (voir en-tête du fichier)
-    2. Signatures : conformes au cahier des charges et à la structure du projet
-       - MoyCov : retourne le vecteur moyen, la covariance, les données centrées
-       - ACP : retourne la base orthonormale (vecteurs propres), valeurs propres, projections
-       - Proj : projette les patchs centrés dans la base ACP
-    3. Format des données : tout en double[][] (matrices 2D), chaque colonne = un patch vectorisé
-    4. Retour des méthodes : tout ce qui est utile pour la suite du pipeline (vecteurs propres, valeurs propres, projections)
-    5. Gestion des erreurs :
-       - Matrice covariance non définissable (nb patchs < dimension) : message explicite
-       - Entrées nulles ou vides : message explicite
-       - Patchs de dimensions incohérentes : message explicite
-    6. Commentaires : pédagogiques, chaque étape expliquée pour un débutant
-    7. Exemple d'utilisation fourni à la fin du fichier
-    */
 }
