@@ -30,8 +30,8 @@ public class PatchExtractor {
 			if (img.getWidth() < side || img.getHeight() < side) {				// vérification de la taille du patch
 				throw(new PatchException());
 			}
-			int countX = (int) (Math.ceil((double)(img.getWidth()) / side) * overlap);		// Calcul du nombre de patchs nécessaire sur l'axe des abscisses
-			int countY = (int) (Math.ceil((double)(img.getHeight()) / side) * overlap);		// Calcul du nombre de patchs nécessaire sur l'axe des ordonnées
+			int countX = (int) (Math.ceil((double) img.getWidth() * overlap / side));		// Calcul du nombre de patchs nécessaire sur l'axe des abscisses
+			int countY = (int) (Math.ceil((double) img.getHeight() * overlap / side));		// Calcul du nombre de patchs nécessaire sur l'axe des ordonnées
 			
 			List<Patch> patchList = new ArrayList<>();							// liste des patchs
 
