@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "DenoiseTest",
+            "request": "launch",
+            "mainClass": "core.acp.DenoiseTest",
+            "projectName": "image-denoising-PCA"
+        },
+        {
+            "type": "java",
             "name": "test_patch",
             "request": "launch",
             "mainClass": "core.patch.test_patch",
