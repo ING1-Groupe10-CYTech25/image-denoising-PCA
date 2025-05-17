@@ -25,14 +25,14 @@ mvn clean compile
 mvn clean package
 ```
 
-Le fichier JAR sera généré à la racine du projet avec le nom `image-denoising-PCA-jar-with-dependencies.jar`.
+Le fichier JAR sera généré à la racine du projet avec le nom `image-denoising-PCA.jar`.
 
 ## Utilisation
 
 Toutes les commandes s'exécutent avec le fichier JAR généré :
 
 ```bash
-java -jar image-denoising-PCA-jar-with-dependencies.jar <commande> [options]
+java -jar image-denoising-PCA.jar <commande> [options]
 ```
 
 ### Commandes disponibles
@@ -40,7 +40,7 @@ java -jar image-denoising-PCA-jar-with-dependencies.jar <commande> [options]
 #### 1. Ajouter du bruit à une image (`noise`)
 
 ```bash
-java -jar image-denoising-PCA-jar-with-dependencies.jar noise -i <chemin_image> [-o <chemin_sortie>] [-s <sigma>]
+java -jar image-denoising-PCA.jar noise -i <chemin_image> [-o <chemin_sortie>] [-s <sigma>]
 ```
 
 Options :
@@ -51,13 +51,13 @@ Options :
 
 Exemple :
 ```bash
-java -jar image-denoising-PCA-jar-with-dependencies.jar noise -i img/original/lena.png -s 30
+java -jar image-denoising-PCA.jar noise -i img/original/lena.png -s 30
 ```
 
 #### 2. Débruiter une image (`denoise`)
 
 ```bash
-java -jar image-denoising-PCA-jar-with-dependencies.jar denoise -i <chemin_image> [-o <chemin_sortie>] [-g|--global] [-l|--local] [-t <type>] [-sh <type>] [-s <sigma>] [-pp <percent>]
+java -jar image-denoising-PCA.jar denoise -i <chemin_image> [-o <chemin_sortie>] [-g|--global] [-l|--local] [-t <type>] [-sh <type>] [-s <sigma>] [-pp <percent>]
 ```
 
 Options :
@@ -73,17 +73,17 @@ Options :
 
 Exemple avec une seule image :
 ```bash
-java -jar image-denoising-PCA-jar-with-dependencies.jar denoise -i img/img_noised/lena_noised_30.png -t hard -sh v -s 30 -pp 0.1
+java -jar image-denoising-PCA.jar denoise -i img/img_noised/lena_noised_30.png -t hard -sh v -s 30 -pp 0.1
 ```
 
 Exemple avec méthode globale :
 ```bash
-java -jar image-denoising-PCA-jar-with-dependencies.jar denoise -i img/img_noised/lena_noised_30.png -g -t soft -sh b -pp 0.1
+java -jar image-denoising-PCA.jar denoise -i img/img_noised/lena_noised_30.png -g -t soft -sh b -pp 0.1
 ```
 
 Exemple avec un dossier d'images :
 ```bash
-java -jar image-denoising-PCA-jar-with-dependencies.jar denoise -i img/img_noised/ -o img/img_denoised/ -t hard -sh v
+java -jar image-denoising-PCA.jar denoise -i img/img_noised/ -o img/img_denoised/ -t hard -sh v
 ```
 
 Lorsque vous spécifiez un dossier en entrée :
@@ -94,7 +94,7 @@ Lorsque vous spécifiez un dossier en entrée :
 #### 3. Évaluer la qualité (`eval`)
 
 ```bash
-java -jar image-denoising-PCA-jar-with-dependencies.jar eval -i1 <chemin_image1> -i2 <chemin_image2> [-m <type>]
+java -jar image-denoising-PCA.jar eval -i1 <chemin_image1> -i2 <chemin_image2> [-m <type>]
 ```
 
 Options :
@@ -105,13 +105,13 @@ Options :
 
 Exemple :
 ```bash
-java -jar image-denoising-PCA-jar-with-dependencies.jar eval -i1 img/original/lena.png -i2 img/img_noised/lena_noised_30.png
+java -jar image-denoising-PCA.jar eval -i1 img/original/lena.png -i2 img/img_noised/lena_noised_30.png
 ```
 
 #### 4. Effectuer un benchmark (`benchmark`)
 
 ```bash
-java -jar image-denoising-PCA-jar-with-dependencies.jar benchmark -i <chemin_image> [-o <chemin_sortie>] [-s <sigma>] [-pp <pourcentage>]
+java -jar image-denoising-PCA.jar benchmark -i <chemin_image> [-o <chemin_sortie>] [-s <sigma>] [-pp <pourcentage>]
 ```
 
 Options :
@@ -123,7 +123,7 @@ Options :
 
 Exemple :
 ```bash
-java -jar image-denoising-PCA-jar-with-dependencies.jar benchmark -i img/original/lena.png -s 30 -pp 0.1
+java -jar image-denoising-PCA.jar benchmark -i img/original/lena.png -s 30 -pp 0.1
 ```
 
 La commande `benchmark` effectue un test complet sur l'image en :
@@ -146,7 +146,7 @@ Les résultats sont organisés dans des sous-répertoires nommés `<nom_image>_b
 Pour une utilisation guidée, lancez le programme sans arguments :
 
 ```bash
-java -jar image-denoising-PCA-jar-with-dependencies.jar
+java -jar image-denoising-PCA.jar
 ```
 
 Le programme vous guidera à travers les différentes options disponibles.
@@ -210,17 +210,17 @@ eval --image1 <chemin> --image2 <chemin> [--metric <type>]
 
 1. Évaluer deux images en utilisant les deux métriques (MSE et PSNR) :
    ```bash
-   java -jar image-denoising-PCA-jar-with-dependencies.jar eval --image1 img/original/lena.png --image2 img/img_noised/lena_noised_10.png
+   java -jar image-denoising-PCA.jar eval --image1 img/original/lena.png --image2 img/img_noised/lena_noised_10.png
    ```
 
 2. Calculer uniquement l'erreur quadratique moyenne (MSE) :
    ```bash
-   java -jar image-denoising-PCA-jar-with-dependencies.jar eval -i1 img/original/lena.png -i2 img/img_noised/lena_noised_10.png -m mse
+   java -jar image-denoising-PCA.jar eval -i1 img/original/lena.png -i2 img/img_noised/lena_noised_10.png -m mse
    ```
 
 3. Calculer uniquement le rapport signal/bruit (PSNR) :
    ```bash
-   java -jar image-denoising-PCA-jar-with-dependencies.jar eval -i1 img/original/lena.png -i2 img/img_noised/lena_noised_10.png -m psnr
+   java -jar image-denoising-PCA.jar eval -i1 img/original/lena.png -i2 img/img_noised/lena_noised_10.png -m psnr
    ```
 
 ## Utilisation en mode interactif
@@ -228,7 +228,7 @@ eval --image1 <chemin> --image2 <chemin> [--metric <type>]
 Pour une utilisation guidée, lancez le programme sans arguments :
 
 ```bash
-java -jar image-denoising-PCA-jar-with-dependencies.jar
+java -jar image-denoising-PCA.jar
 ```
 
 1. Choisissez l'option 3 : "Évaluer la qualité du débruitage (eval)"

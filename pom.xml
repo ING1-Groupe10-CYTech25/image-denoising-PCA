@@ -43,6 +43,7 @@
                    </descriptorRefs>
                    <outputDirectory>${project.basedir}</outputDirectory>
                    <finalName>image-denoising-PCA</finalName>
+                   <appendAssemblyId>false</appendAssemblyId>
                </configuration>
                <executions>
                    <execution>
@@ -50,6 +51,43 @@
                        <phase>package</phase>
                        <goals>
                            <goal>single</goal>
+                       </goals>
+                   </execution>
+               </executions>
+           </plugin>
+           <!-- Plugin pour générer les sources -->
+           <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-source-plugin</artifactId>
+               <version>3.2.1</version>
+               <executions>
+                   <execution>
+                       <id>attach-sources</id>
+                       <goals>
+                           <goal>jar-no-fork</goal>
+                       </goals>
+                   </execution>
+               </executions>
+           </plugin>
+           <!-- Plugin pour générer la documentation JavaDoc -->
+           <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-javadoc-plugin</artifactId>
+               <version>3.5.0</version>
+               <configuration>
+                   <doclint>none</doclint>
+                   <encoding>UTF-8</encoding>
+                   <charset>UTF-8</charset>
+                   <docencoding>UTF-8</docencoding>
+                   <additionalJOptions>
+                       <additionalJOption>-Xdoclint:none</additionalJOption>
+                   </additionalJOptions>
+               </configuration>
+               <executions>
+                   <execution>
+                       <id>attach-javadocs</id>
+                       <goals>
+                           <goal>jar</goal>
                        </goals>
                    </execution>
                </executions>
