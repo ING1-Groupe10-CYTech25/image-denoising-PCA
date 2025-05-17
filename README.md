@@ -35,7 +35,7 @@ Options :
 - `-l, --local` : Active la méthode de débruitage locale (défaut)
 - `-t, --threshold` : Type de seuillage (hard/h ou soft/s, défaut: hard)
 - `-sh, --shrink` : Type de seuillage adaptatif (v pour VisuShrink, b pour BayesShrink)
-- `-s, --sigma` : Écart type du bruit (défaut: 30.0)
+- `-s, --sigma` : Écart type du bruit (défaut: déduit ou 30.0)
 - `-h, --help` : Affiche l'aide
 
 ## Prérequis
@@ -136,17 +136,17 @@ eval --image1 <chemin> --image2 <chemin> [--metric <type>]
 
 1. Évaluer deux images en utilisant les deux métriques (MSE et PSNR) :
    ```bash
-   java -jar image-denoising-PCA-jar-with-dependencies.jar eval --image1 img/original/lena.png --image2 img/img_noised/lena_10.png
+   java -jar image-denoising-PCA-jar-with-dependencies.jar eval --image1 img/original/lena.png --image2 img/img_noised/lena_noised_10.png
    ```
 
 2. Calculer uniquement l'erreur quadratique moyenne (MSE) :
    ```bash
-   java -jar image-denoising-PCA-jar-with-dependencies.jar eval -i1 img/original/lena.png -i2 img/img_noised/lena_10.png -m mse
+   java -jar image-denoising-PCA-jar-with-dependencies.jar eval -i1 img/original/lena.png -i2 img/img_noised/lena_noised_10.png -m mse
    ```
 
 3. Calculer uniquement le rapport signal/bruit (PSNR) :
    ```bash
-   java -jar image-denoising-PCA-jar-with-dependencies.jar eval -i1 img/original/lena.png -i2 img/img_noised/lena_10.png -m psnr
+   java -jar image-denoising-PCA-jar-with-dependencies.jar eval -i1 img/original/lena.png -i2 img/img_noised/lena_noised_10.png -m psnr
    ```
 
 ## Utilisation en mode interactif
