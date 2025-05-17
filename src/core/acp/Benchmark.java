@@ -19,6 +19,7 @@ public class Benchmark {
     private final Path input;
     private final double sigma;
     private final Path outputDir;
+    private final double patchPercent;
 
     /**
      * Constructeur pour le benchmark.
@@ -26,11 +27,13 @@ public class Benchmark {
      * @param input Chemin vers l'image à tester
      * @param sigma Écart type du bruit
      * @param outputDir Répertoire de sortie pour les résultats
+     * @param patchPercent Pourcentage de la taille minimale pour le patch
      */
-    public Benchmark(Path input, double sigma, Path outputDir) {
+    public Benchmark(Path input, double sigma, Path outputDir, double patchPercent) {
         this.input = input;
         this.sigma = sigma;
         this.outputDir = outputDir;
+        this.patchPercent = patchPercent;
     }
 
     /**
@@ -54,6 +57,7 @@ public class Benchmark {
         try (PrintWriter logWriter = new PrintWriter(new FileWriter(imageOutputDir.resolve("benchmark.txt").toFile()))) {
             logWriter.println("=== Benchmark pour " + input.getFileName() + " ===");
             logWriter.println("Sigma: " + sigma);
+            logWriter.println("Taille de patch: " + (patchPercent * 100) + "%");
             logWriter.println();
 
             // Générer l'image bruitée
@@ -100,7 +104,7 @@ public class Benchmark {
                                     ", seuillage: " + threshold + 
                                     ", seuillage adaptatif: " + shrink);
 
-                    ImageDenoiser.ImageDen(noisedPath, outputName, isGlobal, threshold, shrink, sigma);
+                    ImageDenoiser.ImageDen(noisedPath, outputName, isGlobal, threshold, shrink, sigma, patchPercent);
                     logWriter.println("Image débruitée sauvegardée dans: " + outputName);
 
                     // Évaluer le résultat

@@ -19,6 +19,7 @@ import java.util.Set;
  *   <li>threshold : type de seuillage à appliquer ("hard" ou "soft")</li>
  *   <li>shrink : type de seuillage adaptatif ("v" pour VisuShrink, "b" pour BayesShrink)</li>
  *   <li>sigma : écart type du bruit</li>
+ *   <li>patchPercent : pourcentage de la taille minimale pour le patch</li>
  * </ul>
  * 
  * Les arguments reconnus en ligne de commande sont :
@@ -30,6 +31,7 @@ import java.util.Set;
  *   <li>--threshold, -t : type de seuillage ("hard" ou "soft", défaut: "hard")</li>
  *   <li>--shrink, -sh : type de seuillage adaptatif ("v" pour VisuShrink, "b" pour BayesShrink)</li>
  *   <li>--sigma, -s : écart type du bruit</li>
+ *   <li>--patchPercent, -pp : pourcentage de la taille minimale pour le patch (entre 0 et 1)</li>
  *   <li>--help, -h : affiche l'aide et quitte le programme</li>
  * </ul>
  * 
@@ -46,6 +48,7 @@ public final class DenoiseArgs {
     private final String threshold;
     private final String shrink;
     private final double sigma;
+    private final double patchPercent;
     
     // Set des extensions d'images supportées
     private static final Set<String> SUPPORTED_EXTENSIONS = new HashSet<>(
@@ -68,9 +71,11 @@ public final class DenoiseArgs {
      * @param threshold type de seuillage à appliquer ("hard" ou "soft")
      * @param shrink type de seuillage adaptatif ("v" ou "b")
      * @param sigma écart type du bruit
+     * @param patchPercent pourcentage de la taille minimale pour le patch (entre 0 et 1)
      * @throws IllegalArgumentException si les paramètres sont invalides
      */
-    public DenoiseArgs(Path input, Path output, boolean isGlobal, String threshold, String shrink, double sigma) {
+    public DenoiseArgs(Path input, Path output, boolean isGlobal, String threshold, 
+                      String shrink, double sigma, double patchPercent) {
         // Vérifier que le chemin d'entrée existe
         if (input == null || !input.toFile().exists()) {
             throw new IllegalArgumentException("Le chemin d'entrée doit exister: " + input);
@@ -114,12 +119,18 @@ public final class DenoiseArgs {
             throw new IllegalArgumentException("Sigma doit être un nombre strictement positif");
         }
         
+        // Vérifier que patchPercent est entre 0 et 1
+        if (patchPercent <= 0 || patchPercent > 1) {
+            throw new IllegalArgumentException("Le pourcentage de taille de patch doit être entre 0 et 1");
+        }
+        
         this.input = input;
         this.output = output;
         this.isGlobal = isGlobal;
         this.threshold = thresholdLower;
         this.shrink = shrinkLower;
         this.sigma = sigma;
+        this.patchPercent = patchPercent;
     }
 
     /**
@@ -151,6 +162,11 @@ public final class DenoiseArgs {
      * @return l'écart type du bruit
      */
     public double getSigma() { return sigma; }
+    
+    /**
+     * @return le pourcentage de la taille minimale pour le patch
+     */
+    public double getPatchPercent() { return patchPercent; }
     
     /**
      * Vérifie si un fichier est une image supportée en se basant sur son extension.
@@ -218,6 +234,7 @@ public final class DenoiseArgs {
         String threshold = "hard"; // Valeur par défaut
         String shrink = "v";      // VisuuShrink par défaut
         double sigma = 30.0;      // Valeur par défaut pour sigma
+        double patchPercent = 0.5; // Valeur par défaut pour patchPercent
 
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
@@ -267,6 +284,16 @@ public final class DenoiseArgs {
                         throw new IllegalArgumentException("Sigma doit être un nombre valide");
                     }
                 }
+                case "--patchPercent", "-pp" -> {
+                    try {
+                        patchPercent = Double.parseDouble(CliUtil.next(args, ++i, "--patchPercent"));
+                        if (patchPercent <= 0 || patchPercent > 1) {
+                            throw new IllegalArgumentException("Le pourcentage de taille de patch doit être entre 0 et 1");
+                        }
+                    } catch (NumberFormatException e) {
+                        throw new IllegalArgumentException("Le pourcentage de taille de patch doit être un nombre valide");
+                    }
+                }
                 case "-h", "--help" -> { CliUtil.printDenoiseHelp(); System.exit(0); }
                 default -> throw new IllegalArgumentException("Option inconnue : " + args[i]);
             }
@@ -305,6 +332,6 @@ public final class DenoiseArgs {
             }
         }
         
-        return new DenoiseArgs(input, output, isGlobal, threshold, shrink, sigma);
+        return new DenoiseArgs(input, output, isGlobal, threshold, shrink, sigma, patchPercent);
     }
 }

@@ -184,6 +184,25 @@ public class Main {
             }
         }
         
+        // Demander le pourcentage de taille de patch
+        System.out.print("Pourcentage de taille de patch (entre 0 et 1, défaut: 0.1): ");
+        String patchPercentStr = scanner.nextLine().trim();
+        double patchPercent;
+        if (patchPercentStr.isEmpty()) {
+            patchPercent = 0.1;
+        } else {
+            try {
+                patchPercent = Double.parseDouble(patchPercentStr);
+                if (patchPercent <= 0 || patchPercent > 1) {
+                    System.err.println("Valeur invalide, utilisation de 0.1 par défaut.");
+                    patchPercent = 0.1;
+                }
+            } catch (NumberFormatException e) {
+                System.err.println("Valeur invalide, utilisation de 0.1 par défaut.");
+                patchPercent = 0.1;
+            }
+        }
+        
         // Demander le chemin de sortie
         System.out.print("Chemin de sortie (laissez vide pour la valeur par défaut): ");
         String outputStr = scanner.nextLine().trim();
@@ -203,7 +222,7 @@ public class Main {
         }
         
         try {
-            DenoiseArgs args = new DenoiseArgs(input, output, isGlobal, threshold, shrink, sigma);
+            DenoiseArgs args = new DenoiseArgs(input, output, isGlobal, threshold, shrink, sigma, patchPercent);
             runDenoise(args);
         } catch (Exception e) {
             System.err.println("Erreur: " + e.getMessage());
@@ -261,6 +280,25 @@ public class Main {
         String sigmaStr = scanner.nextLine().trim();
         double sigma = sigmaStr.isEmpty() ? 30.0 : Double.parseDouble(sigmaStr);
         
+        // Demander le pourcentage de taille de patch
+        System.out.print("Pourcentage de taille de patch (entre 0 et 1, défaut: 0.1): ");
+        String patchPercentStr = scanner.nextLine().trim();
+        double patchPercent;
+        if (patchPercentStr.isEmpty()) {
+            patchPercent = 0.1;
+        } else {
+            try {
+                patchPercent = Double.parseDouble(patchPercentStr);
+                if (patchPercent <= 0 || patchPercent > 1) {
+                    System.err.println("Valeur invalide, utilisation de 0.1 par défaut.");
+                    patchPercent = 0.1;
+                }
+            } catch (NumberFormatException e) {
+                System.err.println("Valeur invalide, utilisation de 0.1 par défaut.");
+                patchPercent = 0.1;
+            }
+        }
+        
         // Demander le répertoire de sortie
         System.out.print("Répertoire de sortie (vide pour la valeur par défaut): ");
         String outputStr = scanner.nextLine().trim();
@@ -268,7 +306,7 @@ public class Main {
                      Paths.get("img/benchmark") : Paths.get(outputStr);
         
         try {
-            BenchmarkArgs args = new BenchmarkArgs(input, sigma, output);
+            BenchmarkArgs args = new BenchmarkArgs(input, sigma, output, patchPercent);
             runBenchmark(args);
         } catch (Exception e) {
             System.err.println("Erreur: " + e.getMessage());
@@ -340,7 +378,7 @@ public class Main {
      * @throws IOException 
      */
     private static void runDenoise(DenoiseArgs args) {
-            try {
+        try {
             // Débruiter l'image
             ImageDenoiser.ImageDen(
                 args.getInput().toString(),
@@ -348,12 +386,13 @@ public class Main {
                 args.isGlobal(),
                 args.getThreshold(),
                 args.getShrink(),
-                args.getSigma()
+                args.getSigma(),
+                args.getPatchPercent()
             );
             
             System.out.println("Image débruitée sauvegardée dans: " + args.getOutput());
                 
-            } catch (Exception e) {
+        } catch (Exception e) {
             System.err.println("Erreur lors du débruitage: " + e.getMessage());
             System.exit(1);
         }
@@ -440,7 +479,7 @@ public class Main {
             }
             
             // Exécuter le benchmark
-            Benchmark benchmark = new Benchmark(args.getInput(), args.getSigma(), args.getOutputDir());
+            Benchmark benchmark = new Benchmark(args.getInput(), args.getSigma(), args.getOutputDir(), args.getPatchPercent());
             benchmark.run();
             
             System.out.println("Benchmark terminé. Résultats sauvegardés dans : " + args.getOutputDir());

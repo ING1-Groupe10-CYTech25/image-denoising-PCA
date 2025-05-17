@@ -171,17 +171,18 @@ public final class CliUtil {
      * Affiche l'aide pour la commande benchmark.
      */
     public static void printBenchmarkHelp() {
-        System.out.println("benchmark -i <chemin_image>... [-o <chemin_sortie>] [-s <sigma>]");
+        System.out.println("benchmark -i <chemin_image>... [-o <chemin_sortie>] [-s <sigma>] [-pp <pourcentage>]");
         System.out.println("Effectue un benchmark complet sur une ou plusieurs images.");
         System.out.println();
         System.out.println("Options :");
         System.out.println("  -i, --input    : Chemin(s) vers l'image(s) à tester (obligatoire, peut être multiple)");
         System.out.println("  -o, --output   : Répertoire de sortie pour les résultats (optionnel)");
         System.out.println("  -s, --sigma    : Écart type du bruit (défaut: 30.0)");
+        System.out.println("  -pp, --patchPercent : Pourcentage de la taille minimale pour le patch (entre 0 et 1, défaut: 0.1)");
         System.out.println("  -h, --help     : Affiche cette aide");
         System.out.println();
         System.out.println("Exemple :");
-        System.out.println("  benchmark -i img/original/lena.png -s 30");
-        System.out.println("  benchmark -i img/original/lena.png img/original/barbara.png -o results");
+        System.out.println("  benchmark -i img/original/lena.png -s 30 -pp 0.1");
+        System.out.println("  benchmark -i img/original/lena.png img/original/barbara.png -o results -pp 0.05");
     }
 }

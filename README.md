@@ -57,7 +57,7 @@ java -jar image-denoising-PCA-jar-with-dependencies.jar noise -i img/original/le
 #### 2. Débruiter une image (`denoise`)
 
 ```bash
-java -jar image-denoising-PCA-jar-with-dependencies.jar denoise -i <chemin_image> [-o <chemin_sortie>] [-g|--global] [-l|--local] [-t <type>] [-sh <type>] [-s <sigma>]
+java -jar image-denoising-PCA-jar-with-dependencies.jar denoise -i <chemin_image> [-o <chemin_sortie>] [-g|--global] [-l|--local] [-t <type>] [-sh <type>] [-s <sigma>] [-pp <percent>]
 ```
 
 Options :
@@ -68,16 +68,17 @@ Options :
 - `-t, --threshold` : Type de seuillage (hard/h ou soft/s, défaut: hard)
 - `-sh, --shrink` : Type de seuillage adaptatif (v pour VisuShrink, b pour BayesShrink)
 - `-s, --sigma` : Écart type du bruit (défaut: déduit ou 30.0)
+- `-pp, --patchPercent` : Pourcentage de la taille minimale pour le patch (entre 0 et 1, défaut: 0.1, soit 10%)
 - `-h, --help` : Affiche l'aide
 
 Exemple avec méthode locale :
 ```bash
-java -jar image-denoising-PCA-jar-with-dependencies.jar denoise -i img/img_noised/lena_noised_30.png -t hard -sh v -s 30
+java -jar image-denoising-PCA-jar-with-dependencies.jar denoise -i img/img_noised/lena_noised_30.png -t hard -sh v -s 30 -pp 0.1
 ```
 
 Exemple avec méthode globale :
 ```bash
-java -jar image-denoising-PCA-jar-with-dependencies.jar denoise -i img/img_noised/lena_noised_30.png -g -t soft -sh b -s 30
+java -jar image-denoising-PCA-jar-with-dependencies.jar denoise -i img/img_noised/lena_noised_30.png -g -t soft -sh b -s 30 -pp 0.1
 ```
 
 #### 3. Évaluer la qualité (`eval`)
@@ -100,18 +101,19 @@ java -jar image-denoising-PCA-jar-with-dependencies.jar eval -i1 img/original/le
 #### 4. Effectuer un benchmark (`benchmark`)
 
 ```bash
-java -jar image-denoising-PCA-jar-with-dependencies.jar benchmark -i <chemin_image> [-o <chemin_sortie>] [-s <sigma>]
+java -jar image-denoising-PCA-jar-with-dependencies.jar benchmark -i <chemin_image> [-o <chemin_sortie>] [-s <sigma>] [-pp <pourcentage>]
 ```
 
 Options :
 - `-i, --input` : Chemin vers l'image à tester (obligatoire)
 - `-o, --output` : Répertoire de sortie pour les résultats (optionnel)
 - `-s, --sigma` : Écart type du bruit (défaut: 30.0)
+- `-pp, --patchPercent` : Pourcentage de la taille minimale pour le patch (entre 0 et 1, défaut: 0.1)
 - `-h, --help` : Affiche l'aide
 
 Exemple :
 ```bash
-java -jar image-denoising-PCA-jar-with-dependencies.jar benchmark -i img/original/lena.png -s 30
+java -jar image-denoising-PCA-jar-with-dependencies.jar benchmark -i img/original/lena.png -s 30 -pp 0.1
 ```
 
 La commande `benchmark` effectue un test complet sur l'image en :
@@ -120,6 +122,7 @@ La commande `benchmark` effectue un test complet sur l'image en :
    - Méthode globale et locale
    - Seuillage dur et doux
    - VisuShrink et BayesShrink
+   - Avec la taille de patch spécifiée (par défaut 10% de la plus petite dimension)
 3. Évaluant les résultats avec les métriques MSE et PSNR
 4. Sauvegardant toutes les images débruitées et un rapport détaillé
 
@@ -152,11 +155,21 @@ image-denoising-PCA/
 └── pom.xml            # Configuration Maven
 ```
 
+## Taille de patch adaptative
+
+- **Par défaut**, la taille des patchs est fixée à 10% de la plus petite dimension de l'image (ou de l'imagette en mode local).
+- Vous pouvez la modifier avec l'option `-pp` ou `--patchPercent` (ex : `-pp 0.05` pour 5%).
+- **En mode global** : la taille de patch dépend de l'image entière.
+- **En mode local** : la taille de patch dépend de chaque imagette (découpage automatique, 16 imagettes par défaut).
+- La taille minimale d'un patch est 5 pixels, la maximale 31 pixels, et elle est toujours impaire.
+- Si le pourcentage choisi donne une taille inférieure à 5, la taille minimale (5) est utilisée.
+
 ## Limitations
 
 - Seules les images en niveaux de gris sont supportées
 - Les formats d'image supportés sont : PNG, JPG, JPEG, BMP, GIF, TIFF
-- La taille des patchs est fixée à 15x15 pixels
+- **La taille des patchs est adaptative** (voir plus haut), mais reste comprise entre 5 et 31 pixels et toujours impaire
+- Les images à comparer pour l'évaluation doivent avoir exactement les mêmes dimensions
 
 # Manuel d'utilisation - Commande EVAL
 

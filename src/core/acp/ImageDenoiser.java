@@ -25,6 +25,32 @@ import core.patch.PatchExtractor;
  */
 public class ImageDenoiser {
     
+    private static final int DEFAULT_PATCH_SIZE = 15;
+    private static final double DEFAULT_PATCH_PERCENT = 0.1; // 10% par défaut
+    
+    /**
+     * Calcule la taille de patch adaptative en fonction de la taille de l'image.
+     * 
+     * @param width Largeur de l'image
+     * @param height Hauteur de l'image
+     * @param patchPercent Pourcentage de la taille minimale (entre 0 et 1)
+     * @return Taille de patch adaptative (impair)
+     */
+    public static int calculateAdaptivePatchSize(int width, int height, double patchPercent) {
+        int minDimension = Math.min(width, height);
+        int patchSize = (int) (minDimension * patchPercent);
+        
+        // S'assurer que la taille est impaire
+        if (patchSize % 2 == 0) {
+            patchSize++;
+        }
+        
+        // Limiter la taille minimale et maximale
+        patchSize = Math.max(5, Math.min(patchSize, 31));
+        
+        return patchSize;
+    }
+    
     /**
      * Débruite une image en utilisant la méthode PCA globale.
      * Tous les patchs de l'image sont traités ensemble dans une seule ACP.
@@ -98,12 +124,15 @@ public class ImageDenoiser {
             throw new IllegalStateException("Impossible de découper l'image en imagettes");
         }
         
-        // 2. Pour chaque imagette, appliquer le débruitage PCA
+        // 2. Pour chaque imagette, calculer la taille de patch adaptative
         List<core.image.ImageTile> denoisedTiles = new ArrayList<>();
         
         for (core.image.ImageTile tile : tiles) {
+            // Calculer la taille de patch adaptative pour cette imagette
+            int tilePatchSize = calculateAdaptivePatchSize(tile.getWidth(), tile.getHeight(), 0.1);
+            
             // Extraire les patchs de cette imagette
-            List<Patch> patches = PatchExtractor.extractPatchs(tile, patchSize);
+            List<Patch> patches = PatchExtractor.extractPatchs(tile, tilePatchSize);
             
             if (patches == null || patches.isEmpty()) {
                 // Si l'imagette est trop petite pour extraire des patchs, la conserver telle quelle
@@ -113,7 +142,7 @@ public class ImageDenoiser {
             
             // Convertir la liste de Patch en tableau d'entiers
             int numPatches = patches.size();
-            int patchLength = patchSize * patchSize;
+            int patchLength = tilePatchSize * tilePatchSize;
             int[][] patchArray = new int[numPatches][patchLength];
             
             for (int i = 0; i < numPatches; i++) {
@@ -123,7 +152,7 @@ public class ImageDenoiser {
             
             // Appliquer le débruitage PCA local
             int[][] denoisedPatchArray = Denoiser.denoisePatches(
-                patchArray, patchSize, threshold, shrinkType, sigma, false);
+                patchArray, tilePatchSize, threshold, shrinkType, sigma, false);
             
             // Reconvertir les patchs débruités en objets Patch
             List<Patch> denoisedPatches = new ArrayList<>();
@@ -133,7 +162,7 @@ public class ImageDenoiser {
                     denoisedPatchArray[i],
                     originalPatch.getXOrigin(),
                     originalPatch.getYOrigin(),
-                    patchSize
+                    tilePatchSize
                 );
                 denoisedPatches.add(denoisedPatch);
             }
@@ -193,19 +222,62 @@ public class ImageDenoiser {
     /**
      * Débruite une image en utilisant la méthode ACP.
      * 
-     * @param imagePath chemin vers l'image à débruiter
-     * @param outputPath chemin où sauvegarder l'image débruitée
-     * @param isGlobal true pour utiliser la méthode globale, false pour la méthode locale
-     * @param threshold type de seuillage ("hard" ou "soft")
-     * @param shrink type de seuillage adaptatif ("v" pour VisuShrink, "b" pour BayesShrink)
-     * @param sigma écart type du bruit
+     * @param inputPath Chemin de l'image à débruiter
+     * @param outputPath Chemin de l'image débruitée
+     * @param isGlobal Utiliser la méthode globale
+     * @param threshold Type de seuillage (hard/soft)
+     * @param shrink Type de seuillage adaptatif (v/b)
+     * @param sigma Écart type du bruit
      * @throws IOException si une erreur survient lors de la lecture/écriture des fichiers
      */
-    public static void ImageDen(String imagePath, String outputPath, boolean isGlobal, String threshold, String shrink, double sigma) throws IOException {
-        // Charger l'image via la classe ImageFile
-        ImageFile imageFile = new ImageFile(imagePath);
-        Image image = imageFile; // ImageFile hérite de Image
-        int patchSize = 15; // Patch par défaut, cohérent avec le reste du projet
+    public static void ImageDen(String inputPath, String outputPath, boolean isGlobal, 
+                              String threshold, String shrink, double sigma) throws IOException {
+        // Charger l'image
+        ImageFile image = new ImageFile(inputPath);
+        BufferedImage bufferedImage = image.getImage();
+        
+        // Calculer la taille de patch adaptative
+        int patchSize = calculateAdaptivePatchSize(bufferedImage.getWidth(), 
+                                                 bufferedImage.getHeight(), 
+                                                 DEFAULT_PATCH_PERCENT);
+        
+        // Débruiter l'image
+        Image denoised;
+        if (isGlobal) {
+            denoised = denoiseGlobal(image, patchSize, threshold, shrink, sigma);
+        } else {
+            int numImagettes = 16;
+            denoised = denoiseLocal(image, patchSize, numImagettes, threshold, shrink, sigma);
+        }
+        
+        // Sauvegarder l'image débruitée
+        ImageFile denoisedFile = new ImageFile(denoised, "denoised");
+        denoisedFile.saveImage(outputPath);
+    }
+
+    /**
+     * Débruite une image en utilisant la méthode ACP avec une taille de patch spécifiée.
+     * 
+     * @param inputPath Chemin de l'image à débruiter
+     * @param outputPath Chemin de l'image débruitée
+     * @param isGlobal Utiliser la méthode globale
+     * @param threshold Type de seuillage (hard/soft)
+     * @param shrink Type de seuillage adaptatif (v/b)
+     * @param sigma Écart type du bruit
+     * @param patchPercent Pourcentage de la taille minimale pour le patch (entre 0 et 1)
+     * @throws IOException si une erreur survient lors de la lecture/écriture des fichiers
+     */
+    public static void ImageDen(String inputPath, String outputPath, boolean isGlobal, 
+                              String threshold, String shrink, double sigma, 
+                              double patchPercent) throws IOException {
+        // Charger l'image
+        ImageFile image = new ImageFile(inputPath);
+        BufferedImage bufferedImage = image.getImage();
+        
+        // Calculer la taille de patch adaptative
+        int patchSize = calculateAdaptivePatchSize(bufferedImage.getWidth(), 
+                                                 bufferedImage.getHeight(), 
+                                                 patchPercent);
         
         // Débruiter l'image
         Image denoised;

@@ -11,6 +11,7 @@ public class BenchmarkArgs {
     private final Path input;
     private final double sigma;
     private final Path outputDir;
+    private final double patchPercent;
 
     /**
      * Constructeur pour les arguments de benchmark.
@@ -18,11 +19,13 @@ public class BenchmarkArgs {
      * @param input Chemin vers l'image à tester
      * @param sigma Écart type du bruit
      * @param outputDir Répertoire de sortie pour les résultats
+     * @param patchPercent Pourcentage de la taille minimale pour le patch
      */
-    public BenchmarkArgs(Path input, double sigma, Path outputDir) {
+    public BenchmarkArgs(Path input, double sigma, Path outputDir, double patchPercent) {
         this.input = input;
         this.sigma = sigma;
         this.outputDir = outputDir;
+        this.patchPercent = patchPercent;
     }
 
     /**
@@ -35,6 +38,7 @@ public class BenchmarkArgs {
         Path input = null;
         double sigma = 30.0;
         Path outputDir = null;
+        double patchPercent = 0.1; // Valeur par défaut
 
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
@@ -59,6 +63,16 @@ public class BenchmarkArgs {
                         throw new IllegalArgumentException("--output nécessite un chemin");
                     }
                 }
+                case "-pp", "--patchPercent" -> {
+                    if (i + 1 < args.length) {
+                        patchPercent = Double.parseDouble(args[++i]);
+                        if (patchPercent <= 0 || patchPercent > 1) {
+                            throw new IllegalArgumentException("Le pourcentage de taille de patch doit être entre 0 et 1");
+                        }
+                    } else {
+                        throw new IllegalArgumentException("--patchPercent nécessite une valeur");
+                    }
+                }
                 case "-h", "--help" -> CliUtil.printBenchmarkHelp();
                 default -> throw new IllegalArgumentException("Option inconnue: " + args[i]);
             }
@@ -72,7 +86,7 @@ public class BenchmarkArgs {
             outputDir = Paths.get("img/benchmark");
         }
 
-        return new BenchmarkArgs(input, sigma, outputDir);
+        return new BenchmarkArgs(input, sigma, outputDir, patchPercent);
     }
 
     public Path getInput() {
@@ -85,5 +99,9 @@ public class BenchmarkArgs {
 
     public Path getOutputDir() {
         return outputDir;
+    }
+
+    public double getPatchPercent() {
+        return patchPercent;
     }
 } 
