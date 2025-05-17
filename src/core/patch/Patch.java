@@ -18,10 +18,10 @@ public class Patch {
      * @param side coté des patchs en pixels
      */
     public Patch(int[] pixels, int xOrigin, int yOrigin, int side) {
-        this.setPixels(pixels);
-        this.setXOrigin(xOrigin);
-        this.setYOrigin(yOrigin);
-        this.setSide(side);
+        this.pixels = pixels;
+        this.xOrigin = xOrigin;
+        this.yOrigin = yOrigin;
+        this.side = side;
 
     }
 

@@ -1,11 +1,9 @@
 package core.acp;
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.io.File;
-import java.io.IOException;
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 
 import core.image.Image;
 import core.image.ImageFile;
@@ -25,7 +23,7 @@ import core.patch.PatchExtractor;
  */
 public class ImageDenoiser {
     
-    private static final int DEFAULT_PATCH_SIZE = 15;
+    // private static final int DEFAULT_PATCH_SIZE = 15;
     private static final double DEFAULT_PATCH_PERCENT = 0.1; // 10% par défaut
     
     /**

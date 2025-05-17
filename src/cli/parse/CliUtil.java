@@ -188,16 +188,17 @@ public final class CliUtil {
      * Affiche l'aide pour la commande eval.
      */
     public static void printEvalHelp() {
-        System.out.println("eval --image1 <path> --image2 <path> [--metric <type>]\n" +
-                "Compare deux images et calcule des métriques de qualité.\n" +
-                "  --image1, -i1 : chemin de la première image (original)\n" +
-                "  --image2, -i2 : chemin de la deuxième image (traitée)\n" +
-                "  --metric, -m  : métrique à utiliser ('mse', 'psnr' ou 'both', défaut: 'both')\n" +
-                "    mse  : Mean Square Error (Erreur Quadratique Moyenne)\n" +
-                "    psnr : Peak Signal-to-Noise Ratio (Rapport Signal/Bruit de Crête)\n" +
-                "    both : Calcule les deux métriques\n" +
-                "Plus la valeur MSE est basse, plus les images sont similaires.\n" +
-                "Plus la valeur PSNR est élevée, meilleure est la qualité de l'image.");
+        System.out.println("""
+                           eval --image1 <path> --image2 <path> [--metric <type>]
+                           Compare deux images et calcule des métriques de qualité.
+                             --image1, -i1 : chemin de la première image (original)
+                             --image2, -i2 : chemin de la deuxième image (traitée)
+                             --metric, -m  : métrique à utiliser ('mse', 'psnr' ou 'both', défaut: 'both')
+                               mse  : Mean Square Error (Erreur Quadratique Moyenne)
+                               psnr : Peak Signal-to-Noise Ratio (Rapport Signal/Bruit de Crête)
+                               both : Calcule les deux métriques
+                           Plus la valeur MSE est basse, plus les images sont similaires.
+                           Plus la valeur PSNR est élevée, meilleure est la qualité de l'image.""");
     }
 
     /**
@@ -205,12 +206,12 @@ public final class CliUtil {
      */
     public static void printBenchmarkHelp() {
         System.out.println("benchmark -i <chemin_image>... [-o <chemin_sortie>] [-s <sigma>] [-pp <pourcentage>]");
-        System.out.println("Effectue un benchmark complet sur une ou plusieurs images.");
+        System.out.println("Effectue un benchmark complet sur une image.");
         System.out.println();
         System.out.println("Options :");
-        System.out.println("  -i, --input    : Chemin(s) vers l'image(s) à tester (obligatoire, peut être multiple)");
+        System.out.println("  -i, --input    : Chemin vers l'image à tester (obligatoire)");
         System.out.println("  -o, --output   : Répertoire de sortie pour les résultats (optionnel)");
-        System.out.println("  -s, --sigma    : Écart type du bruit (défaut: 30.0)");
+        System.out.println("  -s, --sigma    : Écart type du bruit (défaut: 30)");
         System.out.println("  -pp, --patchPercent : Pourcentage de la taille minimale pour le patch (entre 0 et 1, défaut: 0.1)");
         System.out.println("  -h, --help     : Affiche cette aide");
         System.out.println();

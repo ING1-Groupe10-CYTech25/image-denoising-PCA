@@ -50,8 +50,7 @@ public class PatchExtractor {
 			return patchList;
 		}
 		catch(PatchException e) {
-			System.err.println("Patches cannot be larger than the image");
-			e.printStackTrace();
+			System.err.println("Le patch est plus grand que l'image");
 			return null;
 		}
 	}
@@ -131,8 +130,7 @@ public class PatchExtractor {
 			}
 		}
 		catch (PatchException e) {
-			System.err.println("Patch list is empty");
-			e.printStackTrace();
+			System.err.println("Liste des patchs vides");
 			return null;
 		}
 	}
@@ -163,8 +161,7 @@ public class PatchExtractor {
 			}
 		}
 		catch (PatchException e) {
-			System.err.println("Patch list is empty");
-			e.printStackTrace();
+			System.err.println("Liste des patchs vide");
 			return null;
 		}
 	}

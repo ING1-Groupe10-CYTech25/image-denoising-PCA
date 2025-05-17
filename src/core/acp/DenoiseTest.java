@@ -37,7 +37,6 @@ public class DenoiseTest {
             
         } catch (IOException e) {
             System.err.println("Erreur lors du test de débruitage: " + e.getMessage());
-            e.printStackTrace();
         }
     }
     
