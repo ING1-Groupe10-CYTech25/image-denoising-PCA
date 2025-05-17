@@ -6,3 +6,8 @@ target/
 .classpath
 .project
 .factorypath
+
+# Dossier img (sauf original)
+img/img_noised/*
+img/img_denoised/*
+img/benchmark/*
