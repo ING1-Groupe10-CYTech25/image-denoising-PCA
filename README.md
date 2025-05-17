@@ -2,19 +2,45 @@
 
 Ce projet implémente une méthode de débruitage d'images basée sur l'Analyse en Composantes Principales (ACP).
 
-## Description
+## Prérequis
 
-Le projet propose trois commandes principales :
-- `noise` : Ajoute du bruit gaussien à une image
-- `denoise` : Débruite une image en utilisant la méthode ACP
-- `benchmark` : Effectue un benchmark complet sur une ou plusieurs images
+- Java 17 ou supérieur
+- Maven 3.6 ou supérieur
+
+## Compilation et Installation
+
+1. Cloner le projet :
+```bash
+git clone https://github.com/votre-username/image-denoising-PCA.git
+cd image-denoising-PCA
+```
+
+2. Compiler le projet :
+```bash
+mvn clean compile
+```
+
+3. Générer le fichier JAR exécutable :
+```bash
+mvn clean package
+```
+
+Le fichier JAR sera généré à la racine du projet avec le nom `image-denoising-PCA-jar-with-dependencies.jar`.
 
 ## Utilisation
 
-### Commande `noise`
+Toutes les commandes s'exécutent avec le fichier JAR généré :
 
 ```bash
-noise -i <chemin_image> [-o <chemin_sortie>] [-s <sigma>]
+java -jar image-denoising-PCA-jar-with-dependencies.jar <commande> [options]
+```
+
+### Commandes disponibles
+
+#### 1. Ajouter du bruit à une image (`noise`)
+
+```bash
+java -jar image-denoising-PCA-jar-with-dependencies.jar noise -i <chemin_image> [-o <chemin_sortie>] [-s <sigma>]
 ```
 
 Options :
@@ -23,10 +49,15 @@ Options :
 - `-s, --sigma` : Écart type du bruit (défaut: 30.0)
 - `-h, --help` : Affiche l'aide
 
-### Commande `denoise`
+Exemple :
+```bash
+java -jar image-denoising-PCA-jar-with-dependencies.jar noise -i img/original/lena.png -s 30
+```
+
+#### 2. Débruiter une image (`denoise`)
 
 ```bash
-denoise -i <chemin_image> [-o <chemin_sortie>] [-g|--global] [-l|--local] [-t <type>] [-sh <type>] [-s <sigma>]
+java -jar image-denoising-PCA-jar-with-dependencies.jar denoise -i <chemin_image> [-o <chemin_sortie>] [-g|--global] [-l|--local] [-t <type>] [-sh <type>] [-s <sigma>]
 ```
 
 Options :
@@ -39,19 +70,51 @@ Options :
 - `-s, --sigma` : Écart type du bruit (défaut: déduit ou 30.0)
 - `-h, --help` : Affiche l'aide
 
-### Commande `benchmark`
+Exemple avec méthode locale :
+```bash
+java -jar image-denoising-PCA-jar-with-dependencies.jar denoise -i img/img_noised/lena_noised_30.png -t hard -sh v -s 30
+```
+
+Exemple avec méthode globale :
+```bash
+java -jar image-denoising-PCA-jar-with-dependencies.jar denoise -i img/img_noised/lena_noised_30.png -g -t soft -sh b -s 30
+```
+
+#### 3. Évaluer la qualité (`eval`)
 
 ```bash
-benchmark -i <chemin_image>... [-o <chemin_sortie>] [-s <sigma>]
+java -jar image-denoising-PCA-jar-with-dependencies.jar eval -i1 <chemin_image1> -i2 <chemin_image2> [-m <type>]
 ```
 
 Options :
-- `-i, --input` : Chemin(s) vers l'image(s) à tester (obligatoire, peut être multiple)
+- `-i1, --image1` : Chemin vers la première image (obligatoire)
+- `-i2, --image2` : Chemin vers la deuxième image (obligatoire)
+- `-m, --metric` : Type de métrique (mse/psnr/both, défaut: both)
+- `-h, --help` : Affiche l'aide
+
+Exemple :
+```bash
+java -jar image-denoising-PCA-jar-with-dependencies.jar eval -i1 img/original/lena.png -i2 img/img_noised/lena_noised_30.png
+```
+
+#### 4. Effectuer un benchmark (`benchmark`)
+
+```bash
+java -jar image-denoising-PCA-jar-with-dependencies.jar benchmark -i <chemin_image> [-o <chemin_sortie>] [-s <sigma>]
+```
+
+Options :
+- `-i, --input` : Chemin vers l'image à tester (obligatoire)
 - `-o, --output` : Répertoire de sortie pour les résultats (optionnel)
 - `-s, --sigma` : Écart type du bruit (défaut: 30.0)
 - `-h, --help` : Affiche l'aide
 
-La commande `benchmark` effectue un test complet sur une ou plusieurs images en :
+Exemple :
+```bash
+java -jar image-denoising-PCA-jar-with-dependencies.jar benchmark -i img/original/lena.png -s 30
+```
+
+La commande `benchmark` effectue un test complet sur l'image en :
 1. Ajoutant du bruit gaussien avec le sigma spécifié
 2. Testant toutes les combinaisons possibles de méthodes de débruitage :
    - Méthode globale et locale
@@ -65,59 +128,15 @@ Les résultats sont organisés dans des sous-répertoires nommés `<nom_image>_b
 - Les images débruitées pour chaque configuration
 - Un fichier `benchmark.txt` avec les métriques détaillées
 
-Exemple :
-```bash
-java -jar image-denoising-PCA-jar-with-dependencies.jar benchmark -i img/original/lena.png -s 30
-```
+## Mode Interactif
 
-## Prérequis
-
-- Java 17 ou supérieur
-- Maven 3.6 ou supérieur
-
-## Compilation
-
-Pour compiler le projet :
-
-```bash
-mvn clean compile
-```
-
-## Génération du fichier JAR
-
-Pour générer le fichier JAR exécutable :
-
-```bash
-mvn clean package
-```
-
-Le fichier JAR sera généré à la racine du projet avec le nom `image-denoising-PCA-jar-with-dependencies.jar`.
-
-Pour exécuter le programme avec le fichier JAR :
+Pour une utilisation guidée, lancez le programme sans arguments :
 
 ```bash
 java -jar image-denoising-PCA-jar-with-dependencies.jar
 ```
 
-## Exemples
-
-### Ajouter du bruit à une image
-
-```bash
-java -jar image-denoising-PCA-jar-with-dependencies.jar noise -i img/original/lena.png -s 30
-```
-
-### Débruiter une image avec la méthode locale
-
-```bash
-java -jar image-denoising-PCA-jar-with-dependencies.jar denoise -i img/img_noised/lena_noised_30.png -t hard -sh v -s 30
-```
-
-### Débruiter une image avec la méthode globale
-
-```bash
-java -jar image-denoising-PCA-jar-with-dependencies.jar denoise -i img/img_noised/lena_noised_30.png -g -t soft -sh b -s 30
-```
+Le programme vous guidera à travers les différentes options disponibles.
 
 ## Structure du projet
 

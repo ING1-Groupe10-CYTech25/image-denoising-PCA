@@ -2,26 +2,25 @@ package cli.parse;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Classe pour gérer les arguments de la commande benchmark.
  */
 public class BenchmarkArgs {
-    private final List<Path> inputs;
+    private final Path input;
     private final double sigma;
     private final Path outputDir;
 
     /**
      * Constructeur pour les arguments de benchmark.
      * 
-     * @param inputs Liste des chemins des images originales
+     * @param input Chemin vers l'image à tester
      * @param sigma Écart type du bruit
      * @param outputDir Répertoire de sortie pour les résultats
      */
-    public BenchmarkArgs(List<Path> inputs, double sigma, Path outputDir) {
-        this.inputs = inputs;
+    public BenchmarkArgs(Path input, double sigma, Path outputDir) {
+        this.input = input;
         this.sigma = sigma;
         this.outputDir = outputDir;
     }
@@ -31,56 +30,53 @@ public class BenchmarkArgs {
      * 
      * @param args Arguments de la ligne de commande
      * @return Instance de BenchmarkArgs
-     * @throws IllegalArgumentException si les arguments sont invalides
      */
     public static BenchmarkArgs parse(String[] args) {
-        List<Path> inputs = new ArrayList<>();
+        Path input = null;
         double sigma = 30.0;
         Path outputDir = null;
 
         for (int i = 0; i < args.length; i++) {
-            String arg = args[i];
-            switch (arg) {
+            switch (args[i]) {
                 case "-i", "--input" -> {
-                    while (i + 1 < args.length && !args[i + 1].startsWith("-")) {
-                        inputs.add(Paths.get(args[++i]));
+                    if (i + 1 < args.length) {
+                        input = Path.of(args[++i]);
+                    } else {
+                        throw new IllegalArgumentException("--input nécessite un chemin d'image");
                     }
                 }
                 case "-s", "--sigma" -> {
                     if (i + 1 < args.length) {
                         sigma = Double.parseDouble(args[++i]);
                     } else {
-                        throw new IllegalArgumentException("Valeur manquante pour l'option " + arg);
+                        throw new IllegalArgumentException("--sigma nécessite une valeur");
                     }
                 }
                 case "-o", "--output" -> {
                     if (i + 1 < args.length) {
-                        outputDir = Paths.get(args[++i]);
+                        outputDir = Path.of(args[++i]);
                     } else {
-                        throw new IllegalArgumentException("Valeur manquante pour l'option " + arg);
+                        throw new IllegalArgumentException("--output nécessite un chemin");
                     }
                 }
-                case "-h", "--help" -> {
-                    CliUtil.printBenchmarkHelp();
-                    System.exit(0);
-                }
-                default -> throw new IllegalArgumentException("Option inconnue : " + arg);
+                case "-h", "--help" -> CliUtil.printBenchmarkHelp();
+                default -> throw new IllegalArgumentException("Option inconnue: " + args[i]);
             }
         }
 
-        if (inputs.isEmpty()) {
-            throw new IllegalArgumentException("Au moins une image d'entrée est requise (-i)");
+        if (input == null) {
+            throw new IllegalArgumentException("--input est obligatoire");
         }
 
         if (outputDir == null) {
-            outputDir = Paths.get("img", "benchmark");
+            outputDir = Paths.get("img/benchmark");
         }
 
-        return new BenchmarkArgs(inputs, sigma, outputDir);
+        return new BenchmarkArgs(input, sigma, outputDir);
     }
 
-    public List<Path> getInputs() {
-        return inputs;
+    public Path getInput() {
+        return input;
     }
 
     public double getSigma() {

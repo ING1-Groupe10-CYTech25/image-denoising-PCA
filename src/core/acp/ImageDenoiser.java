@@ -206,7 +206,7 @@ public class ImageDenoiser {
         ImageFile imageFile = new ImageFile(imagePath);
         Image image = imageFile; // ImageFile hérite de Image
         int patchSize = 15; // Patch par défaut, cohérent avec le reste du projet
-
+        
         // Débruiter l'image
         Image denoised;
         if (isGlobal) {
@@ -215,7 +215,7 @@ public class ImageDenoiser {
             int numImagettes = 16;
             denoised = denoiseLocal(image, patchSize, numImagettes, threshold, shrink, sigma);
         }
-
+        
         // Sauvegarder l'image débruitée
         ImageFile denoisedFile = new ImageFile(denoised, "denoised");
         denoisedFile.saveImage(outputPath);

@@ -248,20 +248,13 @@ public class Main {
     private static void collectBenchmarkArgs(Scanner scanner) {
         System.out.println("\n== Benchmark de débruitage ==");
         
-        // Demander les chemins d'entrée
-        List<Path> inputs = new ArrayList<>();
-        while (true) {
-            System.out.print("Chemin de l'image à tester (vide pour terminer): ");
-            String inputStr = scanner.nextLine().trim();
-            if (inputStr.isEmpty()) {
-                if (inputs.isEmpty()) {
-                    System.out.println("Au moins une image est requise.");
-                    continue;
-                }
-                break;
-            }
-            inputs.add(Paths.get(inputStr));
+        // Demander le chemin d'entrée avec une valeur par défaut
+        System.out.print("Chemin de l'image à tester (défaut: img/original/lena.png): ");
+        String inputStr = scanner.nextLine().trim();
+        if (inputStr.isEmpty()) {
+            inputStr = "img/original/lena.png";
         }
+        Path input = Paths.get(inputStr);
         
         // Demander sigma
         System.out.print("Valeur sigma (intensité du bruit, défaut: 30.0): ");
@@ -272,10 +265,10 @@ public class Main {
         System.out.print("Répertoire de sortie (vide pour la valeur par défaut): ");
         String outputStr = scanner.nextLine().trim();
         Path output = outputStr.isEmpty() ? 
-                     Paths.get("benchmark_results") : Paths.get(outputStr);
+                     Paths.get("img/benchmark") : Paths.get(outputStr);
         
         try {
-            BenchmarkArgs args = new BenchmarkArgs(inputs, sigma, output);
+            BenchmarkArgs args = new BenchmarkArgs(input, sigma, output);
             runBenchmark(args);
         } catch (Exception e) {
             System.err.println("Erreur: " + e.getMessage());
@@ -305,28 +298,28 @@ public class Main {
             Path outputPath;
             
             // Créer un nom unique basé sur le nom de l'image originale
-            String baseName = img.getName();
-            String fileName = baseName + "_noised_" + a.getSigma() + ".png";
-            
-            // Déterminer le répertoire de sortie
-            Path outputDir;
-            
-            // Vérifier si le chemin de sortie est un fichier image (quelle que soit l'extension)
-            if (NoiseArgs.isImageFile(a.getOutput())) {
-                // Si l'utilisateur a spécifié un fichier, utiliser son répertoire parent
-                outputDir = a.getOutput().getParent();
+                String baseName = img.getName();
+                String fileName = baseName + "_noised_" + a.getSigma() + ".png";
                 
-                // Si le répertoire parent est null, utiliser le répertoire courant
-                if (outputDir == null) {
-                    outputDir = Paths.get(".");
+                // Déterminer le répertoire de sortie
+                Path outputDir;
+                
+                // Vérifier si le chemin de sortie est un fichier image (quelle que soit l'extension)
+                if (NoiseArgs.isImageFile(a.getOutput())) {
+                    // Si l'utilisateur a spécifié un fichier, utiliser son répertoire parent
+                    outputDir = a.getOutput().getParent();
+                    
+                    // Si le répertoire parent est null, utiliser le répertoire courant
+                    if (outputDir == null) {
+                        outputDir = Paths.get(".");
+                    }
+                } else {
+                    // Si l'utilisateur a spécifié un dossier, l'utiliser directement
+                    outputDir = a.getOutput();
                 }
-            } else {
-                // Si l'utilisateur a spécifié un dossier, l'utiliser directement
-                outputDir = a.getOutput();
-            }
-            
-            // Construire le chemin complet
-            outputPath = outputDir.resolve(fileName);
+                
+                // Construire le chemin complet
+                outputPath = outputDir.resolve(fileName);
             
             // Assurer que le répertoire de sortie existe
             File outputDirFile = outputPath.getParent().toFile();
@@ -347,7 +340,7 @@ public class Main {
      * @throws IOException 
      */
     private static void runDenoise(DenoiseArgs args) {
-        try {
+            try {
             // Débruiter l'image
             ImageDenoiser.ImageDen(
                 args.getInput().toString(),
@@ -359,8 +352,8 @@ public class Main {
             );
             
             System.out.println("Image débruitée sauvegardée dans: " + args.getOutput());
-            
-        } catch (Exception e) {
+                
+            } catch (Exception e) {
             System.err.println("Erreur lors du débruitage: " + e.getMessage());
             System.exit(1);
         }
@@ -447,7 +440,7 @@ public class Main {
             }
             
             // Exécuter le benchmark
-            Benchmark benchmark = new Benchmark(args.getInputs(), args.getSigma(), args.getOutputDir());
+            Benchmark benchmark = new Benchmark(args.getInput(), args.getSigma(), args.getOutputDir());
             benchmark.run();
             
             System.out.println("Benchmark terminé. Résultats sauvegardés dans : " + args.getOutputDir());
