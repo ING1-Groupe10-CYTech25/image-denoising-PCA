@@ -4,9 +4,10 @@ Ce projet implémente une méthode de débruitage d'images basée sur l'Analyse 
 
 ## Description
 
-Le projet propose deux commandes principales :
+Le projet propose trois commandes principales :
 - `noise` : Ajoute du bruit gaussien à une image
 - `denoise` : Débruite une image en utilisant la méthode ACP
+- `benchmark` : Effectue un benchmark complet sur une ou plusieurs images
 
 ## Utilisation
 
@@ -37,6 +38,37 @@ Options :
 - `-sh, --shrink` : Type de seuillage adaptatif (v pour VisuShrink, b pour BayesShrink)
 - `-s, --sigma` : Écart type du bruit (défaut: déduit ou 30.0)
 - `-h, --help` : Affiche l'aide
+
+### Commande `benchmark`
+
+```bash
+benchmark -i <chemin_image>... [-o <chemin_sortie>] [-s <sigma>]
+```
+
+Options :
+- `-i, --input` : Chemin(s) vers l'image(s) à tester (obligatoire, peut être multiple)
+- `-o, --output` : Répertoire de sortie pour les résultats (optionnel)
+- `-s, --sigma` : Écart type du bruit (défaut: 30.0)
+- `-h, --help` : Affiche l'aide
+
+La commande `benchmark` effectue un test complet sur une ou plusieurs images en :
+1. Ajoutant du bruit gaussien avec le sigma spécifié
+2. Testant toutes les combinaisons possibles de méthodes de débruitage :
+   - Méthode globale et locale
+   - Seuillage dur et doux
+   - VisuShrink et BayesShrink
+3. Évaluant les résultats avec les métriques MSE et PSNR
+4. Sauvegardant toutes les images débruitées et un rapport détaillé
+
+Les résultats sont organisés dans des sous-répertoires nommés `<nom_image>_benchmark_<sigma>` contenant :
+- L'image bruitée
+- Les images débruitées pour chaque configuration
+- Un fichier `benchmark.txt` avec les métriques détaillées
+
+Exemple :
+```bash
+java -jar image-denoising-PCA-jar-with-dependencies.jar benchmark -i img/original/lena.png -s 30
+```
 
 ## Prérequis
 

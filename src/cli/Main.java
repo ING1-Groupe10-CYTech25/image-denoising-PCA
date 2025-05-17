@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Scanner;
 import java.util.List;
+import java.util.ArrayList;
 import java.io.File;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
@@ -16,6 +17,7 @@ import core.image.Album;
 import core.image.ImageFile;
 import core.eval.ImageQualityMetrics;
 import core.acp.ImageDenoiser;
+import core.acp.Benchmark;
 
 /**
  * Classe principale de l'application en ligne de commande pour le traitement d'images.
@@ -43,6 +45,7 @@ public class Main {
                     case "noise" -> runNoise(NoiseArgs.parse(rest));
                     case "denoise" -> runDenoise(DenoiseArgs.parse(rest));
                     case "eval" -> runEval(EvalArgs.parse(rest));
+                    case "benchmark" -> runBenchmark(BenchmarkArgs.parse(rest));
                     case "--help", "-h" -> CliUtil.printGlobalHelp();
                     default -> throw new IllegalArgumentException("Commande inconnue : " + cmd);
                 }
@@ -65,13 +68,15 @@ public class Main {
         System.out.println("1. Ajouter du bruit à une image (noise)");
         System.out.println("2. Débruiter une image (denoise)");
         System.out.println("3. Évaluer la qualité du débruitage (eval)");
+        System.out.println("4. Effectuer un benchmark complet (benchmark)");
         
-        int choice = getValidChoice(scanner, 1, 3);
+        int choice = getValidChoice(scanner, 1, 4);
         
         switch (choice) {
             case 1 -> collectNoiseArgs(scanner);
             case 2 -> collectDenoiseArgs(scanner);
             case 3 -> collectEvalArgs(scanner);
+            case 4 -> collectBenchmarkArgs(scanner);
         }
     }
     
@@ -240,6 +245,44 @@ public class Main {
         }
     }
 
+    private static void collectBenchmarkArgs(Scanner scanner) {
+        System.out.println("\n== Benchmark de débruitage ==");
+        
+        // Demander les chemins d'entrée
+        List<Path> inputs = new ArrayList<>();
+        while (true) {
+            System.out.print("Chemin de l'image à tester (vide pour terminer): ");
+            String inputStr = scanner.nextLine().trim();
+            if (inputStr.isEmpty()) {
+                if (inputs.isEmpty()) {
+                    System.out.println("Au moins une image est requise.");
+                    continue;
+                }
+                break;
+            }
+            inputs.add(Paths.get(inputStr));
+        }
+        
+        // Demander sigma
+        System.out.print("Valeur sigma (intensité du bruit, défaut: 30.0): ");
+        String sigmaStr = scanner.nextLine().trim();
+        double sigma = sigmaStr.isEmpty() ? 30.0 : Double.parseDouble(sigmaStr);
+        
+        // Demander le répertoire de sortie
+        System.out.print("Répertoire de sortie (vide pour la valeur par défaut): ");
+        String outputStr = scanner.nextLine().trim();
+        Path output = outputStr.isEmpty() ? 
+                     Paths.get("benchmark_results") : Paths.get(outputStr);
+        
+        try {
+            BenchmarkArgs args = new BenchmarkArgs(inputs, sigma, output);
+            runBenchmark(args);
+        } catch (Exception e) {
+            System.err.println("Erreur: " + e.getMessage());
+            System.exit(1);
+        }
+    }
+
     /**
      * Exécute l'opération d'ajout de bruit à une image.
      * 
@@ -392,6 +435,26 @@ public class Main {
             System.err.println("Erreur lors du chargement des images: " + e.getMessage());
         } catch (Exception e) {
             System.err.println("Erreur lors de l'évaluation: " + e.getMessage());
+        }
+    }
+
+    private static void runBenchmark(BenchmarkArgs args) {
+        try {
+            // Créer le répertoire de sortie s'il n'existe pas
+            File outputDir = args.getOutputDir().toFile();
+            if (!outputDir.exists()) {
+                outputDir.mkdirs();
+            }
+            
+            // Exécuter le benchmark
+            Benchmark benchmark = new Benchmark(args.getInputs(), args.getSigma(), args.getOutputDir());
+            benchmark.run();
+            
+            System.out.println("Benchmark terminé. Résultats sauvegardés dans : " + args.getOutputDir());
+            
+        } catch (Exception e) {
+            System.err.println("Erreur lors du benchmark: " + e.getMessage());
+            System.exit(1);
         }
     }
 }

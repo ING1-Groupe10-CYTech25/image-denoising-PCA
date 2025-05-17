@@ -166,4 +166,22 @@ public final class CliUtil {
                 "Plus la valeur MSE est basse, plus les images sont similaires.\n" +
                 "Plus la valeur PSNR est élevée, meilleure est la qualité de l'image.");
     }
+
+    /**
+     * Affiche l'aide pour la commande benchmark.
+     */
+    public static void printBenchmarkHelp() {
+        System.out.println("benchmark -i <chemin_image>... [-o <chemin_sortie>] [-s <sigma>]");
+        System.out.println("Effectue un benchmark complet sur une ou plusieurs images.");
+        System.out.println();
+        System.out.println("Options :");
+        System.out.println("  -i, --input    : Chemin(s) vers l'image(s) à tester (obligatoire, peut être multiple)");
+        System.out.println("  -o, --output   : Répertoire de sortie pour les résultats (optionnel)");
+        System.out.println("  -s, --sigma    : Écart type du bruit (défaut: 30.0)");
+        System.out.println("  -h, --help     : Affiche cette aide");
+        System.out.println();
+        System.out.println("Exemple :");
+        System.out.println("  benchmark -i img/original/lena.png -s 30");
+        System.out.println("  benchmark -i img/original/lena.png img/original/barbara.png -o results");
+    }
 }
