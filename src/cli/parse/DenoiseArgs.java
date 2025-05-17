@@ -18,6 +18,7 @@ import java.util.Set;
  *   <li>isGlobal : indique si on utilise la méthode globale (true) ou locale (false)</li>
  *   <li>threshold : type de seuillage à appliquer ("hard" ou "soft")</li>
  *   <li>shrink : type de seuillage adaptatif ("v" pour VisuShrink, "b" pour BayesShrink)</li>
+ *   <li>sigma : écart type du bruit</li>
  * </ul>
  * 
  * Les arguments reconnus en ligne de commande sont :
@@ -27,7 +28,8 @@ import java.util.Set;
  *   <li>--global, -g : active la méthode de débruitage globale</li>
  *   <li>--local, -l : active la méthode de débruitage locale (défaut si ni global ni local n'est spécifié)</li>
  *   <li>--threshold, -t : type de seuillage ("hard" ou "soft", défaut: "hard")</li>
- *   <li>--shrink, -s : type de seuillage adaptatif ("v" pour VisuShrink, "b" pour BayesShrink)</li>
+ *   <li>--shrink, -sh : type de seuillage adaptatif ("v" pour VisuShrink, "b" pour BayesShrink)</li>
+ *   <li>--sigma, -s : écart type du bruit</li>
  *   <li>--help, -h : affiche l'aide et quitte le programme</li>
  * </ul>
  * 
@@ -43,6 +45,7 @@ public final class DenoiseArgs {
     private final boolean isGlobal;
     private final String threshold;
     private final String shrink;
+    private final double sigma;
     
     // Set des extensions d'images supportées
     private static final Set<String> SUPPORTED_EXTENSIONS = new HashSet<>(
@@ -50,7 +53,7 @@ public final class DenoiseArgs {
     
     // Set des types de seuillage supportés
     private static final Set<String> SUPPORTED_THRESHOLDS = new HashSet<>(
-            Arrays.asList("hard", "soft"));
+            Arrays.asList("hard", "soft", "h", "s"));
     
     // Set des types de seuillage adaptatif supportés
     private static final Set<String> SUPPORTED_SHRINKS = new HashSet<>(
@@ -64,9 +67,10 @@ public final class DenoiseArgs {
      * @param isGlobal indique si la méthode de débruitage est globale (true) ou locale (false)
      * @param threshold type de seuillage à appliquer ("hard" ou "soft")
      * @param shrink type de seuillage adaptatif ("v" ou "b")
+     * @param sigma écart type du bruit
      * @throws IllegalArgumentException si les paramètres sont invalides
      */
-    public DenoiseArgs(Path input, Path output, boolean isGlobal, String threshold, String shrink) {
+    public DenoiseArgs(Path input, Path output, boolean isGlobal, String threshold, String shrink, double sigma) {
         // Vérifier que le chemin d'entrée existe
         if (input == null || !input.toFile().exists()) {
             throw new IllegalArgumentException("Le chemin d'entrée doit exister: " + input);
@@ -87,7 +91,14 @@ public final class DenoiseArgs {
         if (!SUPPORTED_THRESHOLDS.contains(thresholdLower)) {
             throw new IllegalArgumentException(
                 "Type de seuillage non supporté: " + threshold + 
-                ". Utilisez 'hard' ou 'soft'");
+                ". Utilisez 'hard'/'h' ou 'soft'/'s'");
+        }
+        
+        // Convertir les versions courtes en versions longues
+        if (thresholdLower.equals("h")) {
+            thresholdLower = "hard";
+        } else if (thresholdLower.equals("s")) {
+            thresholdLower = "soft";
         }
         
         // Vérifier le type de seuillage adaptatif si fourni
@@ -98,11 +109,17 @@ public final class DenoiseArgs {
                 ". Utilisez 'v' (VisuShrink) ou 'b' (BayesShrink)");
         }
         
+        // Vérifier que sigma est positif
+        if (sigma <= 0) {
+            throw new IllegalArgumentException("Sigma doit être un nombre strictement positif");
+        }
+        
         this.input = input;
         this.output = output;
         this.isGlobal = isGlobal;
         this.threshold = thresholdLower;
         this.shrink = shrinkLower;
+        this.sigma = sigma;
     }
 
     /**
@@ -131,6 +148,11 @@ public final class DenoiseArgs {
     public String getShrink() { return shrink; }
     
     /**
+     * @return l'écart type du bruit
+     */
+    public double getSigma() { return sigma; }
+    
+    /**
      * Vérifie si un fichier est une image supportée en se basant sur son extension.
      * 
      * @param path chemin du fichier à vérifier
@@ -154,6 +176,35 @@ public final class DenoiseArgs {
     }
 
     /**
+     * Extrait la valeur de sigma du nom du fichier si elle est présente dans le format _noised_<sigma>.
+     * 
+     * @param path chemin du fichier
+     * @return la valeur de sigma extraite, ou -1 si non trouvée
+     */
+    private static double extractSigmaFromFilename(Path path) {
+        String filename = path.getFileName().toString();
+        int index = filename.indexOf("_noised_");
+        if (index != -1) {
+            try {
+                // Extraire la partie après "_noised_"
+                String afterNoised = filename.substring(index + 8);
+                // Trouver la fin du nombre (jusqu'au prochain underscore ou point)
+                int endIndex = afterNoised.indexOf('_');
+                if (endIndex == -1) {
+                    endIndex = afterNoised.indexOf('.');
+                }
+                if (endIndex != -1) {
+                    afterNoised = afterNoised.substring(0, endIndex);
+                }
+                return Double.parseDouble(afterNoised);
+            } catch (NumberFormatException e) {
+                return -1;
+            }
+        }
+        return -1;
+    }
+
+    /**
      * Parse les arguments en ligne de commande pour créer un objet DenoiseArgs.
      *
      * @param args arguments de ligne de commande
@@ -166,6 +217,7 @@ public final class DenoiseArgs {
         boolean explicitLocal = false;
         String threshold = "hard"; // Valeur par défaut
         String shrink = "v";      // VisuuShrink par défaut
+        double sigma = 30.0;      // Valeur par défaut pour sigma
 
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
@@ -180,6 +232,11 @@ public final class DenoiseArgs {
                     if (inputFile.isFile() && !isImageFile(input)) {
                         throw new IllegalArgumentException("Format d'image non supporté pour le fichier d'entrée: " + input);
                     }
+                    // Essayer d'extraire sigma du nom du fichier
+                    double extractedSigma = extractSigmaFromFilename(input);
+                    if (extractedSigma > 0) {
+                        sigma = extractedSigma;
+                    }
                 }
                 case "--output", "-o" -> output = Paths.get(CliUtil.next(args, ++i, "--output"));
                 case "--global", "-g" -> isGlobal = true;
@@ -189,15 +246,25 @@ public final class DenoiseArgs {
                     if (!SUPPORTED_THRESHOLDS.contains(threshold)) {
                         throw new IllegalArgumentException(
                             "Type de seuillage non supporté: " + threshold + 
-                            ". Utilisez 'hard' ou 'soft'");
+                            ". Utilisez 'hard'/'h' ou 'soft'/'s'");
                     }
                 }
-                case "--shrink", "-s" -> {
+                case "--shrink", "-sh" -> {
                     shrink = CliUtil.next(args, ++i, "--shrink").toLowerCase();
                     if (!SUPPORTED_SHRINKS.contains(shrink)) {
                         throw new IllegalArgumentException(
                             "Type de seuillage adaptatif non supporté: " + shrink + 
                             ". Utilisez 'v' (VisuShrink) ou 'b' (BayesShrink)");
+                    }
+                }
+                case "--sigma", "-s" -> {
+                    try {
+                        sigma = Double.parseDouble(CliUtil.next(args, ++i, "--sigma"));
+                        if (sigma <= 0) {
+                            throw new IllegalArgumentException("Sigma doit être un nombre strictement positif");
+                        }
+                    } catch (NumberFormatException e) {
+                        throw new IllegalArgumentException("Sigma doit être un nombre valide");
                     }
                 }
                 case "-h", "--help" -> { CliUtil.printDenoiseHelp(); System.exit(0); }
@@ -238,6 +305,6 @@ public final class DenoiseArgs {
             }
         }
         
-        return new DenoiseArgs(input, output, isGlobal, threshold, shrink);
+        return new DenoiseArgs(input, output, isGlobal, threshold, shrink, sigma);
     }
 }

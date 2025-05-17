@@ -1,6 +1,7 @@
 package cli;
 
 import cli.parse.*;
+import cli.parse.CliUtil;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -162,6 +163,22 @@ public class Main {
         String shrinkStr = scanner.nextLine().trim().toLowerCase();
         String shrink = shrinkStr.isEmpty() ? null : shrinkStr;
         
+        // Demander sigma (optionnel)
+        System.out.print("Valeur sigma (laisser vide pour auto/extraction): ");
+        String sigmaStr = scanner.nextLine().trim();
+        double sigma;
+        if (sigmaStr.isEmpty()) {
+            // Essayer d'extraire sigma du nom du fichier
+            sigma = DenoiseArgs.parse(new String[]{"-i", inputStr}).getSigma();
+        } else {
+            try {
+                sigma = Double.parseDouble(sigmaStr);
+            } catch (NumberFormatException e) {
+                System.err.println("Valeur de sigma invalide, utilisation de 30.0 par défaut.");
+                sigma = 30.0;
+            }
+        }
+        
         // Demander le chemin de sortie
         System.out.print("Chemin de sortie (laissez vide pour la valeur par défaut): ");
         String outputStr = scanner.nextLine().trim();
@@ -181,7 +198,7 @@ public class Main {
         }
         
         try {
-            DenoiseArgs args = new DenoiseArgs(input, output, isGlobal, threshold, shrink);
+            DenoiseArgs args = new DenoiseArgs(input, output, isGlobal, threshold, shrink, sigma);
             runDenoise(args);
         } catch (Exception e) {
             System.err.println("Erreur: " + e.getMessage());
@@ -286,31 +303,24 @@ public class Main {
      * @param args Arguments pour l'opération de débruitage
      * @throws IOException 
      */
-    private static void runDenoise(DenoiseArgs args) throws IOException {
-        // Paramètres de débruitage
-        int patchSize = 15; // Taille des patchs par défaut
-        double sigma = 30;  // Écart type du bruit par défaut
-        
-        // Débruiter l'image
-        System.out.println("Débruitage de l'image...");
-        System.out.println("Méthode: " + (args.isGlobal() ? "globale" : "locale"));
-        System.out.println("Seuillage: " + args.getThreshold());
-        if (args.getShrink() != null) {
-            System.out.println("Seuillage adaptatif: " + args.getShrink());
+    private static void runDenoise(DenoiseArgs args) {
+        try {
+            // Débruiter l'image
+            ImageDenoiser.ImageDen(
+                args.getInput().toString(),
+                args.getOutput().toString(),
+                args.isGlobal(),
+                args.getThreshold(),
+                args.getShrink(),
+                args.getSigma()
+            );
+            
+            System.out.println("Image débruitée sauvegardée dans: " + args.getOutput());
+            
+        } catch (Exception e) {
+            System.err.println("Erreur lors du débruitage: " + e.getMessage());
+            System.exit(1);
         }
-        
-        // Appeler la méthode de débruitage
-        ImageDenoiser.ImageDen(
-            args.getInput().toString(),
-            args.getOutput().toString(),
-            patchSize,
-            args.isGlobal(),
-            args.getThreshold(),
-            args.getShrink(),
-            sigma
-        );
-        
-        System.out.println("Image débruitée sauvegardée dans: " + args.getOutput());
     }
     
     /**

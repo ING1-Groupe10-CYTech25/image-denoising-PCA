@@ -12,7 +12,7 @@ import java.util.Locale;
  *   <li><code>img/img_denoised/</code> pour <em>denoise</em></li>
  * </ul>
  *
- * Pour les autres commandes, aucun chemin par défaut n’est proposé.
+ * Pour les autres commandes, aucun chemin par défaut n'est proposé.
  */
 public final class CliUtil {
 
@@ -39,7 +39,7 @@ public final class CliUtil {
     public static Path defaultOut(Path input, String cmd, int sigma) {
         return switch (cmd.toLowerCase(Locale.ROOT)) {
             case "noise"   -> defaultOutNoise(input, sigma);
-            case "denoise" -> defaultOutDenoise(input);
+            case "denoise" -> defaultOutDenoise(input, "local", "hard", "", ".png");
             default         -> null;
         };
     }
@@ -110,9 +110,17 @@ public final class CliUtil {
     /* ------------------------------------------------------------------ */
 
     public static void printGlobalHelp() {
-        System.out.println("Usage : noise <commande> [options]\n" +
-                "Commandes : noise, denoise, eval.\n" +
-                "‘--help’ après une commande pour le détail des options.");
+        System.out.println("""
+            Usage: image-denoising-PCA [command] [options]
+            
+            Commandes disponibles:
+              noise    Ajouter du bruit à une image
+              denoise  Débruiter une image
+              eval     Évaluer la qualité du débruitage
+            
+            Pour plus d'informations sur une commande:
+              image-denoising-PCA [command] --help
+            """);
     }
 
     public static void printNoiseHelp() {
@@ -124,15 +132,23 @@ public final class CliUtil {
      * Affiche l'aide pour la commande denoise.
      */
     public static void printDenoiseHelp() {
-        System.out.println("denoise --input <path> [--output <path>] [--global | --local] [--threshold <type>] [--shrink <type>]\n" +
-                "Débruite une image en appliquant la méthode PCA.\n" +
-                "  --input, -i      : chemin de l'image à débruiter\n" +
-                "  --output, -o     : chemin de destination (facultatif)\n" +
-                "  --global, -g     : utilise la méthode globale (défaut: locale si ni global ni local spécifié)\n" +
-                "  --local, -l      : utilise la méthode locale (défaut: locale si ni global ni local spécifié)\n" +
-                "  --threshold, -t  : type de seuillage ('hard' ou 'soft', défaut: 'hard')\n" +
-                "  --shrink, -s     : type de seuillage adaptatif ('v' pour VisuShrink, 'b' pour BayesShrink)\n" +
-                "Si --output est omis, le résultat est écrit dans ./img/img_denoised/<img>_denoised_<method>_<threshold>[_<shrink>].png");
+        System.out.println("""
+            Usage: denoise [options]
+            
+            Options:
+              -i, --input <path>     Chemin vers l'image à débruiter (obligatoire)
+              -o, --output <path>    Chemin pour l'image débruitée (optionnel)
+              -g, --global          Active la méthode de débruitage globale
+              -l, --local           Active la méthode de débruitage locale (défaut)
+              -t, --threshold <type> Type de seuillage (hard/h ou soft/s, défaut: hard)
+              -sh, --shrink <type>   Type de seuillage adaptatif (v pour VisuShrink, b pour BayesShrink)
+              -s, --sigma <value>    Écart type du bruit (défaut: 30.0)
+              -h, --help            Affiche cette aide
+            
+            Exemples:
+              denoise -i image.png -t hard -sh v -s 25.0
+              denoise -i image.png -g -t soft -sh b
+            """);
     }
 
     /**

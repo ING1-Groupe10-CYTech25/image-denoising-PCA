@@ -2,6 +2,10 @@ package core.acp;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 
 import core.image.Image;
 import core.image.ImageFile;
@@ -187,30 +191,33 @@ public class ImageDenoiser {
     }
     
     /**
-     * Débruite un fichier image et sauvegarde le résultat.
+     * Débruite une image en utilisant la méthode ACP.
      * 
      * @param imagePath chemin vers l'image à débruiter
      * @param outputPath chemin où sauvegarder l'image débruitée
-     * @param patchSize taille du côté des patchs (généralement 8 ou 16)
-     * @param isGlobal true pour la méthode globale, false pour la méthode locale
+     * @param isGlobal true pour utiliser la méthode globale, false pour la méthode locale
      * @param threshold type de seuillage ("hard" ou "soft")
-     * @param shrinkType type de seuillage adaptatif ("v" pour VisuShrink, "b" pour BayesShrink)
-     * @param sigma écart type du bruit (si connu, sinon sera estimé)
-     * @throws java.io.IOException si une erreur survient lors de la lecture/écriture des fichiers
+     * @param shrink type de seuillage adaptatif ("v" pour VisuShrink, "b" pour BayesShrink)
+     * @param sigma écart type du bruit
+     * @throws IOException si une erreur survient lors de la lecture/écriture des fichiers
      */
-    public static void ImageDen(String imagePath, String outputPath, int patchSize, 
-                                      boolean isGlobal, String threshold, String shrinkType, 
-                                      double sigma) throws java.io.IOException {
-        // Charger l'image
+    public static void ImageDen(String imagePath, String outputPath, boolean isGlobal, String threshold, String shrink, double sigma) throws IOException {
+        // Charger l'image via la classe ImageFile
         ImageFile imageFile = new ImageFile(imagePath);
-        
+        Image image = imageFile; // ImageFile hérite de Image
+        int patchSize = 15; // Patch par défaut, cohérent avec le reste du projet
+
         // Débruiter l'image
-        Image denoisedImage = denoise(imageFile, patchSize, isGlobal, threshold, shrinkType, sigma);
-        
-        // Enregistrer le résultat
-        ImageFile denoisedImageFile = new ImageFile(denoisedImage, "denoised");
-        denoisedImageFile.saveImage(outputPath);
-        
-        System.out.println("Image débruitée sauvegardée: " + outputPath);
+        Image denoised;
+        if (isGlobal) {
+            denoised = denoiseGlobal(image, patchSize, threshold, shrink, sigma);
+        } else {
+            int numImagettes = 16;
+            denoised = denoiseLocal(image, patchSize, numImagettes, threshold, shrink, sigma);
+        }
+
+        // Sauvegarder l'image débruitée
+        ImageFile denoisedFile = new ImageFile(denoised, "denoised");
+        denoisedFile.saveImage(outputPath);
     }
 }

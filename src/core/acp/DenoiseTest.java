@@ -94,8 +94,8 @@ public class DenoiseTest {
                                      ", seuillage: " + threshold + 
                                      ", seuillage adaptatif: " + shrink);
                     
-                    ImageDenoiser.ImageDen(noisedPath, outputName, patchSize, 
-                                                 isGlobal, threshold, shrink, sigma);
+                    ImageDenoiser.ImageDen(noisedPath, outputName, isGlobal, threshold, shrink, sigma);
+                    System.out.println("Image débruitée sauvegardée dans: " + outputName);
                     
                     // Évaluer le résultat
                     ImageFile denoisedImage = new ImageFile(outputName);
