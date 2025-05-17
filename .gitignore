@@ -1,1 +1,8 @@
-/bin
+# Fichiers de build
+target/
+
+# Fichiers Eclipse
+.settings/
+.classpath
+.project
+.factorypath
