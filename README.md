@@ -116,7 +116,7 @@ Cette documentation détaille l'utilisation de la commande `eval` de l'outil ima
 ### Syntaxe
 
 ```bash
-mvn exec:java -Dexec.mainClass="cli.Main" -Dexec.args="eval [options]"
+eval --image1 <chemin> --image2 <chemin> [--metric <type>]
 ```
 
 ### Options
@@ -126,7 +126,6 @@ mvn exec:java -Dexec.mainClass="cli.Main" -Dexec.args="eval [options]"
 | `--image1 <chemin>` | `-i1 <chemin>` | Chemin vers la première image (généralement l'original) | **Obligatoire** |
 | `--image2 <chemin>` | `-i2 <chemin>` | Chemin vers la deuxième image (généralement l'image traitée) | **Obligatoire** |
 | `--metric <type>` | `-m <type>` | Type de métrique à utiliser: 'mse', 'psnr' ou 'both' | *Facultatif* (défaut: 'both') |
-| `--help` | `-h` | Affiche l'aide de la commande eval | *Facultatif* |
 
 ### Métriques disponibles
 
@@ -137,22 +136,17 @@ mvn exec:java -Dexec.mainClass="cli.Main" -Dexec.args="eval [options]"
 
 1. Évaluer deux images en utilisant les deux métriques (MSE et PSNR) :
    ```bash
-   mvn exec:java -Dexec.mainClass="cli.Main" -Dexec.args="eval --image1 img/original/lena.png --image2 img/img_noised/lena_10.png"
+   java -jar image-denoising-PCA-jar-with-dependencies.jar eval --image1 img/original/lena.png --image2 img/img_noised/lena_10.png
    ```
 
 2. Calculer uniquement l'erreur quadratique moyenne (MSE) :
    ```bash
-   mvn exec:java -Dexec.mainClass="cli.Main" -Dexec.args="eval -i1 img/original/lena.png -i2 img/img_noised/lena_10.png -m mse"
+   java -jar image-denoising-PCA-jar-with-dependencies.jar eval -i1 img/original/lena.png -i2 img/img_noised/lena_10.png -m mse
    ```
 
 3. Calculer uniquement le rapport signal/bruit (PSNR) :
    ```bash
-   mvn exec:java -Dexec.mainClass="cli.Main" -Dexec.args="eval -i1 img/original/lena.png -i2 img/img_noised/lena_10.png -m psnr"
-   ```
-
-4. Afficher l'aide de la commande eval :
-   ```bash
-   mvn exec:java -Dexec.mainClass="cli.Main" -Dexec.args="eval --help"
+   java -jar image-denoising-PCA-jar-with-dependencies.jar eval -i1 img/original/lena.png -i2 img/img_noised/lena_10.png -m psnr
    ```
 
 ## Utilisation en mode interactif
@@ -160,7 +154,7 @@ mvn exec:java -Dexec.mainClass="cli.Main" -Dexec.args="eval [options]"
 Pour une utilisation guidée, lancez le programme sans arguments :
 
 ```bash
-mvn exec:java -Dexec.mainClass="cli.Main"
+java -jar image-denoising-PCA-jar-with-dependencies.jar
 ```
 
 1. Choisissez l'option 3 : "Évaluer la qualité du débruitage (eval)"
