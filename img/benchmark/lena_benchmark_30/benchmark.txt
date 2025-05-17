@@ -1,0 +1,45 @@
+=== Benchmark pour lena.png ===
+Sigma: 30.0
+Taille de patch: 10.0%
+
+Débruitage avec méthode: global, seuillage: hard, seuillage adaptatif: v
+Image débruitée sauvegardée dans: img/benchmark/lena_benchmark_30/lena_denoised_global_hard_v.png
+MSE: 220.59
+PSNR: 24.69 dB
+
+Débruitage avec méthode: global, seuillage: hard, seuillage adaptatif: b
+Image débruitée sauvegardée dans: img/benchmark/lena_benchmark_30/lena_denoised_global_hard_b.png
+MSE: 412.61
+PSNR: 21.98 dB
+
+Débruitage avec méthode: global, seuillage: soft, seuillage adaptatif: v
+Image débruitée sauvegardée dans: img/benchmark/lena_benchmark_30/lena_denoised_global_soft_v.png
+MSE: 284.89
+PSNR: 23.58 dB
+
+Débruitage avec méthode: global, seuillage: soft, seuillage adaptatif: b
+Image débruitée sauvegardée dans: img/benchmark/lena_benchmark_30/lena_denoised_global_soft_b.png
+MSE: 272.52
+PSNR: 23.78 dB
+
+Débruitage avec méthode: local, seuillage: hard, seuillage adaptatif: v
+Image débruitée sauvegardée dans: img/benchmark/lena_benchmark_30/lena_denoised_local_hard_v.png
+MSE: 176.23
+PSNR: 25.67 dB
+
+Débruitage avec méthode: local, seuillage: hard, seuillage adaptatif: b
+Image débruitée sauvegardée dans: img/benchmark/lena_benchmark_30/lena_denoised_local_hard_b.png
+MSE: 692.95
+PSNR: 19.72 dB
+
+Débruitage avec méthode: local, seuillage: soft, seuillage adaptatif: v
+Image débruitée sauvegardée dans: img/benchmark/lena_benchmark_30/lena_denoised_local_soft_v.png
+MSE: 225.58
+PSNR: 24.60 dB
+
+Débruitage avec méthode: local, seuillage: soft, seuillage adaptatif: b
+Image débruitée sauvegardée dans: img/benchmark/lena_benchmark_30/lena_denoised_local_soft_b.png
+MSE: 248.52
+PSNR: 24.18 dB
+
+
