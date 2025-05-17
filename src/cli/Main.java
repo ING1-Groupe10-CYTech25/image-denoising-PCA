@@ -1,23 +1,26 @@
 package cli;
 
-import cli.parse.*;
-import cli.parse.CliUtil;
-
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Scanner;
-import java.util.List;
 import java.util.ArrayList;
-import java.io.File;
-import java.awt.image.BufferedImage;
+import java.util.List;
+import java.util.Scanner;
+
 import javax.imageio.ImageIO;
 
+import cli.parse.BenchmarkArgs;
+import cli.parse.CliUtil;
+import cli.parse.DenoiseArgs;
+import cli.parse.EvalArgs;
+import cli.parse.NoiseArgs;
+import core.acp.Benchmark;
+import core.acp.ImageDenoiser;
+import core.eval.ImageQualityMetrics;
 import core.image.Album;
 import core.image.ImageFile;
-import core.eval.ImageQualityMetrics;
-import core.acp.ImageDenoiser;
-import core.acp.Benchmark;
 
 /**
  * Classe principale de l'application en ligne de commande pour le traitement d'images.
@@ -63,7 +66,14 @@ public class Main {
      */
     private static void runInteractiveMode() {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("// image-denoising-PCA //");
+        System.out.println("""                                              
+ _ *                      _             _     _            _____ _____ _____ 
+|_|_____ _*_ _*_ ___    _| |___ ___ ___|_|___|_|___ ___   |  _  |     |  _  |
+| |*   *| .'| . | -_|* | . | -_|   | . | |_ -| |   | . |  |   __|   --|     |
+|_|_|_|_|__,|_ *|___|  |___|___|_|_|___|_|___|_|_|_|_  |  |__|  |_____|__|__|
+*  *     *  |___| *                                |___|                     
+*     *        *    *         GROUPE 10
+        """);
         System.out.println("Que voulez-vous faire ?");
         System.out.println("1. Ajouter du bruit à une image (noise)");
         System.out.println("2. Débruiter une image (denoise)");
@@ -133,8 +143,11 @@ public class Main {
         try {
             NoiseArgs args = new NoiseArgs(input, sigma, output);
             runNoise(args);
-        } catch (Exception e) {
-            System.err.println("Erreur: " + e.getMessage());
+        } catch (IOException e) {
+            System.err.println("Erreur d'entrée/sortie: " + e.getMessage());
+            System.exit(1);
+        } catch (IllegalArgumentException e) {
+            System.err.println("Erreur d'argument: " + e.getMessage());
             System.exit(1);
         }
     }
@@ -169,7 +182,7 @@ public class Main {
         String shrink = shrinkStr.isEmpty() ? null : shrinkStr;
         
         // Demander sigma (optionnel)
-        System.out.print("Valeur sigma (laisser vide pour auto/extraction): ");
+        System.out.print("Valeur sigma (laisser vide pour auto/déduction): ");
         String sigmaStr = scanner.nextLine().trim();
         double sigma;
         if (sigmaStr.isEmpty()) {
@@ -204,9 +217,9 @@ public class Main {
         }
         
         // Demander le chemin de sortie
-        System.out.print("Chemin de sortie (laissez vide pour la valeur par défaut): ");
+        System.out.print("Chemin de sortie (défault : img/img_denoised/): ");
         String outputStr = scanner.nextLine().trim();
-        Path output = null;
+        Path output;
         
         if (!outputStr.isEmpty()) {
             output = Paths.get(outputStr);
@@ -224,8 +237,8 @@ public class Main {
         try {
             DenoiseArgs args = new DenoiseArgs(input, output, isGlobal, threshold, shrink, sigma, patchPercent);
             runDenoise(args);
-        } catch (Exception e) {
-            System.err.println("Erreur: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            System.err.println("Erreur d'argument: " + e.getMessage());
             System.exit(1);
         }
     }
@@ -300,7 +313,7 @@ public class Main {
         }
         
         // Demander le répertoire de sortie
-        System.out.print("Répertoire de sortie (vide pour la valeur par défaut): ");
+        System.out.print("Répertoire de sortie (défaut : img/benchmark): ");
         String outputStr = scanner.nextLine().trim();
         Path output = outputStr.isEmpty() ? 
                      Paths.get("img/benchmark") : Paths.get(outputStr);
@@ -358,7 +371,7 @@ public class Main {
             
             // Si l'entrée est un dossier, créer un sous-dossier avec la date
             if (a.getInput().toFile().isDirectory()) {
-                String timestamp = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yy-MM-dd-HH-mm"));
+                String timestamp = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yy-MM-dd-HH-mm")); // format de date triable simplement
                 outputDir = outputDir.resolve(timestamp);
             }
             
@@ -564,8 +577,11 @@ public class Main {
             
             System.out.println("Benchmark terminé. Résultats sauvegardés dans : " + args.getOutputDir());
             
-        } catch (Exception e) {
-            System.err.println("Erreur lors du benchmark: " + e.getMessage());
+        } catch (IOException e) {
+            System.err.println("Erreur d'entrée/sortie lors du benchmark: " + e.getMessage());
+            System.exit(1);
+        } catch (IllegalArgumentException e) {
+            System.err.println("Erreur d'argument lors du benchmark: " + e.getMessage());
             System.exit(1);
         }
     }
