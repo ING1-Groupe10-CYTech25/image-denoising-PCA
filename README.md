@@ -28,6 +28,22 @@ Pour compiler le projet, utilisez la commande Maven suivante :
 mvn clean compile
 ```
 
+## Génération du fichier JAR
+
+Pour générer un fichier JAR exécutable avec toutes les dépendances, utilisez la commande :
+
+```bash
+mvn clean package
+```
+
+Le fichier JAR sera généré dans le répertoire `target` avec le nom `image-denoising-PCA-jar-with-dependencies.jar`.
+
+Pour exécuter le programme avec le fichier JAR :
+
+```bash
+java -jar target/image-denoising-PCA-jar-with-dependencies.jar
+```
+
 ## Utilisation en ligne de commande
 
 ### Syntaxe
