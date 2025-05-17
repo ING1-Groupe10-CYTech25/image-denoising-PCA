@@ -7,11 +7,15 @@ Ce projet implémente une méthode de débruitage d'images basée sur l'Analyse 
 - Java 17 ou supérieur
 - Maven 3.6 ou supérieur
 
+## Dépendences
+
+- Utilisation d'Apache Common Maths3 pour l'ACP
+
 ## Compilation et Installation
 
 1. Cloner le projet :
 ```bash
-git clone https://github.com/votre-username/image-denoising-PCA.git
+git clone https://github.com/ING1-Groupe10-CYTech25/image-denoising-PCA.git
 cd image-denoising-PCA
 ```
 
