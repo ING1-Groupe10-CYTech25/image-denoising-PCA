@@ -61,8 +61,8 @@ java -jar image-denoising-PCA-jar-with-dependencies.jar denoise -i <chemin_image
 ```
 
 Options :
-- `-i, --input` : Chemin vers l'image à débruiter (obligatoire)
-- `-o, --output` : Chemin pour l'image débruitée (optionnel)
+- `-i, --input` : Chemin vers l'image ou le dossier d'images à débruiter (obligatoire)
+- `-o, --output` : Chemin pour l'image débruitée ou le dossier de sortie (optionnel)
 - `-g, --global` : Active la méthode de débruitage globale
 - `-l, --local` : Active la méthode de débruitage locale (défaut)
 - `-t, --threshold` : Type de seuillage (hard/h ou soft/s, défaut: hard)
@@ -71,15 +71,25 @@ Options :
 - `-pp, --patchPercent` : Pourcentage de la taille minimale pour le patch (entre 0 et 1, défaut: 0.1, soit 10%)
 - `-h, --help` : Affiche l'aide
 
-Exemple avec méthode locale :
+Exemple avec une seule image :
 ```bash
 java -jar image-denoising-PCA-jar-with-dependencies.jar denoise -i img/img_noised/lena_noised_30.png -t hard -sh v -s 30 -pp 0.1
 ```
 
 Exemple avec méthode globale :
 ```bash
-java -jar image-denoising-PCA-jar-with-dependencies.jar denoise -i img/img_noised/lena_noised_30.png -g -t soft -sh b -s 30 -pp 0.1
+java -jar image-denoising-PCA-jar-with-dependencies.jar denoise -i img/img_noised/lena_noised_30.png -g -t soft -sh b -pp 0.1
 ```
+
+Exemple avec un dossier d'images :
+```bash
+java -jar image-denoising-PCA-jar-with-dependencies.jar denoise -i img/img_noised/ -o img/img_denoised/ -t hard -sh v
+```
+
+Lorsque vous spécifiez un dossier en entrée :
+- Toutes les images du dossier seront traitées (formats supportés : PNG, JPG, JPEG, BMP, GIF, TIFF)
+- Les images débruitées seront sauvegardées dans le dossier de sortie spécifié
+- Le nom de chaque image débruitée inclura la méthode et les paramètres utilisés
 
 #### 3. Évaluer la qualité (`eval`)
 

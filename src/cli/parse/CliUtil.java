@@ -124,8 +124,30 @@ public final class CliUtil {
     }
 
     public static void printNoiseHelp() {
-        System.out.println("noise --sigma <double> --input <path> [--output <path>]\n" +
-                "Si --output est omis, le résultat est écrit dans ./img/img_noised/<img>_<σ>.png");
+        System.out.println("""
+            Usage: noise [options]
+            
+            Options:
+              -i, --input <path>     Chemin vers l'image ou le dossier d'images à bruiter (obligatoire)
+              -o, --output <path>    Chemin pour l'image bruitée ou le dossier de sortie (optionnel)
+              -s, --sigma <value>    Écart type du bruit (défaut: 30.0)
+              -h, --help            Affiche cette aide
+            
+            Exemples:
+              # Ajout de bruit à une seule image
+              noise -i image.png -s 30
+              noise -i image.png -o sortie.png -s 25.0
+            
+              # Ajout de bruit à toutes les images d'un dossier
+              noise -i dossier_images/ -o dossier_sortie/ -s 30
+            
+            Lorsque vous spécifiez un dossier en entrée :
+            - Toutes les images du dossier et de ses sous-dossiers seront traitées
+            - Les images bruitées seront sauvegardées dans un sous-dossier avec la date (format: YY-MM-DD-HH-mm)
+            - Le nom de chaque image bruitée inclura le sigma utilisé
+            
+            Formats d'image supportés : PNG, JPG, JPEG, BMP, GIF, TIFF
+            """);
     }
     
     /**
@@ -136,18 +158,29 @@ public final class CliUtil {
             Usage: denoise [options]
             
             Options:
-              -i, --input <path>     Chemin vers l'image à débruiter (obligatoire)
-              -o, --output <path>    Chemin pour l'image débruitée (optionnel)
+              -i, --input <path>     Chemin vers l'image ou le dossier d'images à débruiter (obligatoire)
+              -o, --output <path>    Chemin pour l'image débruitée ou le dossier de sortie (optionnel)
               -g, --global          Active la méthode de débruitage globale
               -l, --local           Active la méthode de débruitage locale (défaut)
               -t, --threshold <type> Type de seuillage (hard/h ou soft/s, défaut: hard)
               -sh, --shrink <type>   Type de seuillage adaptatif (v pour VisuShrink, b pour BayesShrink)
               -s, --sigma <value>    Écart type du bruit (défaut: 30.0)
+              -pp, --patchPercent <value> Pourcentage de la taille minimale pour le patch (entre 0 et 1, défaut: 0.1)
               -h, --help            Affiche cette aide
             
             Exemples:
+              # Débruitage d'une seule image
               denoise -i image.png -t hard -sh v -s 25.0
               denoise -i image.png -g -t soft -sh b
+            
+              # Débruitage de toutes les images d'un dossier
+              denoise -i dossier_images/ -o dossier_sortie/ -t hard -sh v
+              denoise -i dossier_images/ -g -t soft -sh b -pp 0.15
+            
+            Lorsque vous spécifiez un dossier en entrée :
+            - Toutes les images du dossier et de ses sous-dossiers seront traitées (formats supportés : PNG, JPG, JPEG, BMP, GIF, TIFF)
+            - Les images débruitées seront sauvegardées dans un sous-dossier avec la date (format: YY-MM-DD-HH-mm)
+            - Le nom de chaque image débruitée inclura la méthode et les paramètres utilisés
             """);
     }
 

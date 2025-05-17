@@ -336,28 +336,34 @@ public class Main {
             Path outputPath;
             
             // Créer un nom unique basé sur le nom de l'image originale
-                String baseName = img.getName();
-                String fileName = baseName + "_noised_" + a.getSigma() + ".png";
+            String baseName = img.getName();
+            String fileName = baseName + "_noised_" + a.getSigma() + ".png";
+            
+            // Déterminer le répertoire de sortie
+            Path outputDir;
+            
+            // Vérifier si le chemin de sortie est un fichier image (quelle que soit l'extension)
+            if (NoiseArgs.isImageFile(a.getOutput())) {
+                // Si l'utilisateur a spécifié un fichier, utiliser son répertoire parent
+                outputDir = a.getOutput().getParent();
                 
-                // Déterminer le répertoire de sortie
-                Path outputDir;
-                
-                // Vérifier si le chemin de sortie est un fichier image (quelle que soit l'extension)
-                if (NoiseArgs.isImageFile(a.getOutput())) {
-                    // Si l'utilisateur a spécifié un fichier, utiliser son répertoire parent
-                    outputDir = a.getOutput().getParent();
-                    
-                    // Si le répertoire parent est null, utiliser le répertoire courant
-                    if (outputDir == null) {
-                        outputDir = Paths.get(".");
-                    }
-                } else {
-                    // Si l'utilisateur a spécifié un dossier, l'utiliser directement
-                    outputDir = a.getOutput();
+                // Si le répertoire parent est null, utiliser le répertoire courant
+                if (outputDir == null) {
+                    outputDir = Paths.get(".");
                 }
-                
-                // Construire le chemin complet
-                outputPath = outputDir.resolve(fileName);
+            } else {
+                // Si l'utilisateur a spécifié un dossier, l'utiliser directement
+                outputDir = a.getOutput();
+            }
+            
+            // Si l'entrée est un dossier, créer un sous-dossier avec la date
+            if (a.getInput().toFile().isDirectory()) {
+                String timestamp = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yy-MM-dd-HH-mm"));
+                outputDir = outputDir.resolve(timestamp);
+            }
+            
+            // Construire le chemin complet
+            outputPath = outputDir.resolve(fileName);
             
             // Assurer que le répertoire de sortie existe
             File outputDirFile = outputPath.getParent().toFile();
@@ -379,22 +385,96 @@ public class Main {
      */
     private static void runDenoise(DenoiseArgs args) {
         try {
-            // Débruiter l'image
-            ImageDenoiser.ImageDen(
-                args.getInput().toString(),
-                args.getOutput().toString(),
-                args.isGlobal(),
-                args.getThreshold(),
-                args.getShrink(),
-                args.getSigma(),
-                args.getPatchPercent()
-            );
+            File inputFile = args.getInput().toFile();
             
-            System.out.println("Image débruitée sauvegardée dans: " + args.getOutput());
+            if (inputFile.isDirectory()) {
+                // Créer le dossier de sortie avec la date
+                String timestamp = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yy-MM-dd-HH-mm"));
+                File outputDir = args.getOutput().resolve(timestamp).toFile();
+                if (!outputDir.exists()) {
+                    outputDir.mkdirs();
+                }
+                
+                // Liste pour stocker tous les fichiers images trouvés
+                List<File> imageFiles = new ArrayList<>();
+                
+                // Fonction récursive pour trouver tous les fichiers images
+                findImageFiles(inputFile, imageFiles);
+                
+                if (imageFiles.isEmpty()) {
+                    throw new IllegalArgumentException("Aucune image valide trouvée dans le dossier et ses sous-dossiers");
+                }
+                
+                // Traiter chaque image trouvée
+                for (File file : imageFiles) {
+                    String inputPath = file.getAbsolutePath();
+                    String outputPath = outputDir.getAbsolutePath() + "/" + 
+                                      file.getName().replaceFirst("[.][^.]+$", "") + 
+                                      "_denoised_" + (args.isGlobal() ? "global" : "local") + 
+                                      "_" + args.getThreshold() + 
+                                      (args.getShrink() != null ? "_" + args.getShrink() : "") + 
+                                      ".png";
+                    
+                    System.out.println("Traitement de : " + file.getName());
+                    
+                    // Débruiter l'image
+                    ImageDenoiser.ImageDen(
+                        inputPath,
+                        outputPath,
+                        args.isGlobal(),
+                        args.getThreshold(),
+                        args.getShrink(),
+                        args.getSigma(),
+                        args.getPatchPercent()
+                    );
+                    
+                    System.out.println("Image débruitée sauvegardée dans: " + outputPath);
+                }
+            } else {
+                // Traiter une seule image
+                ImageDenoiser.ImageDen(
+                    args.getInput().toString(),
+                    args.getOutput().toString(),
+                    args.isGlobal(),
+                    args.getThreshold(),
+                    args.getShrink(),
+                    args.getSigma(),
+                    args.getPatchPercent()
+                );
+                
+                System.out.println("Image débruitée sauvegardée dans: " + args.getOutput());
+            }
                 
         } catch (Exception e) {
             System.err.println("Erreur lors du débruitage: " + e.getMessage());
             System.exit(1);
+        }
+    }
+    
+    /**
+     * Fonction récursive pour trouver tous les fichiers images dans un dossier et ses sous-dossiers.
+     * 
+     * @param directory Le dossier à explorer
+     * @param imageFiles La liste où stocker les fichiers images trouvés
+     */
+    private static void findImageFiles(File directory, List<File> imageFiles) {
+        File[] files = directory.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    // Explorer récursivement les sous-dossiers
+                    findImageFiles(file, imageFiles);
+                } else {
+                    // Vérifier si le fichier est une image
+                    String name = file.getName().toLowerCase();
+                    if (name.endsWith(".png") || name.endsWith(".jpg") || 
+                        name.endsWith(".jpeg") || name.endsWith(".bmp") || 
+                        name.endsWith(".gif") || name.endsWith(".tiff") || 
+                        name.endsWith(".tif")) {
+                        imageFiles.add(file);
+                    }
+                }
+            }
         }
     }
     
