@@ -141,7 +141,7 @@ public class ImageFile extends Image {
                 parentDir.mkdirs();
             }
             ImageIO.write(this.getImage(), "PNG", outputFile);
-            System.out.println("Image sauvegardée à : " + path);
+            // System.out.println("Image sauvegardée à : " + path);
         } catch (IOException e) {
             e.printStackTrace();
         }
