@@ -1,6 +1,15 @@
 # Image Denoising PCA
 
-Ce projet implémente une méthode de débruitage d'images basée sur l'Analyse en Composantes Principales (ACP).
+Projet réalisé en 2025 dans le cadre d’une SAE à CY Tech Pau. 
+
+Implémentation en Java d’un algorithme de débruitage d’image basé sur l’Analyse en Composantes Principales (ACP / PCA).
+
+## ING1 Groupe 10
+- BIOUDI Matheo
+- BOURGEAT Ewen
+- CAPBLANCQ Sylvain
+- COUSIN Paul
+- MARTIAL Clément
 
 ## Prérequis
 
@@ -24,12 +33,16 @@ cd image-denoising-PCA
 mvn clean compile
 ```
 
-3. Générer le fichier JAR exécutable :
+3. Générer le fichier JAR exécutable (et des archives de sources et de javadoc) :
 ```bash
 mvn clean package
 ```
 
-Le fichier JAR sera généré à la racine du projet avec le nom `image-denoising-PCA.jar`.
+### Le fichier JAR sera généré à la racine du projet avec le nom `image-denoising-PCA.jar`.
+D'autres types d'archives (sources et javadocs) sont accessibles dans `target`
+
+La javadoc sera aussi directement accessible dans `target/apidocs/index.html`
+
 
 ## Utilisation
 
@@ -171,7 +184,7 @@ image-denoising-PCA/
 
 ## Taille de patch adaptative
 
-- **Par défaut**, la taille des patchs est fixée à 10% de la plus petite dimension de l'image (ou de l'imagette en mode local).
+- **Par défaut**, la taille des patchs est fixée à 5% de la plus petite dimension de l'image (ou de l'imagette en mode local).
 - Vous pouvez la modifier avec l'option `-pp` ou `--patchPercent` (ex : `-pp 0.05` pour 5%).
 - **En mode global** : la taille de patch dépend de l'image entière.
 - **En mode local** : la taille de patch dépend de chaque imagette (découpage automatique, 16 imagettes par défaut).
