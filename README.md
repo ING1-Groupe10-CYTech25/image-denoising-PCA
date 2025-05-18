@@ -29,7 +29,6 @@ image-denoising-PCA/
 │   ├── img_denoised/   # Images débruitées (générées automatiquement)
 │   └── benchmark/      # Résultats des benchmarks (générés automatiquement)
 ├── diagrammes/         # Diagrammes du projet
-├── javadoc/           # Documentation Java générée
 └── pom.xml            # Configuration Maven
 ```
 
