@@ -4,16 +4,16 @@ import java.util.List;
 import java.util.ArrayList; 
 
 /**
- * Class responsible for converting patches to vectors and vice versa.
- * This is used for PCA and reconstruction of images.
+ * Classe à l'origine de la conversion des patchs en vecteur, et réciproquement
+ * Pour l'A.C.P. et la reconstitution d'images
  */
 public class Vectorization {
 
 
     /**
-     * Converts a list of patches into a 2D matrix (one patch per row).
-     * @param patches List of patches
-     * @return Matrix [n x s²] where each row is a patch vector
+     * Convertit une liste de patchs en matrice (1 seul patch par ligne).
+     * @param patches Liste de patchs
+     * @return Matrice de taille [n x s²] où chaque ligne est un vecteur de patchs
      */
     public static int[][] patchesToMatrix(List<Patch> patches) {
         if (patches.isEmpty()) {
@@ -32,11 +32,11 @@ public class Vectorization {
     }
 
     /**
-     * Converts a full matrix of vectors back into a list of patches.
-     * @param matrix Matrix where each row is a vector
-     * @param size Patch size (s)
-     * @param origins List of original (x, y) positions for each patch
-     * @return A list of Patch objects
+     * Convertit une matrice en liste de patchs
+     * @param matrix matrice où chaque ligne est un vecteur
+     * @param size taille d'un patch 
+     * @param origins Liste des coordonnées originales (x, y) de chaque patch
+     * @return une liste constituée de patch
      */
     public static List<Patch> matrixToPatches(int[][] matrix, int size, List<int[]> origins) {
         List<Patch> patches = new ArrayList<>();
@@ -48,35 +48,35 @@ public class Vectorization {
     }
 
     /**
- * Centers the data by subtracting the mean of each column.
- * This is often used as a preprocessing step for PCA (Principal Component Analysis).
+ * Concentre les données en retranchant la moyenne de chaque colonne.
+ * C'est une étape préliminaire pour l'A.C.P. (Analyse en Composantes Principales).
  * 
- * @param data 2D matrix (n x s²) where n is the number of patches, and s² is the number of pixels per patch.
- * @return A new 2D matrix where each column has been centered (mean subtracted).
+ * @param données d'une matrice de taille (n x s²) où n est le nombre de patchs, et s² celui de pixels par patch.
+ * @return Une nouvelle matrice où chaque colonne a été centrée (moyenne retranchée).
  */
 public static double[][] centerData(int[][] data) {
-    int rows = data.length;         // Number of rows (patches)
-    int cols = data[0].length;      // Number of columns (pixels per patch)
+    int rows = data.length;         // Nombre de lignes (ie de patchs)
+    int cols = data[0].length;      // Nombre de colonnes (pixels par patch)
     
-    double[][] centered = new double[rows][cols]; // Matrix to store centered data
-    double[] mean = new double[cols];  // Array to store the mean of each column
+    double[][] centered = new double[rows][cols]; // Matrice qui renferme les données centrées.
+    double[] mean = new double[cols];  // tableau qui renferme la moyenne de chaque colonne.
 
-    // Calculate the mean of each column
+    // Calcule la moyenne de chaque colonne
     for (int j = 0; j < cols; j++) {
         for (int i = 0; i < rows; i++) {
-            mean[j] += data[i][j];  // Sum up all values in the column
+            mean[j] += data[i][j];  // Somme toutes les valeurs de la colonne
         }
-        mean[j] /= rows;  // Compute the mean by dividing by the number of rows
+        mean[j] /= rows;  // établit la moyenne en divisant par le nombre de lignes
     }
 
-    // Subtract the mean from each element in the matrix to center the data
+    // Retranche la moyenne à chaque élément de la matrice pour centrer les données
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
-            centered[i][j] = data[i][j] - mean[j];  // Subtract the column mean
+            centered[i][j] = data[i][j] - mean[j];  // Retranche la moyenne de la colonne
         }
     }
 
-    return centered;  // Return the centered data
+    return centered;  // Renvoie les données centrées
 }
 
 }
