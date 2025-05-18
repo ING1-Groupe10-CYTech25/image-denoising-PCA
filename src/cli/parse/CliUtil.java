@@ -165,7 +165,7 @@ public final class CliUtil {
               -t, --threshold <type> Type de seuillage (hard/h ou soft/s, défaut: hard)
               -sh, --shrink <type>   Type de seuillage adaptatif (v pour VisuShrink, b pour BayesShrink)
               -s, --sigma <value>    Écart type du bruit (défaut: 30.0)
-              -pp, --patchPercent <value> Pourcentage de la taille minimale pour le patch (entre 0 et 1, défaut: 0.1)
+              -pp, --patchPercent <value> Pourcentage de la taille minimale pour le patch (entre 0 et 1, défaut: 0.05)
               -h, --help            Affiche cette aide
             
             Exemples:
@@ -212,11 +212,11 @@ public final class CliUtil {
         System.out.println("  -i, --input    : Chemin vers l'image à tester (obligatoire)");
         System.out.println("  -o, --output   : Répertoire de sortie pour les résultats (optionnel)");
         System.out.println("  -s, --sigma    : Écart type du bruit (défaut: 30)");
-        System.out.println("  -pp, --patchPercent : Pourcentage de la taille minimale pour le patch (entre 0 et 1, défaut: 0.1)");
+        System.out.println("  -pp, --patchPercent : Pourcentage de la taille minimale pour le patch (entre 0 et 1, défaut: 0.05)");
         System.out.println("  -h, --help     : Affiche cette aide");
         System.out.println();
         System.out.println("Exemple :");
-        System.out.println("  benchmark -i img/original/lena.png -s 30 -pp 0.1");
+        System.out.println("  benchmark -i img/original/lena.png -s 30 -pp 0.05");
         System.out.println("  benchmark -i img/original/lena.png img/original/barbara.png -o results -pp 0.05");
     }
 }

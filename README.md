@@ -72,17 +72,17 @@ Options :
 - `-t, --threshold` : Type de seuillage (hard/h ou soft/s, défaut: hard)
 - `-sh, --shrink` : Type de seuillage adaptatif (v pour VisuShrink, b pour BayesShrink)
 - `-s, --sigma` : Écart type du bruit (défaut: déduit ou 30.0)
-- `-pp, --patchPercent` : Pourcentage de la taille minimale pour le patch (entre 0 et 1, défaut: 0.1, soit 10%)
+- `-pp, --patchPercent` : Pourcentage de la taille minimale pour le patch (entre 0 et 1, défaut: 0.05, soit 10%)
 - `-h, --help` : Affiche l'aide
 
 Exemple avec une seule image :
 ```bash
-java -jar image-denoising-PCA.jar denoise -i img/img_noised/lena_noised_30.png -t hard -sh v -s 30 -pp 0.1
+java -jar image-denoising-PCA.jar denoise -i img/img_noised/lena_noised_30.png -t hard -sh v -s 30 -pp 0.05
 ```
 
 Exemple avec méthode globale :
 ```bash
-java -jar image-denoising-PCA.jar denoise -i img/img_noised/lena_noised_30.png -g -t soft -sh b -pp 0.1
+java -jar image-denoising-PCA.jar denoise -i img/img_noised/lena_noised_30.png -g -t soft -sh b -pp 0.05
 ```
 
 Exemple avec un dossier d'images :
@@ -122,12 +122,12 @@ Options :
 - `-i, --input` : Chemin vers l'image à tester (obligatoire)
 - `-o, --output` : Répertoire de sortie pour les résultats (optionnel)
 - `-s, --sigma` : Écart type du bruit (défaut: 30.0)
-- `-pp, --patchPercent` : Pourcentage de la taille minimale pour le patch (entre 0 et 1, défaut: 0.1)
+- `-pp, --patchPercent` : Pourcentage de la taille minimale pour le patch (entre 0 et 1, défaut: 0.05)
 - `-h, --help` : Affiche l'aide
 
 Exemple :
 ```bash
-java -jar image-denoising-PCA.jar benchmark -i img/original/lena.png -s 30 -pp 0.1
+java -jar image-denoising-PCA.jar benchmark -i img/original/lena.png -s 30 -pp 0.05
 ```
 
 La commande `benchmark` effectue un test complet sur l'image en :

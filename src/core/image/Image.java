@@ -122,4 +122,44 @@ public class Image{
 			}
 		}
 	}
+	
+	/**
+	 * Convertit l'image en niveaux de gris si elle ne l'est pas déjà.
+	 * Utilise la formule standard de luminance
+	 * https://fr.wikipedia.org/wiki/Niveau_de_gris
+	 */
+	public void convertToGrayscale() {
+		// Si l'image est déjà en niveaux de gris, ne rien faire
+		if (this.getImage().getType() == BufferedImage.TYPE_BYTE_GRAY) {
+			return;
+		}
+		
+		// Créer une nouvelle image en niveaux de gris
+		BufferedImage grayImage = new BufferedImage(
+			this.getWidth(), 
+			this.getHeight(), 
+			BufferedImage.TYPE_BYTE_GRAY);
+		
+		// Copier les pixels en convertissant les couleurs en niveaux de gris
+		for (int y = 0; y < this.getHeight(); y++) {
+			for (int x = 0; x < this.getWidth(); x++) {
+				int rgb = this.getImage().getRGB(x, y);
+				
+				// Extraire les composantes RGB
+				int r = (rgb >> 16) & 0xFF;
+				int g = (rgb >> 8) & 0xFF;
+				int b = rgb & 0xFF;
+				
+				// Calculer la luminance (niveaux de gris)
+				int gray = (int) (0.2126 * r + 0.7152 * g + 0.0722 * b);
+				
+				// Définir le pixel en niveaux de gris
+				int grayRGB = (gray << 16) | (gray << 8) | gray;
+				grayImage.setRGB(x, y, grayRGB);
+			}
+		}
+		
+		// Remplacer l'image originale par l'image en niveaux de gris
+		this.setImage(grayImage);
+	}
 }

@@ -2,7 +2,6 @@ package cli.parse;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 
 /**
  * Classe pour gérer les arguments de la commande benchmark.
@@ -38,7 +37,7 @@ public class BenchmarkArgs {
         Path input = null;
         double sigma = 30.0;
         Path outputDir = null;
-        double patchPercent = 0.1; // Valeur par défaut
+        double patchPercent = 0.05; // Valeur par défaut
 
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {

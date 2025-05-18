@@ -198,21 +198,21 @@ public class Main {
         }
         
         // Demander le pourcentage de taille de patch
-        System.out.print("Pourcentage de taille de patch (entre 0 et 1, défaut: 0.1): ");
+        System.out.print("Pourcentage de taille de patch (entre 0 et 1, défaut: 0.05): ");
         String patchPercentStr = scanner.nextLine().trim();
         double patchPercent;
         if (patchPercentStr.isEmpty()) {
-            patchPercent = 0.1;
+            patchPercent = 0.05;
         } else {
             try {
                 patchPercent = Double.parseDouble(patchPercentStr);
                 if (patchPercent <= 0 || patchPercent > 1) {
-                    System.err.println("Valeur invalide, utilisation de 0.1 par défaut.");
-                    patchPercent = 0.1;
+                    System.err.println("Valeur invalide, utilisation de 0.05 par défaut.");
+                    patchPercent = 0.05;
                 }
             } catch (NumberFormatException e) {
-                System.err.println("Valeur invalide, utilisation de 0.1 par défaut.");
-                patchPercent = 0.1;
+                System.err.println("Valeur invalide, utilisation de 0.05 par défaut.");
+                patchPercent = 0.05;
             }
         }
         
@@ -294,21 +294,21 @@ public class Main {
         double sigma = sigmaStr.isEmpty() ? 30.0 : Double.parseDouble(sigmaStr);
         
         // Demander le pourcentage de taille de patch
-        System.out.print("Pourcentage de taille de patch (entre 0 et 1, défaut: 0.1): ");
+        System.out.print("Pourcentage de taille de patch (entre 0 et 1, défaut: 0.05): ");
         String patchPercentStr = scanner.nextLine().trim();
         double patchPercent;
         if (patchPercentStr.isEmpty()) {
-            patchPercent = 0.1;
+            patchPercent = 0.05;
         } else {
             try {
                 patchPercent = Double.parseDouble(patchPercentStr);
                 if (patchPercent <= 0 || patchPercent > 1) {
-                    System.err.println("Valeur invalide, utilisation de 0.1 par défaut.");
-                    patchPercent = 0.1;
+                    System.err.println("Valeur invalide, utilisation de 0.05 par défaut.");
+                    patchPercent = 0.05;
                 }
             } catch (NumberFormatException e) {
-                System.err.println("Valeur invalide, utilisation de 0.1 par défaut.");
-                patchPercent = 0.1;
+                System.err.println("Valeur invalide, utilisation de 0.05 par défaut.");
+                patchPercent = 0.05;
             }
         }
         

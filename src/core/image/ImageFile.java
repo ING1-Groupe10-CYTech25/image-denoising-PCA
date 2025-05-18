@@ -20,6 +20,7 @@ public class ImageFile extends Image {
     /**
      * Construit une instance de {@code ImageFile} à partir de son chemin
      * passe une {@link BufferedImage} au constructeur de la superclasse {@link Image}
+     * et convertit automatiquement l'image en niveaux de gris si nécessaire
      * @param filePath chemin de l'image
      * @throws IOException
      * @see BufferedImage
@@ -28,10 +29,12 @@ public class ImageFile extends Image {
     public ImageFile(String filePath) throws IOException {
 	    super(ImageIO.read(new File(filePath)));    // lecture du fichier et construction de l'instance
 		splitFilePath(filePath);                    // traitement du chemin du fichier pour le séparer en chemin de dossier, nom et extension
+		this.convertToGrayscale();                  // convertir en niveaux de gris si nécessaire
 	}
 
     /**
-     * Construit une instance de {@code ImageFile} à partir d'une instance de {@link Image} et d'un nom (Downcast) 
+     * Construit une instance de {@code ImageFile} à partir d'une instance de {@link Image} et d'un nom (Downcast)
+     * et convertit automatiquement l'image en niveaux de gris si nécessaire
      * @param img {@code Image} a convertir en {@code ImageFile}
      * @param name nom de l'image a créer
      * @see Image
@@ -41,6 +44,7 @@ public class ImageFile extends Image {
 		this.setName(name);
 		this.setExt("png");
 		this.setDir(System.getProperty("user.dir"));   // emplacement actuel
+		this.convertToGrayscale();                     // convertir en niveaux de gris si nécessaire
 	}
 
     /**

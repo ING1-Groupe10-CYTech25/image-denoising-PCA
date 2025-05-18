@@ -24,7 +24,7 @@ import core.patch.PatchExtractor;
 public class ImageDenoiser {
     
     // private static final int DEFAULT_PATCH_SIZE = 15;
-    private static final double DEFAULT_PATCH_PERCENT = 0.1; // 10% par défaut
+    private static final double DEFAULT_PATCH_PERCENT = 0.05; // 5% par défaut
     
     /**
      * Calcule la taille de patch adaptative en fonction de la taille de l'image.
@@ -127,7 +127,7 @@ public class ImageDenoiser {
         
         for (core.image.ImageTile tile : tiles) {
             // Calculer la taille de patch adaptative pour cette imagette
-            int tilePatchSize = calculateAdaptivePatchSize(tile.getWidth(), tile.getHeight(), 0.1);
+            int tilePatchSize = calculateAdaptivePatchSize(tile.getWidth(), tile.getHeight(), 0.05);
             
             // Extraire les patchs de cette imagette
             List<Patch> patches = PatchExtractor.extractPatchs(tile, tilePatchSize);

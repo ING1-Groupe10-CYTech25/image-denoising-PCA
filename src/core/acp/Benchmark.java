@@ -42,12 +42,12 @@ public class Benchmark {
         Path imageOutputDir = outputDir.resolve(baseName + "_benchmark_" + (int)sigma);
         imageOutputDir.toFile().mkdirs();
 
-        // Copier l'image originale dans le dossier de benchmark
-        java.nio.file.Files.copy(
-            input,
-            imageOutputDir.resolve(input.getFileName()),
-            java.nio.file.StandardCopyOption.REPLACE_EXISTING
-        );
+        // Charger l'image originale (sera automatiquement convertie en niveaux de gris)
+        ImageFile originalImage = new ImageFile(input.toString());
+        
+        // Sauvegarder l'image originale dans le dossier benchmark
+        Path originalPath = imageOutputDir.resolve(baseName + ".png");
+        originalImage.saveImage(originalPath.toString());
 
         // Créer le fichier de log dans le dossier de l'image
         try (PrintWriter logWriter = new PrintWriter(new FileWriter(imageOutputDir.resolve("benchmark.txt").toFile()))) {
@@ -58,12 +58,12 @@ public class Benchmark {
 
             // Générer l'image bruitée
             String noisedPath = imageOutputDir.resolve(baseName + "_noised_" + (int)sigma + ".png").toString();
-            ImageFile originalImage = new ImageFile(input.toString());
-            originalImage.noisify((int)sigma);
-            originalImage.saveImage(noisedPath);
+            ImageFile noisedImage = new ImageFile(originalImage);
+            noisedImage.noisify((int)sigma);
+            noisedImage.saveImage(noisedPath);
 
             // Tester toutes les configurations
-            testAllConfigurations(input.toString(), noisedPath, imageOutputDir.toString(), logWriter);
+            testAllConfigurations(originalPath.toString(), noisedPath, imageOutputDir.toString(), logWriter);
             logWriter.println();
         }
     }
@@ -117,4 +117,4 @@ public class Benchmark {
             }
         }
     }
-} 
+}
