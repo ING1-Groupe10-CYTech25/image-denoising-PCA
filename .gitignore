@@ -5,6 +5,8 @@ target/
 .classpath
 .project
 .factorypath
+# Fichiers VS Code
+.vscode/
 
 # Dossier img (sauf original et .gitkeep)
 img/img_noised/*
