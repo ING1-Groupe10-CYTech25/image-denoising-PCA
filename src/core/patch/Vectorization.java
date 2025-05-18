@@ -1,7 +1,7 @@
 package core.patch; 
 
+import java.util.ArrayList;
 import java.util.List; 
-import java.util.ArrayList; 
 
 /**
  * Classe à l'origine de la conversion des patchs en vecteur, et réciproquement
@@ -51,7 +51,7 @@ public class Vectorization {
  * Concentre les données en retranchant la moyenne de chaque colonne.
  * C'est une étape préliminaire pour l'A.C.P. (Analyse en Composantes Principales).
  * 
- * @param données d'une matrice de taille (n x s²) où n est le nombre de patchs, et s² celui de pixels par patch.
+ * @param data d'une matrice de taille (n x s²) où n est le nombre de patchs, et s² celui de pixels par patch.
  * @return Une nouvelle matrice où chaque colonne a été centrée (moyenne retranchée).
  */
 public static double[][] centerData(int[][] data) {
