@@ -102,6 +102,7 @@ public class Benchmark {
 
                     ImageDenoiser.ImageDen(noisedPath, outputName, isGlobal, threshold, shrink, sigma, patchPercent);
                     logWriter.println("Image débruitée sauvegardée dans: " + outputName);
+                    System.out.println("Traitement de : " + outputName);
 
                     // Évaluer le résultat
                     ImageFile denoisedImage = new ImageFile(outputName);

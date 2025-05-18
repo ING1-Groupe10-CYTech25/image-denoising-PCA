@@ -1,13 +1,14 @@
 # Fichiers de build
 target/
-
 # Fichiers Eclipse
 .settings/
 .classpath
 .project
 .factorypath
 
-# Dossier img (sauf original)
+# Dossier img (sauf original et .gitkeep)
 img/img_noised/*
+!img/img_noised/.gitkeep
 img/img_denoised/*
+!img/img_denoised/.gitkeep
 img/benchmark/*
