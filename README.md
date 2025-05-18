@@ -1,8 +1,8 @@
 # Image Denoising PCA
 
-Projet réalisé en 2025 dans le cadre d’une SAE à CY Tech Pau. 
+Projet réalisé en 2025 dans le cadre d'une SAE à CY Tech Pau. 
 
-Implémentation en Java d’un algorithme de débruitage d’image basé sur l’Analyse en Composantes Principales (ACP / PCA).
+Implémentation en Java d'un algorithme de débruitage d'image basé sur l'Analyse en Composantes Principales (ACP / PCA).
 
 ## ING1 Groupe 10
 - BIOUDI Matheo
@@ -16,7 +16,26 @@ Implémentation en Java d’un algorithme de débruitage d’image basé sur l�
 - Java 17 ou supérieur
 - Maven 3.6 ou supérieur
 
-## Dépendences
+## Structure du projet
+
+```
+image-denoising-PCA/
+├── src/
+│   ├── core/           # Code principal du débruitage
+│   └── cli/            # Interface en ligne de commande
+├── img/
+│   ├── original/       # Images originales (inclut lena.png et autres images de test)
+│   ├── img_noised/     # Images bruitées (générées automatiquement)
+│   ├── img_denoised/   # Images débruitées (générées automatiquement)
+│   └── benchmark/      # Résultats des benchmarks (générés automatiquement)
+├── diagrammes/         # Diagrammes du projet
+├── javadoc/           # Documentation Java générée
+└── pom.xml            # Configuration Maven
+```
+
+> **Note** : Le dossier `img/original/` contient déjà plusieurs images de test, dont `lena.png` qui est utilisée dans les exemples. Vous pouvez utiliser vos propres images en les plaçant dans ce dossier.
+
+## Dépendances
 
 - Utilisation d'Apache Common Maths3 pour l'ACP
 
@@ -43,7 +62,6 @@ D'autres types d'archives (sources et javadocs) sont accessibles dans `target`
 
 La javadoc sera aussi directement accessible dans `target/apidocs/index.html`
 
-
 ## Utilisation
 
 Toutes les commandes s'exécutent avec le fichier JAR généré :
@@ -51,6 +69,20 @@ Toutes les commandes s'exécutent avec le fichier JAR généré :
 ```bash
 java -jar image-denoising-PCA.jar <commande> [options]
 ```
+
+## Mode Interactif
+
+Pour une utilisation guidée, lancez le programme sans arguments :
+
+```bash
+java -jar image-denoising-PCA.jar
+```
+
+Le programme vous guidera à travers les différentes options disponibles :
+1. Ajouter du bruit à une image (noise)
+2. Débruiter une image (denoise)
+3. Évaluer la qualité du débruitage (eval)
+4. Effectuer un benchmark complet (benchmark)
 
 ### Commandes disponibles
 
@@ -158,30 +190,6 @@ Les résultats sont organisés dans des sous-répertoires nommés `<nom_image>_b
 - Les images débruitées pour chaque configuration
 - Un fichier `benchmark.txt` avec les métriques détaillées
 
-## Mode Interactif
-
-Pour une utilisation guidée, lancez le programme sans arguments :
-
-```bash
-java -jar image-denoising-PCA.jar
-```
-
-Le programme vous guidera à travers les différentes options disponibles.
-
-## Structure du projet
-
-```
-image-denoising-PCA/
-├── src/
-│   ├── core/           # Code principal du débruitage
-│   └── cli/            # Interface en ligne de commande
-├── img/
-│   ├── original/       # Images originales
-│   ├── img_noised/     # Images bruitées
-│   └── img_denoised/   # Images débruitées
-└── pom.xml            # Configuration Maven
-```
-
 ## Taille de patch adaptative
 
 - **Par défaut**, la taille des patchs est fixée à 5% de la plus petite dimension de l'image (ou de l'imagette en mode local).
@@ -258,11 +266,7 @@ java -jar image-denoising-PCA.jar
 
 ### MSE (Mean Square Error)
 - **Valeur idéale** : 0 (images identiques)
-- **Interprétation** :
-  - 0-10 : Différences très faibles
-  - 10-50 : Différences perceptibles mais limitées
-  - 50-100 : Différences notables
-  - >100 : Différences importantes
+- **Interprétation** : Plus la valeur est proche de 0, moins il y a de différences de pixels entre les deux images
 
 ### PSNR (Peak Signal-to-Noise Ratio)
 - **Valeur idéale** : ∞ (images identiques)

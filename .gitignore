@@ -14,3 +14,4 @@ img/img_noised/*
 img/img_denoised/*
 !img/img_denoised/.gitkeep
 img/benchmark/*
+!img/benchmark/.gitkeep
