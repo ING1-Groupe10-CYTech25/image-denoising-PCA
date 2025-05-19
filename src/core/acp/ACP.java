@@ -52,10 +52,9 @@ public class ACP {
      * @return Triple : [vecteurs propres (U), valeurs propres, projections alpha]
      * @throws IllegalArgumentException si V est null, vide, ou incohérent
      */
-    public static Triple<double[][], double[], double[][]> ACP(double[][] V) {
+    public static Triple<double[][], double[], double[][]> acp(double[][] V) {
         // On commence par centrer et calculer la covariance
         Triple<double[], double[][], double[][]> res = MoyCov(V);
-        double[] mV = res.first;
         double[][] cov = res.second;
         double[][] Vc = res.third;
         // Diagonalisation de la matrice de covariance
@@ -84,9 +83,6 @@ public class ACP {
     public static double[][] Proj(double[][] U, double[][] Vc) {
         if (U == null || Vc == null)
             throw new IllegalArgumentException("U ou Vc est null");
-        int dim = U.length;
-        int nb = Vc[0].length;
-        double[][] alpha = new double[dim][nb];
         // Pour chaque patch (colonne de Vc), calculer alpha = U^T * Vc
         RealMatrix Umat = new Array2DRowRealMatrix(U);
         RealMatrix VcMat = new Array2DRowRealMatrix(Vc);

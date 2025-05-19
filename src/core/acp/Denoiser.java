@@ -104,7 +104,7 @@ public class Denoiser {
     public static double[][] denoisePatchesWithPCA(double[][] V, String threshold, 
                                                  String shrinkType, double sigma, boolean isGlobal) {
         // 1. Effectuer l'ACP sur les patchs
-        ACP.Triple<double[][], double[], double[][]> acpResult = ACP.ACP(V);
+        ACP.Triple<double[][], double[], double[][]> acpResult = ACP.acp(V);
         double[][] vecteursPropres = acpResult.first;    // Vecteurs propres (U)
         double[] valeursPropres = acpResult.second;      // Valeurs propres
         double[][] alpha = acpResult.third;              // Coefficients projetés
