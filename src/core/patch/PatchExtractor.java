@@ -150,14 +150,7 @@ public class PatchExtractor {
 				throw(new PatchException());
 			}
 			else {
-				ImageTile img = new ImageTile(new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY), posX, posY);	// création d'une image vide
-				for(Patch patch : patchList) {															// parcours des patchs
-					int x = patch.getXOrigin();
-                	int y = patch.getYOrigin();
-                	int side = patch.getSide();
-					img.getRaster().setPixels(x, y, side, side, patch.getPixels());						// ajout du patch a l'image
-				}
-				return img;
+				return new ImageTile(reconstructPatchs(patchList, width, height).getImage(), posX, posY);	// création d'une image vide
 			}
 		}
 		catch (PatchException e) {
