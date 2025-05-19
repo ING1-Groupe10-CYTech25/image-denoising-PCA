@@ -111,15 +111,17 @@ public final class CliUtil {
 
     public static void printGlobalHelp() {
         System.out.println("""
-            Usage: image-denoising-PCA [command] [options]
-            
-            Commandes disponibles:
-              noise    Ajouter du bruit à une image
-              denoise  Débruiter une image
-              eval     Évaluer la qualité du débruitage
-            
-            Pour plus d'informations sur une commande:
-              image-denoising-PCA [command] --help
+        Usage: image-denoising-PCA [command] [options]
+        
+        Commandes disponibles:
+          gui      Lancer l'interface graphique
+          noise    Ajouter du bruit à une image
+          denoise  Débruiter une image
+          eval     Évaluer la qualité du débruitage
+          benchmark Effectuer un benchmark complet
+        
+        Pour plus d'informations sur une commande:
+          image-denoising-PCA [command] --help
             """);
     }
 
