@@ -58,7 +58,6 @@ public class ImageClipper extends Observable {
     public ImageClipper(String lPath) {
         this.setLPath(lPath);
         this.setRPath(null);
-        this.setLImage(new Image("file:" + this.getLPath()));
         this.setRImage((Image) null);
         this.setZoom(1);
         this.setInitWidth();
@@ -108,11 +107,11 @@ public class ImageClipper extends Observable {
     }
     public void setLPath(String lPath) {
         this.lPath = lPath;
-        this.setLImage(new Image("file:" + this.getLPath()));
+        this.setLImage(this.getLPath() != null ? new Image("file:" + this.getLPath()) : null);
     }
     public void setRPath(String rPath) {
         this.rPath = rPath;
-        this.setRImage(new Image("file:" + this.getRPath()));
+        this.setRImage(this.getRPath() != null ? new Image("file:" + this.getRPath()) : null);
     }
     public void setLImage(Image lImage) {
         this.lImage = lImage;
