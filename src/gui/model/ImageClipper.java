@@ -97,6 +97,12 @@ public class ImageClipper extends Observable {
     public double getInitHeight() {
         return this.initHeight;
     }
+    public int getWidth() {
+        return (int) Math.min(this.getLImage().getWidth(), this.getRImage() != null ? this.getRImage().getWidth() : Integer.MAX_VALUE);
+    }
+    public int getHeight() {
+        return (int) Math.min(this.getLImage().getHeight(),  this.getRImage() != null ? this.getRImage().getHeight() : Integer.MAX_VALUE);
+    }
     public double getClip() {
         return this.clip;
     }
@@ -137,11 +143,11 @@ public class ImageClipper extends Observable {
         this.setChanged(); // PAC
 		this.notifyObservers(ZOOM_CHANGE);
     }
-    private int setInitWidth() {
-        return (int) Math.min(this.getLImage().getWidth(), this.getRImage() != null ? this.getRImage().getWidth() : Integer.MAX_VALUE);
+    private void setInitWidth() {
+        this.initWidth = (int) Math.min(this.getLImage().getWidth(), this.getRImage() != null ? this.getRImage().getWidth() : Integer.MAX_VALUE);
     }
-    private int setInitHeight() {
-        return (int) Math.min(this.getLImage().getHeight(),  this.getRImage() != null ? this.getRImage().getHeight() : Integer.MAX_VALUE);
+    private void setInitHeight() {
+        this.initHeight = (int) Math.min(this.getLImage().getHeight(),  this.getRImage() != null ? this.getRImage().getHeight() : Integer.MAX_VALUE);
     }
     public void setClip(double clip) {
         this.clip = Math.min(0, Math.max(clip, 1));
