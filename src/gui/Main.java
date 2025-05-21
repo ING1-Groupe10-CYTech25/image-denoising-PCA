@@ -6,23 +6,27 @@ package gui;
 //  */
 // public class Main extends Application {
     
-import gui.controller.ImageComparatorController;
 import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.image.*;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import gui.model.ImagePair;
-import gui.view.ImageComparatorView;
 
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
-        String pathAvant = System.getProperty("user.dir") + "/img/original/avion.png";
-        String pathApres = System.getProperty("user.dir") + "/img/original/babouin.png";
+        ScrollPane pane = new ScrollPane();
+        ImageView leftview = new ImageView(new Image("file:" + System.getProperty("user.dir") + "/img/original/avion.png"));
+        StackPane stacked = new StackPane(leftview);
+        pane.setContent(stacked);
+        pane.setPannable(true);
+        stacked.setPrefSize(512, 512);
+        pane.setPrefSize(256,256);
+        Scene main = new Scene(pane);
+        primaryStage.setScene(main);
+        primaryStage.show();
 
-        ImagePair model = new ImagePair(pathAvant, pathApres);
-        ImageComparatorView view = new ImageComparatorView();
-        view.setup(primaryStage, model.getWidth(), model.getHeight());
-
-        new ImageComparatorController(model, view);
     }
 
     public static void main(String[] args) {

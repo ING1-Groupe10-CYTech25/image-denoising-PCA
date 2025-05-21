@@ -1,56 +1,82 @@
 package gui.model;
 
-import java.util.Observable;
-
 import javafx.scene.image.Image;
 
-public class ImagePair extends Observable{
-    private String leftPath;
-    private String rightPath;
-    private Image left;
-    private Image right;
+
+public class ImagePair {
+    
+    private String lPath;
+    private String rPath;
+    private Image lImage;
+    private Image rImage;
     private double zoom;
     private int initWidth;
-    private int initHeight; 
-	public static final Integer ZOOM_CHANGE = new Integer(1); // PAC
+    private int initHeight;
 
-    public ImagePair(String leftPath, String rightPath) {
-        this.leftPath = leftPath;
-        this.rightPath = rightPath;
-        this.left = new Image("file:" + leftPath);
-        this.right = new Image("file:" + rightPath);
-        this.zoom = 1;
-        this.initWidth = getWidth();
-        this.initHeight = getHeight();
+    public ImagePair(String lPath, String rPath) {
+        this.setLPath(lPath);
+        this.setRPath(rPath);
+        this.setLImage(new Image("file:" + this.getLPath()));
+        this.setRImage(new Image("file:" + this.getRPath()));
+        this.setZoom(1);
+        this.setInitWidth();
+        this.setInitHeight();
+
     }
+    public ImagePair(String lPath) {
+        this.setLPath(lPath);
+        this.setRPath("");
+        this.setLImage(new Image("file:" + this.getLPath()));
+        this.setRImage(null);
+        this.setZoom(1);
+        this.setInitWidth();
+        this.setInitHeight();
 
+    }
+    public String getLPath() {
+        return this.lPath;
+    }
+    public String getRPath() {
+        return this.rPath;
+    }
+    public Image getLImage() {
+        return this.lImage;
+    }
+    public Image getRImage() {
+        return this.rImage;
+    }
     public double getZoom() {
-        return zoom;
+        return this.zoom;
     }
-
-    public Image getLeft() {
-        return left;
+    public double getInitWidth() {
+        return this.initWidth;
     }
-
-    public Image getRight() {
-        return right;
+    public double getInitHeight() {
+        return this.initHeight;
     }
-
-    public int getWidth() {
-        return (int) Math.min(left.getWidth(), right.getWidth());
+    private void setLPath(String lPath) {
+        this.lPath = lPath;
     }
-
-    public int getHeight() {
-        return (int) Math.min(left.getHeight(), right.getHeight());
+    private void setRPath(String rPath) {
+        this.rPath = rPath;
     }
-
-    public void resize(double zoom) {
-		zoom = Math.min(Math.max(0.1, zoom), 10);
-        int width = (int) (this.initWidth * this.zoom);
-		int height = (int) (this.initHeight * this.zoom);
-        left = new Image(leftPath, width, height, false, false);
-        right = new Image(rightPath, width, height, false, false);
-        this.setChanged();
-        this.notifyObservers(ZOOM_CHANGE);
-	}
+    private void setLImage(Image lImage) {
+        this.lImage = lImage;
+    }
+    private void setRImage(Image rImage) {
+        this.rImage = rImage;
+    }
+    public void setZoom(double zoom) {
+        this.zoom = zoom;
+		int width = (int) (initWidth * this.getZoom());
+		int height = (int) (initHeight * this.getZoom());
+	    this.setLImage(new Image("file:" + this.getLPath(), width, height, false, false));
+        this.setRImage(new Image("file:" + this.getRPath(), width, height, false, false));
+    }
+    private int setInitWidth() {
+        return (int) Math.min(this.getLImage().getWidth(), this.getRImage().getWidth());
+    }
+    private int setInitHeight() {
+        return (int) Math.min(this.getLImage().getHeight(), this.getRImage().getWidth());
+    }
 }
