@@ -1,0 +1,144 @@
+/* Styles généraux */
+.root {
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+    -fx-font-size: 14px;
+}
+
+/* Titres de section */
+.section-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2C3E50;
+}
+
+/* Textes d'aide */
+.help-text {
+    -fx-text-fill: #7F8C8D;
+    -fx-font-style: italic;
+}
+
+/* Boutons */
+.button {
+    -fx-background-color: #3498DB;
+    -fx-text-fill: white;
+    -fx-padding: 8 15;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #2980B9;
+}
+
+/* ComboBox */
+.combo-box {
+    -fx-background-color: white;
+    -fx-border-color: #BDC3C7;
+    -fx-border-radius: 5;
+}
+
+.combo-box:hover {
+    -fx-border-color: #3498DB;
+}
+
+/* Slider */
+.slider {
+    -fx-padding: 0;
+}
+
+.slider .track {
+    -fx-background-color: #ECF0F1;
+}
+
+.slider .thumb {
+    -fx-background-color: #3498DB;
+    -fx-background-radius: 10;
+}
+
+/* Tabs */
+.tab-pane {
+    -fx-background-color: transparent;
+}
+
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: transparent;
+}
+
+.tab {
+    -fx-background-color: #ECF0F1;
+    -fx-background-radius: 5 5 0 0;
+}
+
+.tab:selected {
+    -fx-background-color: #3498DB;
+}
+
+.tab:selected .tab-label {
+    -fx-text-fill: white;
+}
+
+/* Toggle Button */
+.toggle-button {
+    -fx-background-color: #ECF0F1;
+    -fx-text-fill: #2C3E50;
+    -fx-background-radius: 5;
+}
+
+.toggle-button:selected {
+    -fx-background-color: #3498DB;
+    -fx-text-fill: white;
+}
+
+/* Labels */
+.label {
+    -fx-text-fill: #2C3E50;
+}
+
+/* ImageComparisonSlider */
+#imageComparisonSlider {
+    -fx-background-color: #F5F5F5;
+    -fx-background-radius: 5;
+    -fx-border-color: #BDC3C7;
+    -fx-border-radius: 5;
+}
+
+/* Styles des VBox et HBox */
+.vbox, .hbox {
+    -fx-spacing: 10;
+}
+
+/* Styles des bordures arrondies */
+.rounded-box {
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+    -fx-border-color: #E0E0E0;
+    -fx-border-width: 1;
+}
+
+/* Styles des titres */
+.title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #212121;
+}
+
+/* Styles des zones de contenu */
+.content-area {
+    -fx-background-color: white;
+    -fx-padding: 15;
+    -fx-spacing: 10;
+}
+
+/* Styles des séparateurs */
+.separator {
+    -fx-background-color: #E0E0E0;
+    -fx-padding: 5 0;
+}
+
+/* Styles des tooltips */
+.tooltip {
+    -fx-background-color: #424242;
+    -fx-text-fill: white;
+    -fx-padding: 5;
+    -fx-background-radius: 3;
+} 

@@ -1,113 +1,291 @@
 package gui;
 
-// import javafx.application.Application;
-// import javafx.scene.Scene;
-// import javafx.scene.control.Label;
-// import javafx.scene.layout.VBox;
-// import javafx.stage.Stage;
-
-// /**
-//  * Classe simple pour tester que JavaFX fonctionne correctement.
-//  * Cette classe ne dépend pas de FXML ou d'autres composants externes.
-//  */
-// public class Main extends Application {
-    
-
-
-//     @Override
-//     public void start(Stage primaryStage) {
-
-//         VBox root = new VBox(10); 
-//         root.setStyle("-fx-padding: 20px;");
-        
-//         // Création de titres
-//         Label title = new Label("Test JavaFX");
-//         title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
-        
-//         Label text = new Label("Test");
-        
-//         // Ajout des composants au conteneur
-//         root.getChildren().addAll(title, text);
-        
-//         // Création de la scène
-//         Scene scene = new Scene(root, 400, 200);
-        
-//         // Configuration de la fenêtre
-//         primaryStage.setTitle("Test JavaFX");
-//         primaryStage.setScene(scene);
-//         primaryStage.show();
-//     }
-    
-//     public static void main(String[] args) {
-//         // Point d'entrée principal
-//         launch(args);
-//     }
-// }
-
 import javafx.application.Application;
-import javafx.geometry.Rectangle2D;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Slider;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.Image;
+import javafx.collections.FXCollections;
+import javafx.scene.layout.Priority;
+import javafx.stage.FileChooser;
+import java.io.File;
+import java.util.List;
+import java.util.ArrayList;
 
 public class Main extends Application {
+    private ListView<String> imageListView;
+    private List<String> importedImages = new ArrayList<>();
+    private ComboBox<String> image1Combo;
+    private ComboBox<String> image2Combo;
+    private Label noImageLabel;
 
     @Override
     public void start(Stage primaryStage) {
-        // Charge les deux images
-        Image imageAvant = new Image("file:" + System.getProperty("user.dir") + "/img/original/avion.png");
-        Image imageApres = new Image("file:" + System.getProperty("user.dir") + "/img/original/babouin.png");
-        System.out.println("Avant: " + imageAvant.getWidth() + " x " + imageAvant.getHeight());
-        System.out.println("Après: " + imageApres.getWidth() + " x " + imageApres.getHeight());
+        // Création du conteneur principal
+        HBox mainContainer = new HBox(20);
+        mainContainer.setPadding(new Insets(20));
+        mainContainer.getStyleClass().add("content-area");
 
-        // ImageView "avant"
-        ImageView imageViewAvant = new ImageView(imageAvant);
+        // Colonne de gauche - Gestion des images
+        VBox leftColumn = createLeftColumn();
+        leftColumn.setPrefWidth(250);
+        leftColumn.getStyleClass().add("rounded-box");
 
-        // ImageView "après", positionnée par-dessus
-        ImageView imageViewApres = new ImageView(imageApres);
-        imageViewApres.setPreserveRatio(false);
+        // Colonne centrale - Affichage des images
+        VBox centerColumn = createCenterColumn();
+        HBox.setHgrow(centerColumn, Priority.ALWAYS);
+        centerColumn.getStyleClass().add("rounded-box");
 
-        imageViewAvant.setFitWidth(512);
-        imageViewAvant.setFitHeight(512);
-        imageViewAvant.setPreserveRatio(true);
+        // Colonne de droite - Paramètres
+        VBox rightColumn = createRightColumn();
+        rightColumn.setPrefWidth(300);
+        rightColumn.getStyleClass().add("rounded-box");
 
-        imageViewApres.setFitWidth(512);
-        imageViewApres.setFitHeight(512);
-        imageViewApres.setPreserveRatio(true);
+        mainContainer.getChildren().addAll(leftColumn, centerColumn, rightColumn);
 
-        // Slider pour la comparaison (0 -> largeur image)
-        Slider slider = new Slider(1, imageAvant.getWidth(), imageAvant.getWidth() / 2);
+        // Configuration de la scène
+        Scene scene = new Scene(mainContainer, 1200, 800);
+        scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
 
-        // Met à jour le viewport en fonction du slider
-        slider.valueProperty().addListener((obs, oldVal, newVal) -> {
-            double width = newVal.doubleValue();
-            imageViewAvant.setViewport(new Rectangle2D(0, 0, width, imageAvant.getHeight()));
-        });
-
-        // Initialiser le viewport
-        imageViewAvant.setViewport(new Rectangle2D(0, 0, slider.getValue(), imageAvant.getHeight()));
-
-        HBox topContainer = new HBox(imageViewAvant);
-        topContainer.setPrefSize(imageAvant.getHeight(), imageAvant.getWidth());
-        // Empile les images
-        StackPane imagesPane = new StackPane(imageViewApres, topContainer);
-        imagesPane.setPrefWidth(512);
-        imagesPane.setPrefHeight(512);
-        VBox root = new VBox(imagesPane, slider);
-        imagesPane.setStyle("-fx-background-color: lightgray; -fx-border-color: red;");
-
-        Scene scene = new Scene(root);
-        primaryStage.setTitle("Comparaison Avant/Après");
+        // Configuration de la fenêtre
+        primaryStage.setTitle("Traitement d'Image : Bruitage & Débruitage");
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    private VBox createLeftColumn() {
+        VBox leftColumn = new VBox(15);
+        leftColumn.setPadding(new Insets(15));
+
+        // Titre
+        Label titleLabel = new Label("Gestion des Images");
+        titleLabel.getStyleClass().add("title");
+
+        // ComboBox pour le filtrage
+        ComboBox<String> filterCombo = new ComboBox<>(
+            FXCollections.observableArrayList("Toutes", "Originales", "Bruitées", "Débruitées")
+        );
+        filterCombo.setPromptText("Filtrer les images");
+
+        // Boutons d'action
+        HBox buttonBox = new HBox(10);
+        Button importBtn = new Button("📁 Importer");
+        Button deleteBtn = new Button("🗑️ Supprimer");
+        buttonBox.getChildren().addAll(importBtn, deleteBtn);
+
+        imageListView = new ListView<>();
+        imageListView.setPrefHeight(200);
+        imageListView.setPlaceholder(new Label("Aucune image à afficher"));
+
+        noImageLabel = new Label("Aucune image à afficher");
+        noImageLabel.getStyleClass().add("help-text");
+        noImageLabel.setVisible(false);
+
+        // Action Importer
+        importBtn.setOnAction(e -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Importer une image");
+            fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg", "*.bmp", "*.gif", "*.tif", "*.tiff")
+            );
+            File selectedFile = fileChooser.showOpenDialog(null);
+            if (selectedFile != null) {
+                String path = selectedFile.getAbsolutePath();
+                if (!importedImages.contains(path)) {
+                    importedImages.add(path);
+                    imageListView.getItems().add(path);
+                    updateImageCombos();
+                }
+            }
+            updateNoImageLabel();
+        });
+
+        // Action Supprimer
+        deleteBtn.setOnAction(e -> {
+            String selected = imageListView.getSelectionModel().getSelectedItem();
+            if (selected != null) {
+                importedImages.remove(selected);
+                imageListView.getItems().remove(selected);
+                updateImageCombos();
+            }
+            updateNoImageLabel();
+        });
+
+        leftColumn.getChildren().addAll(titleLabel, filterCombo, buttonBox, imageListView, noImageLabel);
+        updateNoImageLabel();
+        return leftColumn;
+    }
+
+    private VBox createCenterColumn() {
+        VBox centerColumn = new VBox(15);
+        centerColumn.setPadding(new Insets(15));
+
+        // Sélection des images
+        HBox imageSelection = new HBox(10);
+        image1Combo = new ComboBox<>();
+        image2Combo = new ComboBox<>();
+        image1Combo.setPromptText("Image 1");
+        image2Combo.setPromptText("Image 2");
+        imageSelection.getChildren().addAll(image1Combo, image2Combo);
+
+        // Zone d'affichage des images
+        StackPane imageDisplay = new StackPane();
+        imageDisplay.setStyle("-fx-background-color: #F5F5F5;");
+        imageDisplay.setPrefHeight(500);
+
+        // Slider de comparaison
+        Slider comparisonSlider = new Slider(0, 100, 50);
+        comparisonSlider.setOrientation(javafx.geometry.Orientation.VERTICAL);
+
+        // Message d'aide
+        Label helpLabel = new Label("Sélectionnez deux images à comparer");
+        helpLabel.getStyleClass().add("help-text");
+
+        centerColumn.getChildren().addAll(imageSelection, imageDisplay, comparisonSlider, helpLabel);
+        return centerColumn;
+    }
+
+    private void updateImageCombos() {
+        image1Combo.getItems().setAll(importedImages);
+        image2Combo.getItems().setAll(importedImages);
+    }
+
+    private void updateNoImageLabel() {
+        boolean empty = importedImages.isEmpty();
+        noImageLabel.setVisible(empty);
+        imageListView.setVisible(!empty);
+    }
+
+    private VBox createRightColumn() {
+        VBox rightColumn = new VBox(15);
+        rightColumn.setPadding(new Insets(15));
+
+        // Toggle Mode Image/Dossier
+        ToggleButton modeToggle = new ToggleButton("Mode Image");
+        modeToggle.setSelected(true);
+
+        // Onglets pour Bruitage/Débruitage
+        TabPane tabPane = new TabPane();
+        
+        // Onglet Bruitage
+        Tab noiseTab = new Tab("Bruitage");
+        VBox noiseContent = new VBox(10);
+        noiseContent.setPadding(new Insets(10));
+
+        // Paramètres de bruitage
+        Label noiseTitle = new Label("Paramètres de bruitage");
+        noiseTitle.getStyleClass().add("section-title");
+
+        Label sigmaNoiseLabel = new Label("Intensité du bruit (Sigma)");
+        Slider sigmaNoiseSlider = new Slider(0, 30, 15);
+        sigmaNoiseSlider.setShowTickMarks(true);
+        sigmaNoiseSlider.setShowTickLabels(true);
+        sigmaNoiseSlider.setMajorTickUnit(5);
+        sigmaNoiseSlider.setMinorTickCount(1);
+        sigmaNoiseSlider.setSnapToTicks(true);
+
+        Label sigmaValueLabel = new Label("15");
+        sigmaNoiseSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            sigmaValueLabel.setText(String.format("%.0f", newVal.doubleValue()));
+        });
+
+        HBox sigmaBox = new HBox(10, sigmaNoiseSlider, sigmaValueLabel);
+        sigmaBox.setAlignment(Pos.CENTER_LEFT);
+
+        Button applyNoiseBtn = new Button("Appliquer le bruit");
+        applyNoiseBtn.setMaxWidth(Double.MAX_VALUE);
+
+        noiseContent.getChildren().addAll(noiseTitle, sigmaNoiseLabel, sigmaBox, applyNoiseBtn);
+        noiseTab.setContent(noiseContent);
+
+        // Onglet Débruitage
+        Tab denoiseTab = new Tab("Débruitage");
+        VBox denoiseContent = new VBox(10);
+        denoiseContent.setPadding(new Insets(10));
+
+        // Titre
+        Label denoiseTitle = new Label("Paramètres de débruitage");
+        denoiseTitle.getStyleClass().add("section-title");
+
+        // Type de débruitage (Global/Local)
+        Label denoiseTypeLabel = new Label("Type de débruitage");
+        ComboBox<String> denoiseTypeCombo = new ComboBox<>(
+            FXCollections.observableArrayList("Global", "Local")
+        );
+        denoiseTypeCombo.setValue("Local");
+        denoiseTypeCombo.setMaxWidth(Double.MAX_VALUE);
+
+        // Type de seuillage (Hard/Soft)
+        Label thresholdTypeLabel = new Label("Type de seuillage");
+        ComboBox<String> thresholdTypeCombo = new ComboBox<>(
+            FXCollections.observableArrayList("Hard", "Soft")
+        );
+        thresholdTypeCombo.setValue("Hard");
+        thresholdTypeCombo.setMaxWidth(Double.MAX_VALUE);
+
+        // Méthode de réduction (VisuShrink/Bayes)
+        Label shrinkMethodLabel = new Label("Méthode de réduction");
+        ComboBox<String> shrinkMethodCombo = new ComboBox<>(
+            FXCollections.observableArrayList("VisuShrink", "Bayes")
+        );
+        shrinkMethodCombo.setValue("VisuShrink");
+        shrinkMethodCombo.setMaxWidth(Double.MAX_VALUE);
+
+        // Sigma estimé
+        Label sigmaLabel = new Label("Sigma estimé");
+        Slider sigmaSlider = new Slider(0, 50, 30);
+        sigmaSlider.setShowTickMarks(true);
+        sigmaSlider.setShowTickLabels(true);
+        sigmaSlider.setMajorTickUnit(10);
+        sigmaSlider.setMinorTickCount(1);
+        sigmaSlider.setSnapToTicks(true);
+        Label denoiseSigmaValueLabel = new Label("30");
+        sigmaSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            denoiseSigmaValueLabel.setText(String.format("%.0f", newVal.doubleValue()));
+        });
+        HBox denoiseSigmaBox = new HBox(10, sigmaSlider, denoiseSigmaValueLabel);
+        denoiseSigmaBox.setAlignment(Pos.CENTER_LEFT);
+
+        // Taille de patch (%)
+        Label patchSizeLabel = new Label("Taille de patch (%)");
+        Slider patchSizeSlider = new Slider(1, 10, 5);
+        patchSizeSlider.setShowTickMarks(true);
+        patchSizeSlider.setShowTickLabels(true);
+        patchSizeSlider.setMajorTickUnit(1);
+        patchSizeSlider.setMinorTickCount(0);
+        patchSizeSlider.setSnapToTicks(true);
+        Label patchSizeValueLabel = new Label("5%");
+        patchSizeSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            patchSizeValueLabel.setText(String.format("%.0f%%", newVal.doubleValue()));
+        });
+        HBox patchSizeBox = new HBox(10, patchSizeSlider, patchSizeValueLabel);
+        patchSizeBox.setAlignment(Pos.CENTER_LEFT);
+
+        Button applyDenoiseBtn = new Button("Appliquer le débruitage");
+        applyDenoiseBtn.setMaxWidth(Double.MAX_VALUE);
+
+        denoiseContent.getChildren().addAll(
+            denoiseTitle,
+            denoiseTypeLabel, denoiseTypeCombo,
+            thresholdTypeLabel, thresholdTypeCombo,
+            shrinkMethodLabel, shrinkMethodCombo,
+            sigmaLabel, denoiseSigmaBox,
+            patchSizeLabel, patchSizeBox,
+            applyDenoiseBtn
+        );
+        denoiseTab.setContent(denoiseContent);
+
+        tabPane.getTabs().addAll(noiseTab, denoiseTab);
+
+        rightColumn.getChildren().addAll(modeToggle, tabPane);
+        return rightColumn;
     }
 
     public static void main(String[] args) {
         launch(args);
     }
-}
+} 
