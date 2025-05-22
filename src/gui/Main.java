@@ -28,6 +28,8 @@ public class Main extends Application {
     private Label noImageLabel;
     private String selectedImagePath = null;
     private ImageView centerImageView = new ImageView();
+    private Label centerImageNameLabel = new Label();
+    private String currentFilter = "Toutes";
 
     @Override
     public void start(Stage primaryStage) {
@@ -81,6 +83,11 @@ public class Main extends Application {
             FXCollections.observableArrayList("Toutes", "Originales", "Bruitées", "Débruitées")
         );
         filterCombo.setPromptText("Filtrer les images");
+        filterCombo.setValue("Toutes");
+        filterCombo.setOnAction(e -> {
+            currentFilter = filterCombo.getValue();
+            updateImageGallery();
+        });
 
         HBox buttonBox = new HBox(10);
         Button importBtn = new Button("📁 Importer");
@@ -140,6 +147,9 @@ public class Main extends Application {
                 importedImages.remove(selectedImagePath);
                 selectedImagePath = null;
                 updateImageGallery();
+                // Effacer l'affichage de l'image centrale
+                centerImageView.setImage(null);
+                centerImageNameLabel.setText("");
             }
             updateNoImageLabel();
         });
@@ -151,7 +161,8 @@ public class Main extends Application {
 
     private void updateImageGallery() {
         imageTilePane.getChildren().clear();
-        for (String path : importedImages) {
+        List<String> filteredImages = filterImages(importedImages);
+        for (String path : filteredImages) {
             VBox card = new VBox(2);
             card.setAlignment(Pos.CENTER);
             card.setPrefSize(90, 110);
@@ -192,13 +203,44 @@ public class Main extends Application {
                 try {
                     Image img = new Image(Paths.get(path).toUri().toString());
                     centerImageView.setImage(img);
+                    centerImageNameLabel.setText(Paths.get(path).getFileName().toString());
                 } catch (Exception ex) {
                     centerImageView.setImage(null);
+                    centerImageNameLabel.setText("");
                 }
             });
 
             imageTilePane.getChildren().add(card);
         }
+    }
+
+    private List<String> filterImages(List<String> images) {
+        if (currentFilter.equals("Toutes")) {
+            return new ArrayList<>(images);
+        }
+        
+        List<String> filtered = new ArrayList<>();
+        for (String path : images) {
+            if (currentFilter.equals("Originales") && path.contains("/original/")) {
+                filtered.add(path);
+            } else if (currentFilter.equals("Bruitées") && path.contains("/img_noised/")) {
+                filtered.add(path);
+            } else if (currentFilter.equals("Débruitées") && path.contains("/img_denoised/")) {
+                filtered.add(path);
+            }
+        }
+        return filtered;
+    }
+
+    private void updateImageCombos() {
+        image1Combo.getItems().setAll(importedImages);
+        image2Combo.getItems().setAll(importedImages);
+    }
+
+    private void updateNoImageLabel() {
+        boolean empty = filterImages(importedImages).isEmpty();
+        noImageLabel.setVisible(empty);
+        imageTilePane.setVisible(!empty);
     }
 
     private VBox createCenterColumn() {
@@ -214,19 +256,15 @@ public class Main extends Application {
         centerImageView.setFitHeight(500);
         imageDisplay.getChildren().add(centerImageView);
 
-        centerColumn.getChildren().addAll(imageDisplay);
+        // Label du nom de l'image sélectionnée
+        centerImageNameLabel.setStyle("-fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: #444; -fx-padding: 0; -fx-background-color: transparent;");
+        centerImageNameLabel.setAlignment(Pos.CENTER);
+        centerImageNameLabel.setMaxWidth(Double.MAX_VALUE);
+        centerImageNameLabel.setWrapText(true);
+
+        VBox.setMargin(centerImageNameLabel, Insets.EMPTY);
+        centerColumn.getChildren().addAll(imageDisplay, centerImageNameLabel);
         return centerColumn;
-    }
-
-    private void updateImageCombos() {
-        image1Combo.getItems().setAll(importedImages);
-        image2Combo.getItems().setAll(importedImages);
-    }
-
-    private void updateNoImageLabel() {
-        boolean empty = importedImages.isEmpty();
-        noImageLabel.setVisible(empty);
-        imageTilePane.setVisible(!empty);
     }
 
     private VBox createRightColumn() {
