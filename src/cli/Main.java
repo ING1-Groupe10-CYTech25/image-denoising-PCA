@@ -40,7 +40,7 @@ public class Main {
         if (args.length == 0) {
             // Lancez l'interface graphique si aucun argument n'est fourni
             try {
-                gui.Main.main(args);
+                gui.view.ImageDenoisePCA.main(args);
             } catch (NoClassDefFoundError e) {
                 // Si JavaFX n'est pas disponible, basculez vers le mode interactif CLI
                 System.out.println("Interface graphique non disponible, lancement en mode interactif...");
@@ -52,7 +52,7 @@ public class Main {
     
             try {
                 switch (cmd) {
-                    case "gui" -> gui.Main.main(args);
+                    case "gui" -> gui.view.ImageDenoisePCA.main(args);
                     case "noise" -> runNoise(NoiseArgs.parse(rest));
                     case "denoise" -> runDenoise(DenoiseArgs.parse(rest));
                     case "eval" -> runEval(EvalArgs.parse(rest));

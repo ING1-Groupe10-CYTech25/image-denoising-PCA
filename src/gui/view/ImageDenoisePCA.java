@@ -39,6 +39,8 @@
 package gui.view;
 import gui.model.*;
 import javafx.application.Application;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -57,6 +59,9 @@ public class ImageDenoisePCA extends Application {
         model = new ImageClipper(System.getProperty("user.dir") + "/img/original/avion.png", System.getProperty("user.dir") + "/img/original/babouin.png");
         BorderPane root = new BorderPane();
         root.setCenter(buildComparator());
+        Scene scene = new Scene(root);
+		primaryStage.setScene(scene);
+		primaryStage.show();
     }
 
     private ScrollPane buildComparator() {
@@ -66,6 +71,8 @@ public class ImageDenoisePCA extends Application {
         
         ImageView lView = new ImageView(model.getLImage());
         ImageView rView = new ImageView(model.getRImage());
+        lView.setViewport(new Rectangle2D(0, 0, model.getInitWidth() * model.getClip(), model.getInitHeight()));
+        model.setZoom(2);
         ComparatorControl comparatorControl = new ComparatorControl(lView, rView);
         model.addObserver(comparatorControl);
         stackPane.getChildren().addAll(rView,lView);
