@@ -377,6 +377,55 @@ public class Main extends Application {
         Button applyDenoiseBtn = new Button("Appliquer le débruitage");
         applyDenoiseBtn.setMaxWidth(Double.MAX_VALUE);
 
+        // Action : appliquer le débruitage à l'image sélectionnée
+        applyDenoiseBtn.setOnAction(e -> {
+            if (selectedImagePath == null) {
+                Alert alert = new Alert(Alert.AlertType.WARNING, "Veuillez sélectionner une image à débruiter.", ButtonType.OK);
+                alert.showAndWait();
+                return;
+            }
+            try {
+                // Récupérer les paramètres de l'UI
+                String type = denoiseTypeCombo.getValue(); // "Global" ou "Local"
+                boolean isGlobal = type.equalsIgnoreCase("Global");
+                String threshold = thresholdTypeCombo.getValue().toLowerCase(); // "hard" ou "soft"
+                String shrink = shrinkMethodCombo.getValue().equals("VisuShrink") ? "v" : "b";
+                double sigma = sigmaSlider.getValue();
+                double patchPercent = patchSizeSlider.getValue() / 100.0;
+
+                // Générer un nom de fichier pour l'image débruitée
+                String baseName = Paths.get(selectedImagePath).getFileName().toString();
+                String nameSansExt = baseName.contains(".") ? baseName.substring(0, baseName.lastIndexOf('.')) : baseName;
+                String outName = nameSansExt + "_denoised_" + (isGlobal ? "global" : "local") + "_" + threshold + "_" + shrink + ".png";
+                String outPath = "img/img_denoised/" + outName;
+
+                // Créer le dossier s'il n'existe pas
+                File outDir = new File("img/img_denoised");
+                if (!outDir.exists()) outDir.mkdirs();
+
+                // Appliquer le débruitage PCA
+                core.acp.ImageDenoiser.ImageDen(
+                    selectedImagePath,
+                    outPath,
+                    isGlobal,
+                    threshold,
+                    shrink,
+                    sigma,
+                    patchPercent
+                );
+
+                // Ajouter à la galerie si pas déjà présent
+                if (!importedImages.contains(outPath)) {
+                    importedImages.add(outPath);
+                    updateImageGallery();
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Erreur lors du débruitage : " + ex.getMessage(), ButtonType.OK);
+                alert.showAndWait();
+            }
+        });
+
         denoiseContent.getChildren().addAll(
             denoiseTitle,
             denoiseTypeLabel, denoiseTypeCombo,
