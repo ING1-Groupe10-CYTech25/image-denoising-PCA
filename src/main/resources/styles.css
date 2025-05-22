@@ -65,16 +65,41 @@
 }
 
 .tab {
-    -fx-background-color: #ECF0F1;
-    -fx-background-radius: 5 5 0 0;
+    -fx-background-color: #111;
+    -fx-text-fill: #fff;
+    -fx-background-radius: 8px;
+    -fx-font-size: 14px;
+    -fx-padding: 8 32;
+    -fx-min-width: 120px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, #111, 2, 0.1, 0, 0);
+    -fx-border-radius: 8px;
+    -fx-border-width: 0;
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+    -fx-font-weight: 600;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-border-color: transparent;
+    -fx-opacity: 1;
+}
+
+.tab:hover {
+    -fx-background-color: #222;
+    -fx-text-fill: #fff;
 }
 
 .tab:selected {
-    -fx-background-color: #3498DB;
+    -fx-background-color: #222;
+    -fx-text-fill: #fff;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-border-color: transparent;
+    -fx-opacity: 1;
 }
 
 .tab:selected .tab-label {
-    -fx-text-fill: white;
+    -fx-text-fill: #fff;
+    -fx-opacity: 1;
 }
 
 /* Toggle Button */
@@ -157,4 +182,46 @@
 }
 .gallery-btn:hover {
     -fx-background-color: #1976D2;
+}
+
+/* Boutons noirs (principaux) */
+.black-btn {
+    -fx-background-color: #111 !important;
+    -fx-text-fill: #fff !important;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-effect: dropshadow(gaussian, #111, 2, 0.1, 0, 0);
+}
+.black-btn:hover {
+    -fx-background-color: #222 !important;
+}
+
+/* Bouton rouge (supprimer) */
+.red-btn {
+    -fx-background-color: #e53935 !important;
+    -fx-text-fill: #fff !important;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-effect: dropshadow(gaussian, #b71c1c, 2, 0.1, 0, 0);
+}
+.red-btn:hover {
+    -fx-background-color: #b71c1c !important;
+}
+
+.black-btn:disabled, .red-btn:disabled {
+    -fx-opacity: 0.5;
+}
+
+/* Supprime la croix de fermeture des onglets (au cas où) */
+.tab-close-button {
+    -fx-padding: 0;
+    -fx-shape: "";
+    -fx-background-color: transparent;
+    -fx-min-width: 0;
+    -fx-max-width: 0;
+    -fx-pref-width: 0;
+    -fx-opacity: 0;
+    -fx-background-insets: 0;
+    -fx-border-width: 0;
+    -fx-border-color: transparent;
 } 

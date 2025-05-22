@@ -101,8 +101,8 @@ public class Main extends Application {
         deleteBtn.setMinWidth(90);
         deleteBtn.setPrefWidth(110);
         deleteBtn.setMaxWidth(Double.MAX_VALUE);
-        importBtn.getStyleClass().add("gallery-btn");
-        deleteBtn.getStyleClass().add("gallery-btn");
+        importBtn.getStyleClass().addAll("gallery-btn", "black-btn");
+        deleteBtn.getStyleClass().addAll("gallery-btn", "red-btn");
         buttonBox.getChildren().addAll(importBtn, deleteBtn);
         buttonBox.setAlignment(Pos.CENTER);
         buttonBox.setFillHeight(false);
@@ -253,10 +253,10 @@ public class Main extends Application {
         // Boutons Affichage et Comparer côte à côte
         Button displayBtn = new Button("Affichage");
         displayBtn.setMaxWidth(120);
-        displayBtn.getStyleClass().add("action-btn");
+        displayBtn.getStyleClass().addAll("action-btn", "black-btn");
         Button compareBtn = new Button("Comparer");
         compareBtn.setMaxWidth(120);
-        compareBtn.getStyleClass().add("action-btn");
+        compareBtn.getStyleClass().addAll("action-btn", "black-btn");
         HBox topBtnBox = new HBox(10, displayBtn, compareBtn);
         topBtnBox.setAlignment(Pos.CENTER_LEFT);
         VBox.setMargin(topBtnBox, new Insets(0, 0, 10, 0));
@@ -319,6 +319,8 @@ public class Main extends Application {
         } else {
             dynamicDisplay.getChildren().add(imageDisplay);
         }
+        // Mettre à jour l'état des boutons bruitage/débruitage
+        if (compareModeListener != null) compareModeListener.run();
     }
 
     // Crée le composant de comparaison interactif
@@ -416,22 +418,23 @@ public class Main extends Application {
         VBox rightColumn = new VBox(15);
         rightColumn.setPadding(new Insets(15));
 
-        // Toggle Mode Image/Dossier
-        ToggleButton modeToggle = new ToggleButton("Mode Image");
-        modeToggle.setSelected(true);
+        // Deux vrais boutons noirs pour Bruitage et Débruitage
+        HBox modeBtnBox = new HBox(10);
+        Button noiseBtn = new Button("Bruitage");
+        Button denoiseBtn = new Button("Débruitage");
+        noiseBtn.getStyleClass().add("black-btn");
+        denoiseBtn.getStyleClass().add("black-btn");
+        noiseBtn.setMinWidth(120);
+        denoiseBtn.setMinWidth(120);
+        noiseBtn.setStyle("-fx-background-color: #111; -fx-text-fill: #fff;");
+        denoiseBtn.setStyle("-fx-background-color: #111; -fx-text-fill: #fff;");
+        modeBtnBox.getChildren().addAll(noiseBtn, denoiseBtn);
+        modeBtnBox.setAlignment(Pos.CENTER_LEFT);
+        VBox.setMargin(modeBtnBox, new Insets(0, 0, 10, 0));
 
-        // Onglets pour Bruitage/Débruitage
-        TabPane tabPane = new TabPane();
-        
-        // Onglet Bruitage
-        Tab noiseTab = new Tab("Bruitage");
-        VBox noiseContent = new VBox(10);
-        noiseContent.setPadding(new Insets(10));
-
-        // Paramètres de bruitage
+        // === Composants Bruitage ===
         Label noiseTitle = new Label("Paramètres de bruitage");
         noiseTitle.getStyleClass().add("section-title");
-
         Label sigmaNoiseLabel = new Label("Intensité du bruit (Sigma)");
         Slider sigmaNoiseSlider = new Slider(0, 30, 15);
         sigmaNoiseSlider.setShowTickMarks(true);
@@ -439,19 +442,15 @@ public class Main extends Application {
         sigmaNoiseSlider.setMajorTickUnit(5);
         sigmaNoiseSlider.setMinorTickCount(1);
         sigmaNoiseSlider.setSnapToTicks(true);
-
         Label sigmaValueLabel = new Label("15");
         sigmaNoiseSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
             sigmaValueLabel.setText(String.format("%.0f", newVal.doubleValue()));
         });
-
         HBox sigmaBox = new HBox(10, sigmaNoiseSlider, sigmaValueLabel);
         sigmaBox.setAlignment(Pos.CENTER_LEFT);
-
         Button applyNoiseBtn = new Button("Appliquer le bruit");
         applyNoiseBtn.setMaxWidth(Double.MAX_VALUE);
-
-        // Action : appliquer le bruitage à l'image sélectionnée
+        applyNoiseBtn.getStyleClass().add("black-btn");
         applyNoiseBtn.setOnAction(e -> {
             if (selectedImagePath == null) {
                 Alert alert = new Alert(Alert.AlertType.WARNING, "Veuillez sélectionner une image à bruiter.", ButtonType.OK);
@@ -459,27 +458,16 @@ public class Main extends Application {
                 return;
             }
             try {
-                // Charger l'image originale
                 core.image.ImageFile img = new core.image.ImageFile(selectedImagePath);
                 int sigma = (int) sigmaNoiseSlider.getValue();
-
-                // Appliquer le bruit
                 img.noisify(sigma);
-
-                // Générer un nom de fichier pour l'image bruitée
                 String baseName = Paths.get(selectedImagePath).getFileName().toString();
                 String nameSansExt = baseName.contains(".") ? baseName.substring(0, baseName.lastIndexOf('.')) : baseName;
                 String outName = nameSansExt + "_noised_" + sigma + ".png";
                 String outPath = "img/img_noised/" + outName;
-
-                // Créer le dossier s'il n'existe pas
                 File outDir = new File("img/img_noised");
                 if (!outDir.exists()) outDir.mkdirs();
-
-                // Sauvegarder l'image bruitée
                 img.saveImage(outPath);
-
-                // Ajouter à la galerie si pas déjà présent
                 if (!importedImages.contains(outPath)) {
                     importedImages.add(outPath);
                     updateImageGallery();
@@ -491,43 +479,31 @@ public class Main extends Application {
             }
         });
 
+        VBox noiseContent = new VBox(10);
+        noiseContent.setPadding(new Insets(10));
         noiseContent.getChildren().addAll(noiseTitle, sigmaNoiseLabel, sigmaBox, applyNoiseBtn);
-        noiseTab.setContent(noiseContent);
 
-        // Onglet Débruitage
-        Tab denoiseTab = new Tab("Débruitage");
-        VBox denoiseContent = new VBox(10);
-        denoiseContent.setPadding(new Insets(10));
-
-        // Titre
+        // === Composants Débruitage ===
         Label denoiseTitle = new Label("Paramètres de débruitage");
         denoiseTitle.getStyleClass().add("section-title");
-
-        // Type de débruitage (Global/Local)
         Label denoiseTypeLabel = new Label("Type de débruitage");
         ComboBox<String> denoiseTypeCombo = new ComboBox<>(
             FXCollections.observableArrayList("Global", "Local")
         );
         denoiseTypeCombo.setValue("Local");
         denoiseTypeCombo.setMaxWidth(Double.MAX_VALUE);
-
-        // Type de seuillage (Hard/Soft)
         Label thresholdTypeLabel = new Label("Type de seuillage");
         ComboBox<String> thresholdTypeCombo = new ComboBox<>(
             FXCollections.observableArrayList("Hard", "Soft")
         );
         thresholdTypeCombo.setValue("Hard");
         thresholdTypeCombo.setMaxWidth(Double.MAX_VALUE);
-
-        // Méthode de réduction (VisuShrink/Bayes)
         Label shrinkMethodLabel = new Label("Méthode de réduction");
         ComboBox<String> shrinkMethodCombo = new ComboBox<>(
             FXCollections.observableArrayList("VisuShrink", "Bayes")
         );
         shrinkMethodCombo.setValue("VisuShrink");
         shrinkMethodCombo.setMaxWidth(Double.MAX_VALUE);
-
-        // Sigma estimé
         Label sigmaLabel = new Label("Sigma estimé");
         Slider sigmaSlider = new Slider(0, 50, 30);
         sigmaSlider.setShowTickMarks(true);
@@ -541,8 +517,6 @@ public class Main extends Application {
         });
         HBox denoiseSigmaBox = new HBox(10, sigmaSlider, denoiseSigmaValueLabel);
         denoiseSigmaBox.setAlignment(Pos.CENTER_LEFT);
-
-        // Taille de patch (%)
         Label patchSizeLabel = new Label("Taille de patch (%)");
         Slider patchSizeSlider = new Slider(1, 10, 5);
         patchSizeSlider.setShowTickMarks(true);
@@ -556,11 +530,9 @@ public class Main extends Application {
         });
         HBox patchSizeBox = new HBox(10, patchSizeSlider, patchSizeValueLabel);
         patchSizeBox.setAlignment(Pos.CENTER_LEFT);
-
         Button applyDenoiseBtn = new Button("Appliquer le débruitage");
         applyDenoiseBtn.setMaxWidth(Double.MAX_VALUE);
-
-        // Action : appliquer le débruitage à l'image sélectionnée
+        applyDenoiseBtn.getStyleClass().add("black-btn");
         applyDenoiseBtn.setOnAction(e -> {
             if (selectedImagePath == null) {
                 Alert alert = new Alert(Alert.AlertType.WARNING, "Veuillez sélectionner une image à débruiter.", ButtonType.OK);
@@ -568,25 +540,18 @@ public class Main extends Application {
                 return;
             }
             try {
-                // Récupérer les paramètres de l'UI
-                String type = denoiseTypeCombo.getValue(); // "Global" ou "Local"
+                String type = denoiseTypeCombo.getValue();
                 boolean isGlobal = type.equalsIgnoreCase("Global");
-                String threshold = thresholdTypeCombo.getValue().toLowerCase(); // "hard" ou "soft"
+                String threshold = thresholdTypeCombo.getValue().toLowerCase();
                 String shrink = shrinkMethodCombo.getValue().equals("VisuShrink") ? "v" : "b";
                 double sigma = sigmaSlider.getValue();
                 double patchPercent = patchSizeSlider.getValue() / 100.0;
-
-                // Générer un nom de fichier pour l'image débruitée
                 String baseName = Paths.get(selectedImagePath).getFileName().toString();
                 String nameSansExt = baseName.contains(".") ? baseName.substring(0, baseName.lastIndexOf('.')) : baseName;
                 String outName = nameSansExt + "_denoised_" + (isGlobal ? "global" : "local") + "_" + threshold + "_" + shrink + ".png";
                 String outPath = "img/img_denoised/" + outName;
-
-                // Créer le dossier s'il n'existe pas
                 File outDir = new File("img/img_denoised");
                 if (!outDir.exists()) outDir.mkdirs();
-
-                // Appliquer le débruitage PCA
                 core.acp.ImageDenoiser.ImageDen(
                     selectedImagePath,
                     outPath,
@@ -596,8 +561,6 @@ public class Main extends Application {
                     sigma,
                     patchPercent
                 );
-
-                // Ajouter à la galerie si pas déjà présent
                 if (!importedImages.contains(outPath)) {
                     importedImages.add(outPath);
                     updateImageGallery();
@@ -608,7 +571,8 @@ public class Main extends Application {
                 alert.showAndWait();
             }
         });
-
+        VBox denoiseContent = new VBox(10);
+        denoiseContent.setPadding(new Insets(10));
         denoiseContent.getChildren().addAll(
             denoiseTitle,
             denoiseTypeLabel, denoiseTypeCombo,
@@ -618,13 +582,33 @@ public class Main extends Application {
             patchSizeLabel, patchSizeBox,
             applyDenoiseBtn
         );
-        denoiseTab.setContent(denoiseContent);
 
-        tabPane.getTabs().addAll(noiseTab, denoiseTab);
+        Label paramsTitle = new Label("Paramètres");
+        paramsTitle.getStyleClass().add("section-title");
 
-        rightColumn.getChildren().addAll(modeToggle, tabPane);
+        StackPane contentPane = new StackPane();
+        contentPane.getChildren().add(noiseContent);
+
+        // Logique de switch
+        noiseBtn.setOnAction(e -> {
+            contentPane.getChildren().setAll(noiseContent);
+            noiseBtn.setStyle("-fx-background-color: #222; -fx-text-fill: #fff;");
+            denoiseBtn.setStyle("-fx-background-color: #111; -fx-text-fill: #fff;");
+        });
+        denoiseBtn.setOnAction(e -> {
+            contentPane.getChildren().setAll(denoiseContent);
+            noiseBtn.setStyle("-fx-background-color: #111; -fx-text-fill: #fff;");
+            denoiseBtn.setStyle("-fx-background-color: #222; -fx-text-fill: #fff;");
+        });
+        // Par défaut, Bruitage actif
+        noiseBtn.setStyle("-fx-background-color: #222; -fx-text-fill: #fff;");
+
+        rightColumn.getChildren().addAll(modeBtnBox, paramsTitle, contentPane);
         return rightColumn;
     }
+
+    // Listener pour désactiver les boutons bruitage/débruitage selon le mode comparaison
+    private Runnable compareModeListener = null;
 
     public static void main(String[] args) {
         launch(args);
