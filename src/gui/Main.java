@@ -30,6 +30,9 @@ public class Main extends Application {
     private ImageView centerImageView = new ImageView();
     private Label centerImageNameLabel = new Label();
     private String currentFilter = "Toutes";
+    private boolean compareMode = false;
+    private String compareImage1 = null;
+    private String compareImage2 = null;
 
     @Override
     public void start(Stage primaryStage) {
@@ -247,24 +250,166 @@ public class Main extends Application {
         VBox centerColumn = new VBox(15);
         centerColumn.setPadding(new Insets(15));
 
-        // Zone d'affichage des images
-        StackPane imageDisplay = new StackPane();
-        imageDisplay.setStyle("-fx-background-color: #F5F5F5;");
-        imageDisplay.setPrefHeight(500);
-        centerImageView.setPreserveRatio(true);
-        centerImageView.setFitWidth(500);
-        centerImageView.setFitHeight(500);
-        imageDisplay.getChildren().add(centerImageView);
+        // Boutons Affichage et Comparer côte à côte
+        Button displayBtn = new Button("Affichage");
+        displayBtn.setMaxWidth(120);
+        displayBtn.getStyleClass().add("action-btn");
+        Button compareBtn = new Button("Comparer");
+        compareBtn.setMaxWidth(120);
+        compareBtn.getStyleClass().add("action-btn");
+        HBox topBtnBox = new HBox(10, displayBtn, compareBtn);
+        topBtnBox.setAlignment(Pos.CENTER_LEFT);
+        VBox.setMargin(topBtnBox, new Insets(0, 0, 10, 0));
 
-        // Label du nom de l'image sélectionnée
+        // Conteneur pour l'affichage dynamique (image simple ou comparaison)
+        StackPane dynamicDisplay = new StackPane();
+        dynamicDisplay.setPrefHeight(500);
+        dynamicDisplay.setStyle("-fx-background-color: #F5F5F5;");
+
+        // Label du nom de l'image sélectionnée (mode simple)
         centerImageNameLabel.setStyle("-fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: #444; -fx-padding: 0; -fx-background-color: transparent;");
         centerImageNameLabel.setAlignment(Pos.CENTER);
         centerImageNameLabel.setMaxWidth(Double.MAX_VALUE);
         centerImageNameLabel.setWrapText(true);
-
         VBox.setMargin(centerImageNameLabel, Insets.EMPTY);
-        centerColumn.getChildren().addAll(imageDisplay, centerImageNameLabel);
+
+        // Affichage normal (image simple)
+        StackPane imageDisplay = new StackPane(centerImageView);
+        imageDisplay.setPrefHeight(500);
+        centerImageView.setPreserveRatio(true);
+        centerImageView.setFitWidth(500);
+        centerImageView.setFitHeight(500);
+
+        // Affichage comparaison (initialisé à null, créé dynamiquement)
+        VBox compareBox = createCompareBox();
+
+        // Affichage dynamique selon le mode
+        updateCenterDisplay(dynamicDisplay, imageDisplay, compareBox);
+
+        // Action bouton Affichage
+        displayBtn.setOnAction(e -> {
+            compareMode = false;
+            updateCenterDisplay(dynamicDisplay, imageDisplay, createCompareBox());
+        });
+        // Action bouton Comparer
+        compareBtn.setOnAction(e -> {
+            if (importedImages.size() < 2) {
+                Alert alert = new Alert(Alert.AlertType.WARNING, "Veuillez importer au moins deux images pour comparer.", ButtonType.OK);
+                alert.showAndWait();
+                return;
+            }
+            compareMode = true;
+            // Par défaut, on prend l'image sélectionnée et la suivante (ou la première si à la fin)
+            int idx = importedImages.indexOf(selectedImagePath);
+            if (idx == -1) idx = 0;
+            compareImage1 = importedImages.get(idx);
+            compareImage2 = importedImages.get((idx + 1) % importedImages.size());
+            updateCenterDisplay(dynamicDisplay, imageDisplay, createCompareBox());
+        });
+
+        centerColumn.getChildren().addAll(topBtnBox, dynamicDisplay, centerImageNameLabel);
         return centerColumn;
+    }
+
+    // Met à jour l'affichage central selon le mode
+    private void updateCenterDisplay(StackPane dynamicDisplay, StackPane imageDisplay, VBox compareBox) {
+        dynamicDisplay.getChildren().clear();
+        if (compareMode) {
+            dynamicDisplay.getChildren().add(compareBox);
+        } else {
+            dynamicDisplay.getChildren().add(imageDisplay);
+        }
+    }
+
+    // Crée le composant de comparaison interactif
+    private VBox createCompareBox() {
+        VBox box = new VBox(10);
+        box.setAlignment(Pos.TOP_CENTER);
+
+        // Sélection des images à comparer
+        HBox selectors = new HBox(10);
+        selectors.setAlignment(Pos.CENTER);
+        ComboBox<String> img1Combo = new ComboBox<>(FXCollections.observableArrayList(importedImages));
+        ComboBox<String> img2Combo = new ComboBox<>(FXCollections.observableArrayList(importedImages));
+        img1Combo.setValue(compareImage1);
+        img2Combo.setValue(compareImage2);
+        img1Combo.setMaxWidth(180);
+        img2Combo.setMaxWidth(180);
+        selectors.getChildren().addAll(new Label("Image 1 :"), img1Combo, new Label("Image 2 :"), img2Combo);
+
+        // Zone d'affichage des images superposées
+        StackPane comparePane = new StackPane();
+        comparePane.setPrefSize(500, 500);
+        ImageView img1View = new ImageView();
+        ImageView img2View = new ImageView();
+        img1View.setPreserveRatio(true);
+        img2View.setPreserveRatio(true);
+        img1View.setFitWidth(500);
+        img1View.setFitHeight(500);
+        img2View.setFitWidth(500);
+        img2View.setFitHeight(500);
+        if (compareImage1 != null) img1View.setImage(new Image(Paths.get(compareImage1).toUri().toString()));
+        if (compareImage2 != null) img2View.setImage(new Image(Paths.get(compareImage2).toUri().toString()));
+
+        // Barre verticale (slider)
+        Slider slider = new Slider(0, 1, 0.5);
+        slider.setPrefWidth(500);
+        slider.setStyle("-fx-padding: 0 0 0 0;");
+
+        // Clip dynamique sur img2View
+        javafx.scene.shape.Rectangle clip = new javafx.scene.shape.Rectangle();
+        img2View.setClip(clip);
+        comparePane.widthProperty().addListener((obs, oldVal, newVal) -> {
+            clip.setHeight(comparePane.getHeight());
+            clip.setWidth(slider.getValue() * comparePane.getWidth());
+        });
+        comparePane.heightProperty().addListener((obs, oldVal, newVal) -> {
+            clip.setHeight(comparePane.getHeight());
+            clip.setWidth(slider.getValue() * comparePane.getWidth());
+        });
+        slider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            clip.setWidth(newVal.doubleValue() * comparePane.getWidth());
+        });
+        // Initialiser le clip
+        comparePane.widthProperty().addListener((obs, oldVal, newVal) -> {
+            clip.setWidth(slider.getValue() * comparePane.getWidth());
+        });
+        comparePane.heightProperty().addListener((obs, oldVal, newVal) -> {
+            clip.setHeight(comparePane.getHeight());
+        });
+
+        comparePane.getChildren().addAll(img1View, img2View);
+
+        // Labels "Image 1" et "Image 2"
+        Label label1 = new Label("Image 1");
+        label1.setStyle("-fx-background-color: rgba(255,255,255,0.7); -fx-font-size: 13px; -fx-padding: 4 10 4 10; -fx-border-radius: 6; -fx-background-radius: 6;");
+        label1.setAlignment(Pos.TOP_LEFT);
+        label1.setTranslateX(-210);
+        label1.setTranslateY(10 - comparePane.getPrefHeight()/2);
+        Label label2 = new Label("Image 2");
+        label2.setStyle("-fx-background-color: rgba(255,255,255,0.7); -fx-font-size: 13px; -fx-padding: 4 10 4 10; -fx-border-radius: 6; -fx-background-radius: 6;");
+        label2.setAlignment(Pos.TOP_RIGHT);
+        label2.setTranslateX(210);
+        label2.setTranslateY(10 - comparePane.getPrefHeight()/2);
+        comparePane.getChildren().addAll(label1, label2);
+
+        // Slider sous l'image
+        HBox sliderBox = new HBox(slider);
+        sliderBox.setAlignment(Pos.CENTER);
+        sliderBox.setPadding(new Insets(10, 0, 0, 0));
+
+        // Mise à jour des images lors du changement de sélection
+        img1Combo.setOnAction(e -> {
+            compareImage1 = img1Combo.getValue();
+            if (compareImage1 != null) img1View.setImage(new Image(Paths.get(compareImage1).toUri().toString()));
+        });
+        img2Combo.setOnAction(e -> {
+            compareImage2 = img2Combo.getValue();
+            if (compareImage2 != null) img2View.setImage(new Image(Paths.get(compareImage2).toUri().toString()));
+        });
+
+        box.getChildren().addAll(selectors, comparePane, sliderBox);
+        return box;
     }
 
     private VBox createRightColumn() {
