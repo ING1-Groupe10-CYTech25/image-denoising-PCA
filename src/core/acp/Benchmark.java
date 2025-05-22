@@ -1,5 +1,6 @@
 package core.acp;
 
+import java.awt.image.BufferedImage;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -82,6 +83,21 @@ public class Benchmark {
         // Extraire le nom de base de l'image
         String baseName = Path.of(originalPath).getFileName().toString().replaceFirst("[.][^.]+$", "");
 
+        // Charger les images originale et bruitée pour comparaison
+        ImageFile originalImage = new ImageFile(originalPath);
+        ImageFile noisedImage = new ImageFile(noisedPath);
+        BufferedImage originalBuffered = originalImage.getImage();
+        BufferedImage noisedBuffered = noisedImage.getImage();
+
+        // Calculer MSE et PSNR pour l'image bruitée par rapport à l'originale
+        double noisedMSE = ImageQualityMetrics.calculateMSE(originalBuffered, noisedBuffered);
+        double noisedPSNR = ImageQualityMetrics.calculatePSNR(noisedMSE, 255);
+
+        logWriter.println("=== Image bruitée ===");
+        logWriter.printf("MSE: %.2f\n", noisedMSE);
+        logWriter.printf("PSNR: %.2f dB\n", noisedPSNR);
+        logWriter.println();
+
         // Tester toutes les combinaisons de méthodes
         boolean[] globalOptions = {true, false};
         String[] thresholdOptions = {"hard", "soft"};
@@ -106,13 +122,19 @@ public class Benchmark {
 
                     // Évaluer le résultat
                     ImageFile denoisedImage = new ImageFile(outputName);
-                    ImageFile originalImage = new ImageFile(originalPath);
+                    BufferedImage denoisedBuffered = denoisedImage.getImage();
 
-                    double mse = ImageQualityMetrics.calculateMSE(originalImage.getImage(), denoisedImage.getImage());
-                    double psnr = ImageQualityMetrics.calculatePSNR(mse, 255);
+                    double denoisedMSE = ImageQualityMetrics.calculateMSE(originalBuffered, denoisedBuffered);
+                    double denoisedPSNR = ImageQualityMetrics.calculatePSNR(denoisedMSE, 255);
 
-                    logWriter.printf("MSE: %.2f\n", mse);
-                    logWriter.printf("PSNR: %.2f dB\n", psnr);
+                    // Calculer les pourcentages d'amélioration
+                    double mseImprovement = 100 * (noisedMSE - denoisedMSE) / noisedMSE;
+                    double psnrImprovement = denoisedPSNR - noisedPSNR;
+
+                    logWriter.printf("MSE: %.2f (Amélioration: %.2f%%)\n", 
+                                   denoisedMSE, mseImprovement);
+                    logWriter.printf("PSNR: %.2f dB (Amélioration: %.2f dB)\n", 
+                                   denoisedPSNR, psnrImprovement);
                     logWriter.println();
                 }
             }
