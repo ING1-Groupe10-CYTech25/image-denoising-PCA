@@ -141,4 +141,20 @@
     -fx-text-fill: white;
     -fx-padding: 5;
     -fx-background-radius: 3;
+}
+
+.gallery-btn {
+    -fx-background-color: #2196F3;
+    -fx-text-fill: white;
+    -fx-background-radius: 8px;
+    -fx-font-weight: 600;
+    -fx-padding: 8 0;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, #1976D2, 2, 0.1, 0, 0);
+    -fx-border-radius: 8px;
+    -fx-border-width: 0;
+    -fx-font-size: 13px;
+}
+.gallery-btn:hover {
+    -fx-background-color: #1976D2;
 } 
