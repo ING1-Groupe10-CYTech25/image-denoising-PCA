@@ -33,6 +33,8 @@ public class Main extends Application {
     private boolean compareMode = false;
     private String compareImage1 = null;
     private String compareImage2 = null;
+    private ComboBox<String> compareImg1Combo = null;
+    private ComboBox<String> compareImg2Combo = null;
 
     @Override
     public void start(Stage primaryStage) {
@@ -93,7 +95,10 @@ public class Main extends Application {
         });
 
         HBox buttonBox = new HBox(10);
-        Button importBtn = new Button("📁 Importer");
+        // Utilisation d'une icône graphique à gauche du texte
+        javafx.scene.image.Image importIcon = new javafx.scene.image.Image(getClass().getResourceAsStream("/import.png"), 18, 18, true, true);
+        ImageView importIconView = new ImageView(importIcon);
+        Button importBtn = new Button("", importIconView);
         Button deleteBtn = new Button("🗑️ Supprimer");
         importBtn.setMinWidth(90);
         importBtn.setPrefWidth(110);
@@ -101,7 +106,7 @@ public class Main extends Application {
         deleteBtn.setMinWidth(90);
         deleteBtn.setPrefWidth(110);
         deleteBtn.setMaxWidth(Double.MAX_VALUE);
-        importBtn.getStyleClass().addAll("gallery-btn", "black-btn");
+        importBtn.getStyleClass().addAll("gallery-btn", "black-btn", "centered-text");
         deleteBtn.getStyleClass().addAll("gallery-btn", "red-btn");
         buttonBox.getChildren().addAll(importBtn, deleteBtn);
         buttonBox.setAlignment(Pos.CENTER);
@@ -214,6 +219,13 @@ public class Main extends Application {
             });
 
             imageTilePane.getChildren().add(card);
+        }
+        // Mise à jour instantanée des ComboBox de comparaison si elles existent
+        if (compareImg1Combo != null) {
+            compareImg1Combo.setItems(FXCollections.observableArrayList(importedImages));
+        }
+        if (compareImg2Combo != null) {
+            compareImg2Combo.setItems(FXCollections.observableArrayList(importedImages));
         }
     }
 
@@ -331,13 +343,25 @@ public class Main extends Application {
         // Sélection des images à comparer
         HBox selectors = new HBox(10);
         selectors.setAlignment(Pos.CENTER);
-        ComboBox<String> img1Combo = new ComboBox<>(FXCollections.observableArrayList(importedImages));
-        ComboBox<String> img2Combo = new ComboBox<>(FXCollections.observableArrayList(importedImages));
-        img1Combo.setValue(compareImage1);
-        img2Combo.setValue(compareImage2);
-        img1Combo.setMaxWidth(180);
-        img2Combo.setMaxWidth(180);
-        selectors.getChildren().addAll(new Label("Image 1 :"), img1Combo, new Label("Image 2 :"), img2Combo);
+        compareImg1Combo = new ComboBox<>(FXCollections.observableArrayList(importedImages));
+        compareImg2Combo = new ComboBox<>(FXCollections.observableArrayList(importedImages));
+        compareImg1Combo.setValue(compareImage1);
+        compareImg2Combo.setValue(compareImage2);
+        compareImg1Combo.setMaxWidth(180);
+        compareImg2Combo.setMaxWidth(180);
+        compareImg1Combo.setConverter(new javafx.util.StringConverter<>() {
+            @Override public String toString(String path) {
+                return (path == null) ? "" : java.nio.file.Paths.get(path).getFileName().toString();
+            }
+            @Override public String fromString(String string) { return string; }
+        });
+        compareImg2Combo.setConverter(new javafx.util.StringConverter<>() {
+            @Override public String toString(String path) {
+                return (path == null) ? "" : java.nio.file.Paths.get(path).getFileName().toString();
+            }
+            @Override public String fromString(String string) { return string; }
+        });
+        selectors.getChildren().addAll(new Label("Image 1 :"), compareImg1Combo, new Label("Image 2 :"), compareImg2Combo);
 
         // Zone d'affichage des images superposées
         StackPane comparePane = new StackPane();
@@ -401,12 +425,12 @@ public class Main extends Application {
         sliderBox.setPadding(new Insets(10, 0, 0, 0));
 
         // Mise à jour des images lors du changement de sélection
-        img1Combo.setOnAction(e -> {
-            compareImage1 = img1Combo.getValue();
+        compareImg1Combo.setOnAction(e -> {
+            compareImage1 = compareImg1Combo.getValue();
             if (compareImage1 != null) img1View.setImage(new Image(Paths.get(compareImage1).toUri().toString()));
         });
-        img2Combo.setOnAction(e -> {
-            compareImage2 = img2Combo.getValue();
+        compareImg2Combo.setOnAction(e -> {
+            compareImage2 = compareImg2Combo.getValue();
             if (compareImage2 != null) img2View.setImage(new Image(Paths.get(compareImage2).toUri().toString()));
         });
 

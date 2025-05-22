@@ -224,4 +224,20 @@
     -fx-background-insets: 0;
     -fx-border-width: 0;
     -fx-border-color: transparent;
+}
+
+/* Centrage du texte dans les boutons */
+.centered-text {
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+    -fx-content-display: center;
+    -fx-padding: 8 0;
+    -fx-graphic-text-gap: 0;
+    -fx-min-height: 36px;
+    -fx-min-width: 90px;
+    -fx-pref-width: 110px;
+    -fx-pref-height: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 } 
