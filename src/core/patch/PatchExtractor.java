@@ -189,6 +189,10 @@ public class PatchExtractor {
 			}
 		}
 
+		// Calcul de la taille de chevauchement (20% de la taille minimale)
+		int overlapX = (int)(img.getWidth() * 0.2 / bestCols);
+		int overlapY = (int)(img.getHeight() * 0.2 / bestRows);
+
 		int[] colStarts = new int[bestCols + 1];														// Stocke les positions des colonnes
 		int[] rowStarts = new int[bestRows + 1];														// Stocke les position des lignes
 																										// Remplissage des deux tableaux
@@ -202,10 +206,10 @@ public class PatchExtractor {
 		List<ImageTile> imageList = new ArrayList<>();													// Liste des imagettes
 		for (int row = 0; row < bestRows; row ++) {														// parcours des cases
 			for (int col = 0; col < bestCols; col ++) {
-				int x = colStarts[col];
-				int y = rowStarts[row];
-				int w = colStarts[col + 1];
-				int h = rowStarts[row + 1];
+				int x = Math.max(0, colStarts[col] - (col > 0 ? overlapX : 0));
+				int y = Math.max(0, rowStarts[row] - (row > 0 ? overlapY : 0));
+				int w = Math.min(img.getWidth(), colStarts[col + 1] + (col < bestCols - 1 ? overlapX : 0));
+				int h = Math.min(img.getHeight(), rowStarts[row + 1] + (row < bestRows - 1 ? overlapY : 0));
 				imageList.add(new ImageTile(img.getImage().getSubimage(x, y, w - x, h - y), x, y));		// ajout de l'imagette correspondant a la case
 			}
 		}
@@ -213,19 +217,45 @@ public class PatchExtractor {
 	}
 
 	/**
-	 * Reconstruit une image a partir de ses imagettes et de ses dimensions.
+	 * Reconstruit une image a partir de ses imagettes et de ses dimensions. Avec chevauchement des imagettes de 20% de leur taille.
 	 * @param tileList liste des imagettes
 	 * @param width largeur de l'image a reconstruire
 	 * @param height hauteur de l'image a reconstruire
+	 * @version 2.0
 	 * @return l'image obtenue en recollant les imagettes
 	 */
 	public static Image reconstructImageTiles(List<ImageTile> tileList, int width, int height) {
-		Image result = new Image(new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY));	    				// création d'une image vide aux bonnes dimensions
-        for (ImageTile tile : tileList) {																				// parcours des imagettes
-            int[] pixels = new int[tile.getWidth() * tile.getHeight()];													// tableau des pixels de l'imagette
-            tile.getRaster().getPixels(0, 0, tile.getWidth(), tile.getHeight(), pixels);								// obtention des valeurs des pixels
-            result.getRaster().setPixels(tile.getPosX(), tile.getPosY(), tile.getWidth(), tile.getHeight(), pixels);	// ecriture des valeurs au bon endroit sur l'image
-        }
+		Image result = new Image(new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY));
+		int[][] pixelCounts = new int[height][width]; // Compteur de contributions pour chaque pixel
+		int[][] pixelSums = new int[height][width];   // Somme des valeurs pour chaque pixel
+
+		// Accumulation des valeurs et comptage des contributions (çàd nombre de patchs contribuant a la valeur de chaque pixel)
+		for (ImageTile tile : tileList) {
+			int[] pixels = new int[tile.getWidth() * tile.getHeight()];
+			tile.getRaster().getPixels(0, 0, tile.getWidth(), tile.getHeight(), pixels);
+			
+			for (int y = 0; y < tile.getHeight(); y++) {
+				for (int x = 0; x < tile.getWidth(); x++) {
+					int globalX = tile.getPosX() + x;
+					int globalY = tile.getPosY() + y;
+					if (globalX < width && globalY < height) {
+						pixelSums[globalY][globalX] += pixels[y * tile.getWidth() + x];
+						pixelCounts[globalY][globalX]++;
+					}
+				}
+			}
+		}
+
+		// Calcul de la moyenne pour chaque pixel et écriture dans l'image finale
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				if (pixelCounts[y][x] > 0) {
+					int averageValue = pixelSums[y][x] / pixelCounts[y][x];
+					result.setPixel(x, y, averageValue);
+				}
+			}
+		}
+
 		return result;
 	}
 }
