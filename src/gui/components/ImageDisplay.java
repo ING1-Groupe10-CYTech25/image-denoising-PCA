@@ -35,6 +35,11 @@ public class ImageDisplay extends VBox {
         void onModeChange(boolean isCompareMode);
     }
 
+    // Interface de callback pour la mise à jour des métriques
+    public interface MetricsUpdateListener {
+        void onMetricsUpdate(double mse, double psnr);
+    }
+
     private ImageView centerImageView = new ImageView();
     private Label centerImageNameLabel = new Label();
     private boolean compareMode = false;
@@ -45,10 +50,10 @@ public class ImageDisplay extends VBox {
     private StackPane dynamicDisplay;
     private StackPane imageDisplay;
     private List<String> availableImages;
-    private Label metricsLabel;
 
-    // Listener
+    // Listeners
     private ModeChangeListener modeChangeListener;
+    private MetricsUpdateListener metricsUpdateListener;
 
     public ImageDisplay() {
         super(15);
@@ -83,14 +88,6 @@ public class ImageDisplay extends VBox {
         centerImageNameLabel.setMaxWidth(Double.MAX_VALUE);
         centerImageNameLabel.setWrapText(true);
         VBox.setMargin(centerImageNameLabel, Insets.EMPTY);
-
-        // Label pour les métriques
-        metricsLabel = new Label();
-        metricsLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #666; -fx-padding: 5; -fx-background-color: #f8f8f8; -fx-border-color: #ddd; -fx-border-width: 1; -fx-border-radius: 4; -fx-background-radius: 4;");
-        metricsLabel.setAlignment(Pos.CENTER);
-        metricsLabel.setMaxWidth(Double.MAX_VALUE);
-        metricsLabel.setWrapText(true);
-        VBox.setMargin(metricsLabel, new Insets(10, 0, 0, 0));
 
         // Affichage normal (image simple)
         imageDisplay = new StackPane(centerImageView);
@@ -129,7 +126,7 @@ public class ImageDisplay extends VBox {
             notifyModeChange();
         });
 
-        getChildren().addAll(topBtnBox, dynamicDisplay, centerImageNameLabel, metricsLabel);
+        getChildren().addAll(topBtnBox, dynamicDisplay, centerImageNameLabel);
     }
 
     private void setupEventHandlers() {
@@ -291,13 +288,16 @@ public class ImageDisplay extends VBox {
         this.modeChangeListener = listener;
     }
 
+    public void setMetricsUpdateListener(MetricsUpdateListener listener) {
+        this.metricsUpdateListener = listener;
+    }
+
     public void displayImage(String imagePath) {
         if (imagePath != null) {
             try {
                 Image img = new Image(Paths.get(imagePath).toUri().toString());
                 centerImageView.setImage(img);
                 centerImageNameLabel.setText(Paths.get(imagePath).getFileName().toString());
-                metricsLabel.setText(""); // Réinitialiser les métriques en mode affichage simple
                 
                 // Basculer en mode affichage simple
                 if (compareMode) {
@@ -308,12 +308,10 @@ public class ImageDisplay extends VBox {
             } catch (Exception ex) {
                 centerImageView.setImage(null);
                 centerImageNameLabel.setText("");
-                metricsLabel.setText("");
             }
         } else {
             centerImageView.setImage(null);
             centerImageNameLabel.setText("");
-            metricsLabel.setText("");
         }
     }
 
@@ -366,9 +364,14 @@ public class ImageDisplay extends VBox {
             double mse = ImageQualityMetrics.calculateMSE(img1, img2);
             double psnr = ImageQualityMetrics.calculatePSNR(mse, 255);
             
-            metricsLabel.setText(String.format("MSE: %.2f | PSNR: %.2f dB", mse, psnr));
+            // Notifier le listener des métriques
+            if (metricsUpdateListener != null) {
+                metricsUpdateListener.onMetricsUpdate(mse, psnr);
+            }
         } catch (Exception e) {
-            metricsLabel.setText("Impossible de calculer les métriques");
+            if (metricsUpdateListener != null) {
+                metricsUpdateListener.onMetricsUpdate(0, 0);
+            }
         }
     }
 }

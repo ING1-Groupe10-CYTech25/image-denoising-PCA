@@ -34,7 +34,6 @@ public class ImageGallery extends VBox {
 
     private TilePane imageTilePane;
     private List<String> importedImages = new ArrayList<>();
-    private List<String> recentImages = new ArrayList<>();
     private Label noImageLabel;
     private String selectedImagePath = null;
     private String currentFilter = "Toutes";
@@ -53,7 +52,6 @@ public class ImageGallery extends VBox {
 
         initializeComponents();
         setupEventHandlers();
-        loadImagesFromImgFolders();
         updateNoImageLabel();
     }
 
@@ -62,7 +60,7 @@ public class ImageGallery extends VBox {
         titleLabel.getStyleClass().add("title");
 
         ComboBox<String> filterCombo = new ComboBox<>(
-                FXCollections.observableArrayList("Toutes", "Originales", "Bruitées", "Débruitées", "Récent"));
+                FXCollections.observableArrayList("Toutes", "Originales", "Bruitées", "Débruitées"));
         filterCombo.setPromptText("Filtrer les images");
         filterCombo.setValue("Toutes");
         filterCombo.setOnAction(e -> {
@@ -144,7 +142,7 @@ public class ImageGallery extends VBox {
 
     private void importImage() {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Importer une image");
+        fileChooser.setTitle("Importer des images ou un dossier");
 
         // Se placer dans le dossier img par défaut
         File imgDir = new File("img");
@@ -155,16 +153,58 @@ public class ImageGallery extends VBox {
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg", "*.bmp", "*.gif", "*.tif",
                         "*.tiff"));
-        File selectedFile = fileChooser.showOpenDialog(getScene().getWindow());
-        if (selectedFile != null) {
-            String path = selectedFile.getAbsolutePath();
-            if (!importedImages.contains(path)) {
-                importedImages.add(path);
-                updateImageGallery();
-                notifyImageListChange();
+        
+        // Permettre la sélection multiple
+        List<File> selectedFiles = fileChooser.showOpenMultipleDialog(getScene().getWindow());
+        if (selectedFiles != null && !selectedFiles.isEmpty()) {
+            for (File selectedFile : selectedFiles) {
+                if (selectedFile.isDirectory()) {
+                    // Si c'est un dossier, importer toutes les images qu'il contient
+                    importDirectory(selectedFile);
+                } else {
+                    // Si c'est un fichier, l'importer normalement
+                    String path = selectedFile.getAbsolutePath();
+                    if (!importedImages.contains(path)) {
+                        importedImages.add(path);
+                    }
+                }
             }
+            updateImageGallery();
+            notifyImageListChange();
         }
         updateNoImageLabel();
+    }
+
+    /**
+     * Importe récursivement toutes les images d'un dossier
+     * @param directory le dossier à importer
+     */
+    private void importDirectory(File directory) {
+        File[] files = directory.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    // Explorer récursivement les sous-dossiers
+                    importDirectory(file);
+                } else if (isImageFile(file)) {
+                    String path = file.getAbsolutePath();
+                    if (!importedImages.contains(path)) {
+                        importedImages.add(path);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Vérifie si un fichier est une image supportée
+     */
+    private static boolean isImageFile(File file) {
+        String name = file.getName().toLowerCase();
+        return name.endsWith(".png") || name.endsWith(".jpg") ||
+                name.endsWith(".jpeg") || name.endsWith(".bmp") ||
+                name.endsWith(".gif") || name.endsWith(".tiff") ||
+                name.endsWith(".tif");
     }
 
     private void deleteSelectedImage() {
@@ -242,10 +282,7 @@ public class ImageGallery extends VBox {
     private List<String> filterImages(List<String> images) {
         if (currentFilter.equals("Toutes")) {
             return new ArrayList<>(images);
-        } else if (currentFilter.equals("Récent")) {
-            return new ArrayList<>(recentImages);
         }
-
         List<String> filtered = new ArrayList<>();
         for (String path : images) {
             if (currentFilter.equals("Originales") && path.contains("/original/")) {
@@ -306,72 +343,6 @@ public class ImageGallery extends VBox {
         // Notifier la sélection
         if (selectionListener != null) {
             selectionListener.onImageSelected(imagePath);
-        }
-    }
-
-    /**
-     * Charge automatiquement les images présentes dans les dossiers img au
-     * démarrage
-     */
-    private void loadImagesFromImgFolders() {
-        String[] folders = { "img/original", "img/img_noised", "img/img_denoised" };
-
-        for (String folderPath : folders) {
-            File folder = new File(folderPath);
-            if (folder.exists() && folder.isDirectory()) {
-                loadImagesFromFolder(folder);
-            }
-        }
-
-        // Mettre à jour l'affichage après le chargement
-        updateImageGallery();
-        notifyImageListChange();
-    }
-
-    /**
-     * Charge récursivement les images d'un dossier
-     */
-    private void loadImagesFromFolder(File folder) {
-        File[] files = folder.listFiles();
-        if (files != null) {
-            for (File file : files) {
-                if (file.isDirectory()) {
-                    // Explorer récursivement les sous-dossiers
-                    loadImagesFromFolder(file);
-                } else if (isImageFile(file)) {
-                    String path = file.getAbsolutePath();
-                    if (!importedImages.contains(path)) {
-                        importedImages.add(path);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Vérifie si un fichier est une image supportée
-     */
-    private static boolean isImageFile(File file) {
-        String name = file.getName().toLowerCase();
-        return name.endsWith(".png") || name.endsWith(".jpg") ||
-                name.endsWith(".jpeg") || name.endsWith(".bmp") ||
-                name.endsWith(".gif") || name.endsWith(".tiff") ||
-                name.endsWith(".tif");
-    }
-
-    public void addToRecent(String imagePath) {
-        if (!recentImages.contains(imagePath)) {
-            recentImages.add(0, imagePath); // Ajouter au début de la liste
-            // Garder seulement les 10 images les plus récentes
-            if (recentImages.size() > 10) {
-                recentImages = recentImages.subList(0, 10);
-            }
-            // Mettre à jour la sélection et l'affichage
-            setSelectedImagePath(imagePath);
-            // Si le filtre "Récent" est actif, mettre à jour l'affichage
-            if (currentFilter.equals("Récent")) {
-                updateImageGallery();
-            }
         }
     }
 

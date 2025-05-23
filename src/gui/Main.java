@@ -10,6 +10,7 @@ import javafx.stage.Stage;
 import gui.components.ImageGallery;
 import gui.components.ImageDisplay;
 import gui.components.ParametersPanel;
+import gui.components.MetricsPanel;
 
 /**
  * Classe principale de l'application JavaFX refactorisée
@@ -20,6 +21,7 @@ public class Main extends Application {
     private ImageGallery imageGallery;
     private ImageDisplay imageDisplay;
     private ParametersPanel parametersPanel;
+    private MetricsPanel metricsPanel;
 
     @Override
     public void start(Stage primaryStage) {
@@ -32,6 +34,7 @@ public class Main extends Application {
         imageGallery = new ImageGallery();
         imageDisplay = new ImageDisplay();
         parametersPanel = new ParametersPanel();
+        metricsPanel = new MetricsPanel();
 
         // Initialisation de la liste des images disponibles
         imageDisplay.updateAvailableImages(imageGallery.getImportedImages());
@@ -42,23 +45,13 @@ public class Main extends Application {
         // Configuration des listeners de traitement d'image
         parametersPanel.getNoisePanel().setImageProcessingListener(outputPath -> {
             imageGallery.addImage(outputPath);
-            imageGallery.addToRecent(outputPath);
-            // Ajouter aussi l'image source dans les récents
-            String sourcePath = parametersPanel.getSelectedImagePath();
-            if (sourcePath != null) {
-                imageGallery.addToRecent(sourcePath);
-            }
+            imageGallery.setSelectedImagePath(outputPath);
         });
         parametersPanel.getNoisePanel().setImageDisplay(imageDisplay);
 
         parametersPanel.getDenoisePanel().setImageProcessingListener(outputPath -> {
             imageGallery.addImage(outputPath);
-            imageGallery.addToRecent(outputPath);
-            // Ajouter aussi l'image source dans les récents
-            String sourcePath = parametersPanel.getSelectedImagePath();
-            if (sourcePath != null) {
-                imageGallery.addToRecent(sourcePath);
-            }
+            imageGallery.setSelectedImagePath(outputPath);
         });
         parametersPanel.getDenoisePanel().setImageDisplay(imageDisplay);
 
@@ -96,18 +89,31 @@ public class Main extends Application {
         // Liaison traitement d'image -> ajout automatique à la galerie
         parametersPanel.setImageProcessingListener(outputPath -> {
             imageGallery.addImage(outputPath);
-            imageGallery.addToRecent(outputPath);
+            // imageGallery.addToRecent(outputPath); // Suppression
             // Ajouter aussi l'image source dans les récents
-            String sourcePath = parametersPanel.getSelectedImagePath();
-            if (sourcePath != null) {
-                imageGallery.addToRecent(sourcePath);
+            // String sourcePath = parametersPanel.getSelectedImagePath();
+            // if (sourcePath != null) {
+            //     imageGallery.addToRecent(sourcePath);
+            // }
+        });
+
+        // Liaison mode comparaison -> remplacement des paramètres par les métriques
+        imageDisplay.setModeChangeListener(isCompareMode -> {
+            HBox mainContainer = (HBox) imageDisplay.getParent();
+            if (isCompareMode) {
+                // Remplacer le panneau de paramètres par le panneau de métriques
+                mainContainer.getChildren().remove(parametersPanel);
+                mainContainer.getChildren().add(metricsPanel);
+            } else {
+                // Remplacer le panneau de métriques par le panneau de paramètres
+                mainContainer.getChildren().remove(metricsPanel);
+                mainContainer.getChildren().add(parametersPanel);
             }
         });
 
-        // Optionnel : Liaison mode comparaison -> désactivation des paramètres
-        imageDisplay.setModeChangeListener(isCompareMode -> {
-            // Ici on pourrait désactiver les panneaux de paramètres en mode comparaison
-            // si souhaité, mais ce n'était pas implémenté dans l'original
+        // Liaison mise à jour des métriques
+        imageDisplay.setMetricsUpdateListener((mse, psnr) -> {
+            metricsPanel.updateMetrics(mse, psnr);
         });
     }
 
