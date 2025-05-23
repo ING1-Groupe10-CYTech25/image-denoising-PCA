@@ -297,6 +297,19 @@ public class ImageGallery extends VBox {
     }
 
     /**
+     * Définit l'image sélectionnée et met à jour l'affichage
+     * @param imagePath le chemin de l'image à sélectionner
+     */
+    public void setSelectedImagePath(String imagePath) {
+        this.selectedImagePath = imagePath;
+        updateImageGallery();
+        // Notifier la sélection
+        if (selectionListener != null) {
+            selectionListener.onImageSelected(imagePath);
+        }
+    }
+
+    /**
      * Charge automatiquement les images présentes dans les dossiers img au
      * démarrage
      */
@@ -353,7 +366,21 @@ public class ImageGallery extends VBox {
             if (recentImages.size() > 10) {
                 recentImages = recentImages.subList(0, 10);
             }
-            updateImageGallery();
+            // Mettre à jour la sélection et l'affichage
+            setSelectedImagePath(imagePath);
+            // Si le filtre "Récent" est actif, mettre à jour l'affichage
+            if (currentFilter.equals("Récent")) {
+                updateImageGallery();
+            }
         }
+    }
+
+    /**
+     * Définit le filtre actif et met à jour l'affichage
+     * @param filter le nom du filtre à appliquer
+     */
+    public void setFilter(String filter) {
+        this.currentFilter = filter;
+        updateImageGallery();
     }
 }

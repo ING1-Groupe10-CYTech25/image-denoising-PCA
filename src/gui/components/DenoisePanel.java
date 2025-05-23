@@ -152,14 +152,12 @@ public class DenoisePanel extends VBox {
                     sigma,
                     patchPercent);
 
-            // Notifier le traitement terminé
-            if (processingListener != null) {
-                processingListener.onImageProcessed(outPath);
-            }
-
-            // Ajouter à la liste des images récentes
+            // Ajouter l'image originale aux images récentes si ce n'est pas déjà fait
             if (processingListener instanceof ImageGallery) {
+                ((ImageGallery) processingListener).addToRecent(selectedImagePath);
+                // Ajouter l'image traitée aux images récentes
                 ((ImageGallery) processingListener).addToRecent(outPath);
+                ((ImageGallery) processingListener).setFilter("Récent");
             }
 
             // Afficher un message de succès
@@ -173,6 +171,15 @@ public class DenoisePanel extends VBox {
                     // Notifier pour passer en mode comparaison
                     if (imageDisplay != null) {
                         imageDisplay.switchToCompareMode(selectedImagePath, outPath);
+                    }
+                } else {
+                    // Mettre à jour l'affichage central avec l'image débruitée
+                    if (imageDisplay != null) {
+                        imageDisplay.displayImage(outPath);
+                    }
+                    // Mettre à jour la sélection dans la galerie
+                    if (processingListener instanceof ImageGallery) {
+                        ((ImageGallery) processingListener).setSelectedImagePath(outPath);
                     }
                 }
             });

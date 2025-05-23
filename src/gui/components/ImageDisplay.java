@@ -142,8 +142,8 @@ public class ImageDisplay extends VBox {
                 .observableArrayList(availableImages != null ? availableImages : FXCollections.emptyObservableList()));
         compareImg1Combo.setValue(compareImage1);
         compareImg2Combo.setValue(compareImage2);
-        compareImg1Combo.setMaxWidth(180);
-        compareImg2Combo.setMaxWidth(180);
+        compareImg1Combo.setMaxWidth(240);
+        compareImg2Combo.setMaxWidth(240);
         compareImg1Combo.setConverter(new javafx.util.StringConverter<>() {
             @Override
             public String toString(String path) {
@@ -166,8 +166,7 @@ public class ImageDisplay extends VBox {
                 return string;
             }
         });
-        selectors.getChildren().addAll(new Label("Image 1 :"), compareImg1Combo, new Label("Image 2 :"),
-                compareImg2Combo);
+        selectors.getChildren().addAll(compareImg1Combo, compareImg2Combo);
 
         // Zone d'affichage des images superposées
         StackPane comparePane = new StackPane();
