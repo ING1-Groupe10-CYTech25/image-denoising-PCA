@@ -4,6 +4,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import java.io.File;
@@ -26,6 +27,7 @@ public class NoisePanel extends VBox {
 
     // Listener
     private ImageProcessingListener processingListener;
+    private ImageDisplay imageDisplay;
 
     public NoisePanel() {
         super(10);
@@ -41,17 +43,19 @@ public class NoisePanel extends VBox {
 
         Label sigmaNoiseLabel = new Label("Intensité du bruit (Sigma)");
 
-        sigmaNoiseSlider = new Slider(0, 30, 15);
+        sigmaNoiseSlider = new Slider(0, 50, 15);
         sigmaNoiseSlider.setShowTickMarks(true);
         sigmaNoiseSlider.setShowTickLabels(true);
-        sigmaNoiseSlider.setMajorTickUnit(5);
+        sigmaNoiseSlider.setMajorTickUnit(10);
         sigmaNoiseSlider.setMinorTickCount(1);
         sigmaNoiseSlider.setSnapToTicks(true);
+        sigmaNoiseSlider.setMaxWidth(Double.MAX_VALUE);
 
         sigmaValueLabel = new Label("15");
 
         HBox sigmaBox = new HBox(10, sigmaNoiseSlider, sigmaValueLabel);
         sigmaBox.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(sigmaNoiseSlider, Priority.ALWAYS);
 
         applyNoiseBtn = new Button("Appliquer le bruit");
         applyNoiseBtn.setMaxWidth(Double.MAX_VALUE);
@@ -97,11 +101,25 @@ public class NoisePanel extends VBox {
                 processingListener.onImageProcessed(outPath);
             }
 
+            // Ajouter à la liste des images récentes
+            if (processingListener instanceof ImageGallery) {
+                ((ImageGallery) processingListener).addToRecent(outPath);
+            }
+
             // Afficher un message de succès
             Alert successAlert = new Alert(Alert.AlertType.INFORMATION,
-                    "Image bruitée sauvegardée avec succès :\n" + outPath, ButtonType.OK);
+                    "Image bruitée sauvegardée avec succès :\n" + outPath, 
+                    ButtonType.OK,
+                    new ButtonType("Comparer les images"));
             successAlert.setTitle("Bruitage terminé");
-            successAlert.showAndWait();
+            successAlert.showAndWait().ifPresent(response -> {
+                if (response.getText().equals("Comparer les images")) {
+                    // Notifier pour passer en mode comparaison
+                    if (imageDisplay != null) {
+                        imageDisplay.switchToCompareMode(selectedImagePath, outPath);
+                    }
+                }
+            });
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -114,6 +132,10 @@ public class NoisePanel extends VBox {
     // Méthodes publiques pour l'interface
     public void setImageProcessingListener(ImageProcessingListener listener) {
         this.processingListener = listener;
+    }
+
+    public void setImageDisplay(ImageDisplay imageDisplay) {
+        this.imageDisplay = imageDisplay;
     }
 
     public void setSelectedImagePath(String imagePath) {

@@ -34,6 +34,7 @@ public class ImageGallery extends VBox {
 
     private TilePane imageTilePane;
     private List<String> importedImages = new ArrayList<>();
+    private List<String> recentImages = new ArrayList<>();
     private Label noImageLabel;
     private String selectedImagePath = null;
     private String currentFilter = "Toutes";
@@ -61,7 +62,7 @@ public class ImageGallery extends VBox {
         titleLabel.getStyleClass().add("title");
 
         ComboBox<String> filterCombo = new ComboBox<>(
-                FXCollections.observableArrayList("Toutes", "Originales", "Bruitées", "Débruitées"));
+                FXCollections.observableArrayList("Toutes", "Originales", "Bruitées", "Débruitées", "Récent"));
         filterCombo.setPromptText("Filtrer les images");
         filterCombo.setValue("Toutes");
         filterCombo.setOnAction(e -> {
@@ -241,6 +242,8 @@ public class ImageGallery extends VBox {
     private List<String> filterImages(List<String> images) {
         if (currentFilter.equals("Toutes")) {
             return new ArrayList<>(images);
+        } else if (currentFilter.equals("Récent")) {
+            return new ArrayList<>(recentImages);
         }
 
         List<String> filtered = new ArrayList<>();
@@ -341,5 +344,16 @@ public class ImageGallery extends VBox {
                 name.endsWith(".jpeg") || name.endsWith(".bmp") ||
                 name.endsWith(".gif") || name.endsWith(".tiff") ||
                 name.endsWith(".tif");
+    }
+
+    public void addToRecent(String imagePath) {
+        if (!recentImages.contains(imagePath)) {
+            recentImages.add(0, imagePath); // Ajouter au début de la liste
+            // Garder seulement les 10 images les plus récentes
+            if (recentImages.size() > 10) {
+                recentImages = recentImages.subList(0, 10);
+            }
+            updateImageGallery();
+        }
     }
 }

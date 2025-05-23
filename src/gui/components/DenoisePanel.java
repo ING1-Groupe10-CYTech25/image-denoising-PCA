@@ -6,6 +6,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.Priority;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -32,6 +33,7 @@ public class DenoisePanel extends VBox {
 
     // Listener
     private ImageProcessingListener processingListener;
+    private ImageDisplay imageDisplay;
 
     public DenoisePanel() {
         super(10);
@@ -70,9 +72,11 @@ public class DenoisePanel extends VBox {
         sigmaSlider.setMajorTickUnit(10);
         sigmaSlider.setMinorTickCount(1);
         sigmaSlider.setSnapToTicks(true);
+        sigmaSlider.setMaxWidth(Double.MAX_VALUE);
         denoiseSigmaValueLabel = new Label("30");
         HBox denoiseSigmaBox = new HBox(10, sigmaSlider, denoiseSigmaValueLabel);
         denoiseSigmaBox.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(sigmaSlider, Priority.ALWAYS);
 
         Label patchSizeLabel = new Label("Taille de patch (%)");
         patchSizeSlider = new Slider(1, 10, 5);
@@ -81,9 +85,11 @@ public class DenoisePanel extends VBox {
         patchSizeSlider.setMajorTickUnit(1);
         patchSizeSlider.setMinorTickCount(0);
         patchSizeSlider.setSnapToTicks(true);
+        patchSizeSlider.setMaxWidth(Double.MAX_VALUE);
         patchSizeValueLabel = new Label("5%");
         HBox patchSizeBox = new HBox(10, patchSizeSlider, patchSizeValueLabel);
         patchSizeBox.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(patchSizeSlider, Priority.ALWAYS);
 
         applyDenoiseBtn = new Button("Appliquer le débruitage");
         applyDenoiseBtn.setMaxWidth(Double.MAX_VALUE);
@@ -151,11 +157,25 @@ public class DenoisePanel extends VBox {
                 processingListener.onImageProcessed(outPath);
             }
 
+            // Ajouter à la liste des images récentes
+            if (processingListener instanceof ImageGallery) {
+                ((ImageGallery) processingListener).addToRecent(outPath);
+            }
+
             // Afficher un message de succès
             Alert successAlert = new Alert(Alert.AlertType.INFORMATION,
-                    "Image débruitée sauvegardée avec succès :\n" + outPath, ButtonType.OK);
+                    "Image débruitée sauvegardée avec succès :\n" + outPath, 
+                    ButtonType.OK,
+                    new ButtonType("Comparer les images"));
             successAlert.setTitle("Débruitage terminé");
-            successAlert.showAndWait();
+            successAlert.showAndWait().ifPresent(response -> {
+                if (response.getText().equals("Comparer les images")) {
+                    // Notifier pour passer en mode comparaison
+                    if (imageDisplay != null) {
+                        imageDisplay.switchToCompareMode(selectedImagePath, outPath);
+                    }
+                }
+            });
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -168,6 +188,10 @@ public class DenoisePanel extends VBox {
     // Méthodes publiques pour l'interface
     public void setImageProcessingListener(ImageProcessingListener listener) {
         this.processingListener = listener;
+    }
+
+    public void setImageDisplay(ImageDisplay imageDisplay) {
+        this.imageDisplay = imageDisplay;
     }
 
     public void setSelectedImagePath(String imagePath) {

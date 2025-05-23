@@ -33,8 +33,34 @@ public class Main extends Application {
         imageDisplay = new ImageDisplay();
         parametersPanel = new ParametersPanel();
 
+        // Initialisation de la liste des images disponibles
+        imageDisplay.updateAvailableImages(imageGallery.getImportedImages());
+
         // Configuration des liaisons entre composants
         setupComponentBindings();
+
+        // Configuration des listeners de traitement d'image
+        parametersPanel.getNoisePanel().setImageProcessingListener(outputPath -> {
+            imageGallery.addImage(outputPath);
+            imageGallery.addToRecent(outputPath);
+            // Ajouter aussi l'image source dans les récents
+            String sourcePath = parametersPanel.getSelectedImagePath();
+            if (sourcePath != null) {
+                imageGallery.addToRecent(sourcePath);
+            }
+        });
+        parametersPanel.getNoisePanel().setImageDisplay(imageDisplay);
+
+        parametersPanel.getDenoisePanel().setImageProcessingListener(outputPath -> {
+            imageGallery.addImage(outputPath);
+            imageGallery.addToRecent(outputPath);
+            // Ajouter aussi l'image source dans les récents
+            String sourcePath = parametersPanel.getSelectedImagePath();
+            if (sourcePath != null) {
+                imageGallery.addToRecent(sourcePath);
+            }
+        });
+        parametersPanel.getDenoisePanel().setImageDisplay(imageDisplay);
 
         // Configuration de la croissance horizontale
         HBox.setHgrow(imageDisplay, Priority.ALWAYS);
@@ -70,6 +96,12 @@ public class Main extends Application {
         // Liaison traitement d'image -> ajout automatique à la galerie
         parametersPanel.setImageProcessingListener(outputPath -> {
             imageGallery.addImage(outputPath);
+            imageGallery.addToRecent(outputPath);
+            // Ajouter aussi l'image source dans les récents
+            String sourcePath = parametersPanel.getSelectedImagePath();
+            if (sourcePath != null) {
+                imageGallery.addToRecent(sourcePath);
+            }
         });
 
         // Optionnel : Liaison mode comparaison -> désactivation des paramètres

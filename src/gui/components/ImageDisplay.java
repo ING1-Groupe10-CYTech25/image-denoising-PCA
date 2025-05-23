@@ -8,8 +8,11 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 
+import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.io.IOException;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Composant responsable de l'affichage des images
@@ -92,15 +95,16 @@ public class ImageDisplay extends VBox {
         compareBtn.setOnAction(e -> {
             if (availableImages == null || availableImages.size() < 2) {
                 Alert alert = new Alert(Alert.AlertType.WARNING,
-                        "Veuillez importer au moins deux images pour comparer.", ButtonType.OK);
+                        "Il faut au moins deux images pour comparer. Images disponibles : " + 
+                        (availableImages == null ? "0" : availableImages.size()), ButtonType.OK);
                 alert.showAndWait();
                 return;
             }
             compareMode = true;
-            // Par défaut, prendre les deux premières images disponibles
+            // Par défaut, prendre les deux images les plus récentes
             if (compareImage1 == null && !availableImages.isEmpty()) {
-                compareImage1 = availableImages.get(0);
-                compareImage2 = availableImages.get(availableImages.size() > 1 ? 1 : 0);
+                compareImage1 = availableImages.get(0); // La plus récente
+                compareImage2 = availableImages.get(1); // La deuxième plus récente
             }
             updateCenterDisplay();
             notifyModeChange();
@@ -271,15 +275,31 @@ public class ImageDisplay extends VBox {
     }
 
     public void updateAvailableImages(List<String> images) {
-        this.availableImages = images;
+        // Trier les images par date de création (les plus récentes d'abord)
+        List<String> sortedImages = new ArrayList<>(images);
+        sortedImages.sort((path1, path2) -> {
+            try {
+                long time1 = Files.getLastModifiedTime(Paths.get(path1)).toMillis();
+                long time2 = Files.getLastModifiedTime(Paths.get(path2)).toMillis();
+                return Long.compare(time2, time1); // Ordre décroissant (plus récent d'abord)
+            } catch (IOException e) {
+                return 0;
+            }
+        });
+        
+        this.availableImages = sortedImages;
+        if (compareImg1Combo != null && compareImg2Combo != null) {
+            compareImg1Combo.setItems(FXCollections.observableArrayList(sortedImages));
+            compareImg2Combo.setItems(FXCollections.observableArrayList(sortedImages));
+        }
+    }
 
-        // Mettre à jour les ComboBox de comparaison si elles existent
-        if (compareImg1Combo != null) {
-            compareImg1Combo.setItems(FXCollections.observableArrayList(images));
-        }
-        if (compareImg2Combo != null) {
-            compareImg2Combo.setItems(FXCollections.observableArrayList(images));
-        }
+    public void switchToCompareMode(String image1, String image2) {
+        compareMode = true;
+        compareImage1 = image1;
+        compareImage2 = image2;
+        updateCenterDisplay();
+        notifyModeChange();
     }
 
     public boolean isCompareMode() {

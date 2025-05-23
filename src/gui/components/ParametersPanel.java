@@ -111,6 +111,10 @@ public class ParametersPanel extends VBox {
         denoisePanel.setSelectedImagePath(imagePath);
     }
 
+    public String getSelectedImagePath() {
+        return selectedImagePath;
+    }
+
     public NoisePanel getNoisePanel() {
         return noisePanel;
     }
