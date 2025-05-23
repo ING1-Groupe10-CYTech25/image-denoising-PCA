@@ -81,6 +81,10 @@ public class NoisePanel extends VBox {
         }
 
         try {
+            // Désactiver le bouton et ajouter la classe processing
+            applyNoiseBtn.setDisable(true);
+            getScene().getRoot().getStyleClass().add("processing");
+
             core.image.ImageFile img = new core.image.ImageFile(selectedImagePath);
             int sigma = (int) sigmaNoiseSlider.getValue();
             img.noisify(sigma);
@@ -96,6 +100,10 @@ public class NoisePanel extends VBox {
 
             img.saveImage(outPath);
 
+            // Réactiver le bouton et retirer la classe processing
+            applyNoiseBtn.setDisable(false);
+            getScene().getRoot().getStyleClass().remove("processing");
+
             // Afficher un message de succès
             Alert successAlert = new Alert(Alert.AlertType.INFORMATION,
                     "Image bruitée sauvegardée avec succès :\n" + outPath, 
@@ -107,6 +115,7 @@ public class NoisePanel extends VBox {
                     // Notifier pour passer en mode comparaison
                     if (imageDisplay != null) {
                         imageDisplay.switchToCompareMode(selectedImagePath, outPath);
+                        imageDisplay.forceCompareButtonSelected();
                     }
                 } else {
                     // Mettre à jour l'affichage central avec l'image bruitée
@@ -122,6 +131,9 @@ public class NoisePanel extends VBox {
 
         } catch (Exception ex) {
             ex.printStackTrace();
+            // Réactiver le bouton et retirer la classe processing en cas d'erreur
+            applyNoiseBtn.setDisable(false);
+            getScene().getRoot().getStyleClass().remove("processing");
             Alert alert = new Alert(Alert.AlertType.ERROR, "Erreur lors du bruitage : " + ex.getMessage(),
                     ButtonType.OK);
             alert.showAndWait();

@@ -95,40 +95,25 @@ public class ImageGallery extends VBox {
     private HBox createButtonBox() {
         HBox buttonBox = new HBox(10);
 
-        // Bouton d'import avec icône
-        try {
-            javafx.scene.image.Image importIcon = new javafx.scene.image.Image(
-                    getClass().getResourceAsStream("/import.png"), 18, 18, true, true);
-            ImageView importIconView = new ImageView(importIcon);
-            Button importBtn = new Button("", importIconView);
-            importBtn.setMinWidth(90);
-            importBtn.setPrefWidth(110);
-            importBtn.setMaxWidth(Double.MAX_VALUE);
-            importBtn.getStyleClass().addAll("gallery-btn", "black-btn", "centered-text");
+        // Bouton d'import avec texte
+        Button importBtn = new Button("Importer");
+        importBtn.setMinWidth(90);
+        importBtn.setPrefWidth(110);
+        importBtn.setMaxWidth(Double.MAX_VALUE);
+        importBtn.getStyleClass().addAll("gallery-btn", "black-btn", "centered-text");
 
-            Button deleteBtn = new Button("🗑️ Supprimer");
-            deleteBtn.setMinWidth(90);
-            deleteBtn.setPrefWidth(110);
-            deleteBtn.setMaxWidth(Double.MAX_VALUE);
-            deleteBtn.getStyleClass().addAll("gallery-btn", "red-btn");
+        // Bouton de suppression avec texte
+        Button deleteBtn = new Button("Supprimer");
+        deleteBtn.setMinWidth(90);
+        deleteBtn.setPrefWidth(110);
+        deleteBtn.setMaxWidth(Double.MAX_VALUE);
+        deleteBtn.getStyleClass().addAll("gallery-btn", "red-btn", "centered-text");
 
-            buttonBox.getChildren().addAll(importBtn, deleteBtn);
+        buttonBox.getChildren().addAll(importBtn, deleteBtn);
 
-            // Event handlers avec des noms de paramètres différents pr éviter les conflits
-            importBtn.setOnAction(importEvent -> importImage());
-            deleteBtn.setOnAction(deleteEvent -> deleteSelectedImage());
-
-        } catch (Exception ex) {
-            // Si jamais l'icône n'est pas trouvée
-            Button importBtn = new Button("📁 Importer");
-            Button deleteBtn = new Button("🗑️ Supprimer");
-            importBtn.getStyleClass().addAll("gallery-btn", "black-btn");
-            deleteBtn.getStyleClass().addAll("gallery-btn", "red-btn");
-            buttonBox.getChildren().addAll(importBtn, deleteBtn);
-
-            importBtn.setOnAction(importEvent -> importImage());
-            deleteBtn.setOnAction(deleteEvent -> deleteSelectedImage());
-        }
+        // Event handlers
+        importBtn.setOnAction(importEvent -> importImage());
+        deleteBtn.setOnAction(deleteEvent -> deleteSelectedImage());
 
         buttonBox.setAlignment(Pos.CENTER);
         buttonBox.setFillHeight(false);
@@ -256,12 +241,16 @@ public class ImageGallery extends VBox {
         nameLabel.setWrapText(true);
         nameLabel.setAlignment(Pos.CENTER);
 
+        // Ajout du Tooltip avec le chemin complet de l'image (quand on survole l'image à la souris)
+        Tooltip tooltip = new Tooltip(path);
+        nameLabel.setTooltip(tooltip);
+
         card.getChildren().addAll(imageView, nameLabel);
 
         // Sélection visuelle
         if (path.equals(selectedImagePath)) {
             card.setStyle(card.getStyle()
-                    + "-fx-border-color: #4CAF50; -fx-border-width: 2; -fx-effect: dropshadow(gaussian, #4CAF50, 8, 0.2, 0, 0);");
+                    + "-fx-border-color: #2196F3; -fx-border-width: 2;");
         } else {
             card.setStyle(card.getStyle() + "-fx-border-color: #E0E0E0; -fx-border-width: 1;");
         }

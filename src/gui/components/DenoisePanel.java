@@ -126,6 +126,10 @@ public class DenoisePanel extends VBox {
         }
 
         try {
+            // Désactiver le bouton et ajouter la classe processing
+            applyDenoiseBtn.setDisable(true);
+            getScene().getRoot().getStyleClass().add("processing");
+
             String type = denoiseTypeCombo.getValue();
             boolean isGlobal = type.equalsIgnoreCase("Global");
             String threshold = thresholdTypeCombo.getValue().toLowerCase();
@@ -152,6 +156,10 @@ public class DenoisePanel extends VBox {
                     sigma,
                     patchPercent);
 
+            // Réactiver le bouton et retirer la classe processing
+            applyDenoiseBtn.setDisable(false);
+            getScene().getRoot().getStyleClass().remove("processing");
+
             // Afficher un message de succès
             Alert successAlert = new Alert(Alert.AlertType.INFORMATION,
                     "Image débruitée sauvegardée avec succès :\n" + outPath, 
@@ -163,6 +171,7 @@ public class DenoisePanel extends VBox {
                     // Notifier pour passer en mode comparaison
                     if (imageDisplay != null) {
                         imageDisplay.switchToCompareMode(selectedImagePath, outPath);
+                        imageDisplay.forceCompareButtonSelected();
                     }
                 } else {
                     // Mettre à jour l'affichage central avec l'image débruitée
@@ -178,6 +187,9 @@ public class DenoisePanel extends VBox {
 
         } catch (Exception ex) {
             ex.printStackTrace();
+            // Réactiver le bouton et retirer la classe processing en cas d'erreur
+            applyDenoiseBtn.setDisable(false);
+            getScene().getRoot().getStyleClass().remove("processing");
             Alert alert = new Alert(Alert.AlertType.ERROR, "Erreur lors du débruitage : " + ex.getMessage(),
                     ButtonType.OK);
             alert.showAndWait();

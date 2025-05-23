@@ -51,9 +51,16 @@ public class ImageDisplay extends VBox {
     private StackPane imageDisplay;
     private List<String> availableImages;
 
+    // ImageView pour l'image de remplacement
+    private ImageView placeholderImageView;
+
     // Listeners
     private ModeChangeListener modeChangeListener;
     private MetricsUpdateListener metricsUpdateListener;
+
+    // Références aux boutons pour contrôle externe
+    private ToggleButton displayBtnRef;
+    private ToggleButton compareBtnRef;
 
     public ImageDisplay() {
         super(15);
@@ -66,15 +73,26 @@ public class ImageDisplay extends VBox {
 
     private void initializeComponents() {
         // Boutons Affichage et Comparer côte à côte
-        Button displayBtn = new Button("Affichage");
-        displayBtn.setMaxWidth(120);
-        displayBtn.getStyleClass().addAll("action-btn", "black-btn");
-        Button compareBtn = new Button("Comparer");
-        compareBtn.setMaxWidth(120);
-        compareBtn.getStyleClass().addAll("action-btn", "black-btn");
+        ToggleButton displayBtn = new ToggleButton("Vue simple");
+        displayBtn.setSelected(true);
+        displayBtn.getStyleClass().addAll("action-btn");
+        this.displayBtnRef = displayBtn;
+        
+        ToggleButton compareBtn = new ToggleButton("Comparaison");
+        compareBtn.getStyleClass().addAll("action-btn");
+        this.compareBtnRef = compareBtn;
+        
+        ToggleGroup modeGroup = new ToggleGroup();
+        displayBtn.setToggleGroup(modeGroup);
+        compareBtn.setToggleGroup(modeGroup);
+        
         HBox topBtnBox = new HBox(10, displayBtn, compareBtn);
         topBtnBox.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(displayBtn, Priority.ALWAYS);
+        HBox.setHgrow(compareBtn, Priority.ALWAYS);
         VBox.setMargin(topBtnBox, new Insets(0, 0, 10, 0));
+        topBtnBox.setFillHeight(true);
+        topBtnBox.setMaxWidth(Double.MAX_VALUE);
 
         // Conteneur pour l'affichage dynamique (image simple ou comparaison)
         dynamicDisplay = new StackPane();
@@ -96,22 +114,43 @@ public class ImageDisplay extends VBox {
         centerImageView.setFitWidth(500);
         centerImageView.setFitHeight(500);
 
+        // Charger l'image de remplacement
+        try {
+            Image placeholderImage = new Image(getClass().getResourceAsStream("/placeholder.png"));
+            placeholderImageView = new ImageView(placeholderImage);
+            placeholderImageView.setPreserveRatio(true);
+            placeholderImageView.setFitWidth(500);
+            placeholderImageView.setFitHeight(500);
+            placeholderImageView.setStyle("-fx-opacity: 0.5;");
+        } catch (Exception e) {
+            System.err.println("Erreur lors du chargement du placeholder : " + e.getMessage());
+            placeholderImageView = new ImageView(); // Fallback si le placeholder ne charge pas
+        }
+
         // Affichage initial
         updateCenterDisplay();
 
         // Event handlers pour les boutons
         displayBtn.setOnAction(e -> {
+            if (!displayBtn.isSelected()) {
+                displayBtn.setSelected(true);
+            }
             compareMode = false;
             updateCenterDisplay();
             notifyModeChange();
         });
 
         compareBtn.setOnAction(e -> {
+            if (!compareBtn.isSelected()) {
+                compareBtn.setSelected(true);
+            }
             if (availableImages == null || availableImages.size() < 2) {
                 Alert alert = new Alert(Alert.AlertType.WARNING,
                         "Il faut au moins deux images pour comparer. Images disponibles : " + 
                         (availableImages == null ? "0" : availableImages.size()), ButtonType.OK);
                 alert.showAndWait();
+                compareBtn.setSelected(false);
+                displayBtn.setSelected(true);
                 return;
             }
             compareMode = true;
@@ -141,8 +180,14 @@ public class ImageDisplay extends VBox {
             dynamicDisplay.getChildren().add(compareBox);
             centerImageNameLabel.setVisible(false);
         } else {
-            dynamicDisplay.getChildren().add(imageDisplay);
-            centerImageNameLabel.setVisible(true);
+            // Afficher l'image normale ou le placeholder si aucune image n'est chargée
+            if (centerImageView.getImage() != null) {
+                dynamicDisplay.getChildren().add(imageDisplay);
+                centerImageNameLabel.setVisible(true);
+            } else {
+                dynamicDisplay.getChildren().add(placeholderImageView);
+                centerImageNameLabel.setVisible(false); // Cacher le label quand le placeholder est affiché
+            }
         }
     }
 
@@ -302,17 +347,19 @@ public class ImageDisplay extends VBox {
                 // Basculer en mode affichage simple
                 if (compareMode) {
                     compareMode = false;
-                    updateCenterDisplay();
+                    // updateCenterDisplay(); // Appelé après setImage
                     notifyModeChange();
                 }
             } catch (Exception ex) {
-                centerImageView.setImage(null);
+                System.err.println("Erreur lors du chargement de l'image : " + ex.getMessage());
+                centerImageView.setImage(null); // Définit l'image sur null en cas d'erreur
                 centerImageNameLabel.setText("");
             }
         } else {
-            centerImageView.setImage(null);
+            centerImageView.setImage(null); // Définit l'image sur null si le chemin est null
             centerImageNameLabel.setText("");
         }
+        updateCenterDisplay(); // Mettre à jour l'affichage (image ou placeholder)
     }
 
     public void updateAvailableImages(List<String> images) {
@@ -372,6 +419,13 @@ public class ImageDisplay extends VBox {
             if (metricsUpdateListener != null) {
                 metricsUpdateListener.onMetricsUpdate(0, 0);
             }
+        }
+    }
+
+    // Méthode publique pour forcer la sélection du bouton Comparaison
+    public void forceCompareButtonSelected() {
+        if (compareBtnRef != null) {
+            compareBtnRef.setSelected(true);
         }
     }
 }

@@ -4,6 +4,8 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -19,8 +21,8 @@ public class ParametersPanel extends VBox {
         void onImageProcessed(String outputPath);
     }
 
-    private Button noiseBtn;
-    private Button denoiseBtn;
+    private ToggleButton noiseBtn;
+    private ToggleButton denoiseBtn;
     private StackPane contentPane;
     private NoisePanel noisePanel;
     private DenoisePanel denoisePanel;
@@ -44,14 +46,18 @@ public class ParametersPanel extends VBox {
     private void initializeComponents() {
         // Deux vrais boutons noirs pour Bruitage et Débruitage
         HBox modeBtnBox = new HBox(10);
-        noiseBtn = new Button("Bruitage");
-        denoiseBtn = new Button("Débruitage");
+        noiseBtn = new ToggleButton("Bruitage");
+        denoiseBtn = new ToggleButton("Débruitage");
         noiseBtn.getStyleClass().add("black-btn");
         denoiseBtn.getStyleClass().add("black-btn");
         noiseBtn.setMinWidth(120);
         denoiseBtn.setMinWidth(120);
-        noiseBtn.setStyle("-fx-background-color: #111; -fx-text-fill: #fff;");
-        denoiseBtn.setStyle("-fx-background-color: #111; -fx-text-fill: #fff;");
+        
+        ToggleGroup modeGroup = new ToggleGroup();
+        noiseBtn.setToggleGroup(modeGroup);
+        denoiseBtn.setToggleGroup(modeGroup);
+        noiseBtn.setSelected(true);
+        
         modeBtnBox.getChildren().addAll(noiseBtn, denoiseBtn);
         modeBtnBox.setAlignment(Pos.CENTER_LEFT);
         VBox.setMargin(modeBtnBox, new Insets(0, 0, 10, 0));
@@ -79,24 +85,23 @@ public class ParametersPanel extends VBox {
         contentPane = new StackPane();
         contentPane.getChildren().add(noisePanel);
 
-        // Par défaut, Bruitage actif
-        noiseBtn.setStyle("-fx-background-color: #222; -fx-text-fill: #fff;");
-
         getChildren().addAll(modeBtnBox, paramsTitle, contentPane);
     }
 
     private void setupEventHandlers() {
         // Logique de switch
         noiseBtn.setOnAction(e -> {
+            if (!noiseBtn.isSelected()) {
+                noiseBtn.setSelected(true);
+            }
             contentPane.getChildren().setAll(noisePanel);
-            noiseBtn.setStyle("-fx-background-color: #222; -fx-text-fill: #fff;");
-            denoiseBtn.setStyle("-fx-background-color: #111; -fx-text-fill: #fff;");
         });
 
         denoiseBtn.setOnAction(e -> {
+            if (!denoiseBtn.isSelected()) {
+                denoiseBtn.setSelected(true);
+            }
             contentPane.getChildren().setAll(denoisePanel);
-            noiseBtn.setStyle("-fx-background-color: #111; -fx-text-fill: #fff;");
-            denoiseBtn.setStyle("-fx-background-color: #222; -fx-text-fill: #fff;");
         });
     }
 
@@ -124,10 +129,14 @@ public class ParametersPanel extends VBox {
     }
 
     public void switchToNoiseMode() {
-        noiseBtn.fire();
+        noiseBtn.setSelected(true);
+        denoiseBtn.setSelected(false);
+        contentPane.getChildren().setAll(noisePanel);
     }
 
     public void switchToDenoiseMode() {
-        denoiseBtn.fire();
+        denoiseBtn.setSelected(true);
+        noiseBtn.setSelected(false);
+        contentPane.getChildren().setAll(denoisePanel);
     }
 }
