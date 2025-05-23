@@ -12,6 +12,8 @@ import gui.components.ImageDisplay;
 import gui.components.ParametersPanel;
 import gui.components.MetricsPanel;
 
+import javafx.scene.image.Image;
+
 /**
  * Classe principale de l'application JavaFX refactorisée
  * Orchestre les différents composants de l'interface
@@ -68,6 +70,15 @@ public class Main extends Application {
         // Configuration de la fenêtre
         primaryStage.setTitle("Traitement d'Image : Bruitage & Débruitage");
         primaryStage.setScene(scene);
+
+        // Ajout du logo de l'application
+        try {
+            Image applicationIcon = new Image(getClass().getResourceAsStream("/logo.png"));
+            primaryStage.getIcons().add(applicationIcon);
+        } catch (Exception e) {
+            System.err.println("Erreur lors du chargement de l'icône : " + e.getMessage());
+        }
+
         primaryStage.show();
     }
 
