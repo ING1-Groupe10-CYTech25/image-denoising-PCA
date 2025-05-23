@@ -52,6 +52,7 @@ public class ImageGallery extends VBox {
 
         initializeComponents();
         setupEventHandlers();
+        loadImagesFromImgFolders();
         updateNoImageLabel();
     }
 
@@ -114,20 +115,20 @@ public class ImageGallery extends VBox {
 
             buttonBox.getChildren().addAll(importBtn, deleteBtn);
 
-            // Event handlers
-            importBtn.setOnAction(event -> importImage());
-            deleteBtn.setOnAction(event -> deleteSelectedImage());
+            // Event handlers avec des noms de paramètres différents pr éviter les conflits
+            importBtn.setOnAction(importEvent -> importImage());
+            deleteBtn.setOnAction(deleteEvent -> deleteSelectedImage());
 
-        } catch (Exception e) {
-            // Fallback si l'icône n'est pas trouvée
+        } catch (Exception ex) {
+            // Si jamais l'icône n'est pas trouvée
             Button importBtn = new Button("📁 Importer");
             Button deleteBtn = new Button("🗑️ Supprimer");
             importBtn.getStyleClass().addAll("gallery-btn", "black-btn");
             deleteBtn.getStyleClass().addAll("gallery-btn", "red-btn");
             buttonBox.getChildren().addAll(importBtn, deleteBtn);
 
-            importBtn.setOnAction(event -> importImage());
-            deleteBtn.setOnAction(event -> deleteSelectedImage());
+            importBtn.setOnAction(importEvent -> importImage());
+            deleteBtn.setOnAction(deleteEvent -> deleteSelectedImage());
         }
 
         buttonBox.setAlignment(Pos.CENTER);
@@ -143,6 +144,13 @@ public class ImageGallery extends VBox {
     private void importImage() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Importer une image");
+
+        // Se placer dans le dossier img par défaut
+        File imgDir = new File("img");
+        if (imgDir.exists() && imgDir.isDirectory()) {
+            fileChooser.setInitialDirectory(imgDir);
+        }
+
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg", "*.bmp", "*.gif", "*.tif",
                         "*.tiff"));
@@ -283,5 +291,55 @@ public class ImageGallery extends VBox {
             updateImageGallery();
             notifyImageListChange();
         }
+    }
+
+    /**
+     * Charge automatiquement les images présentes dans les dossiers img au
+     * démarrage
+     */
+    private void loadImagesFromImgFolders() {
+        String[] folders = { "img/original", "img/img_noised", "img/img_denoised" };
+
+        for (String folderPath : folders) {
+            File folder = new File(folderPath);
+            if (folder.exists() && folder.isDirectory()) {
+                loadImagesFromFolder(folder);
+            }
+        }
+
+        // Mettre à jour l'affichage après le chargement
+        updateImageGallery();
+        notifyImageListChange();
+    }
+
+    /**
+     * Charge récursivement les images d'un dossier
+     */
+    private void loadImagesFromFolder(File folder) {
+        File[] files = folder.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    // Explorer récursivement les sous-dossiers
+                    loadImagesFromFolder(file);
+                } else if (isImageFile(file)) {
+                    String path = file.getAbsolutePath();
+                    if (!importedImages.contains(path)) {
+                        importedImages.add(path);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Vérifie si un fichier est une image supportée
+     */
+    private static boolean isImageFile(File file) {
+        String name = file.getName().toLowerCase();
+        return name.endsWith(".png") || name.endsWith(".jpg") ||
+                name.endsWith(".jpeg") || name.endsWith(".bmp") ||
+                name.endsWith(".gif") || name.endsWith(".tiff") ||
+                name.endsWith(".tif");
     }
 }
