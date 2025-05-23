@@ -7,12 +7,20 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-
-import java.nio.file.Files;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import java.nio.file.Paths;
-import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import javax.imageio.ImageIO;
+import core.eval.ImageQualityMetrics;
 
 /**
  * Composant responsable de l'affichage des images
@@ -37,6 +45,7 @@ public class ImageDisplay extends VBox {
     private StackPane dynamicDisplay;
     private StackPane imageDisplay;
     private List<String> availableImages;
+    private Label metricsLabel;
 
     // Listener
     private ModeChangeListener modeChangeListener;
@@ -75,6 +84,14 @@ public class ImageDisplay extends VBox {
         centerImageNameLabel.setWrapText(true);
         VBox.setMargin(centerImageNameLabel, Insets.EMPTY);
 
+        // Label pour les métriques
+        metricsLabel = new Label();
+        metricsLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #666; -fx-padding: 5; -fx-background-color: #f8f8f8; -fx-border-color: #ddd; -fx-border-width: 1; -fx-border-radius: 4; -fx-background-radius: 4;");
+        metricsLabel.setAlignment(Pos.CENTER);
+        metricsLabel.setMaxWidth(Double.MAX_VALUE);
+        metricsLabel.setWrapText(true);
+        VBox.setMargin(metricsLabel, new Insets(10, 0, 0, 0));
+
         // Affichage normal (image simple)
         imageDisplay = new StackPane(centerImageView);
         imageDisplay.setPrefHeight(500);
@@ -105,12 +122,14 @@ public class ImageDisplay extends VBox {
             if (compareImage1 == null && !availableImages.isEmpty()) {
                 compareImage1 = availableImages.get(0); // La plus récente
                 compareImage2 = availableImages.get(1); // La deuxième plus récente
+                // Mettre à jour les métriques avec les nouvelles images
+                updateMetrics(compareImage1, compareImage2);
             }
             updateCenterDisplay();
             notifyModeChange();
         });
 
-        getChildren().addAll(topBtnBox, dynamicDisplay, centerImageNameLabel);
+        getChildren().addAll(topBtnBox, dynamicDisplay, centerImageNameLabel, metricsLabel);
     }
 
     private void setupEventHandlers() {
@@ -123,8 +142,10 @@ public class ImageDisplay extends VBox {
         if (compareMode) {
             VBox compareBox = createCompareBox();
             dynamicDisplay.getChildren().add(compareBox);
+            centerImageNameLabel.setVisible(false);
         } else {
             dynamicDisplay.getChildren().add(imageDisplay);
+            centerImageNameLabel.setVisible(true);
         }
     }
 
@@ -234,13 +255,26 @@ public class ImageDisplay extends VBox {
             // img2View affiche maintenant compareImage1 (après inversion)
             if (compareImage1 != null)
                 img2View.setImage(new Image(Paths.get(compareImage1).toUri().toString()));
+            // Mettre à jour les métriques
+            if (compareImage1 != null && compareImage2 != null) {
+                updateMetrics(compareImage1, compareImage2);
+            }
         });
         compareImg2Combo.setOnAction(e -> {
             compareImage2 = compareImg2Combo.getValue();
             // img1View affiche maintenant compareImage2 (après inversion)
             if (compareImage2 != null)
                 img1View.setImage(new Image(Paths.get(compareImage2).toUri().toString()));
+            // Mettre à jour les métriques
+            if (compareImage1 != null && compareImage2 != null) {
+                updateMetrics(compareImage1, compareImage2);
+            }
         });
+
+        // Mettre à jour les métriques initiales
+        if (compareImage1 != null && compareImage2 != null) {
+            updateMetrics(compareImage1, compareImage2);
+        }
 
         box.getChildren().addAll(selectors, comparePane, sliderBox);
         return box;
@@ -263,13 +297,23 @@ public class ImageDisplay extends VBox {
                 Image img = new Image(Paths.get(imagePath).toUri().toString());
                 centerImageView.setImage(img);
                 centerImageNameLabel.setText(Paths.get(imagePath).getFileName().toString());
+                metricsLabel.setText(""); // Réinitialiser les métriques en mode affichage simple
+                
+                // Basculer en mode affichage simple
+                if (compareMode) {
+                    compareMode = false;
+                    updateCenterDisplay();
+                    notifyModeChange();
+                }
             } catch (Exception ex) {
                 centerImageView.setImage(null);
                 centerImageNameLabel.setText("");
+                metricsLabel.setText("");
             }
         } else {
             centerImageView.setImage(null);
             centerImageNameLabel.setText("");
+            metricsLabel.setText("");
         }
     }
 
@@ -278,10 +322,10 @@ public class ImageDisplay extends VBox {
         List<String> sortedImages = new ArrayList<>(images);
         sortedImages.sort((path1, path2) -> {
             try {
-                long time1 = Files.getLastModifiedTime(Paths.get(path1)).toMillis();
-                long time2 = Files.getLastModifiedTime(Paths.get(path2)).toMillis();
+                long time1 = java.nio.file.Files.getLastModifiedTime(java.nio.file.Paths.get(path1)).toMillis();
+                long time2 = java.nio.file.Files.getLastModifiedTime(java.nio.file.Paths.get(path2)).toMillis();
                 return Long.compare(time2, time1); // Ordre décroissant (plus récent d'abord)
-            } catch (IOException e) {
+            } catch (java.io.IOException e) {
                 return 0;
             }
         });
@@ -290,6 +334,11 @@ public class ImageDisplay extends VBox {
         if (compareImg1Combo != null && compareImg2Combo != null) {
             compareImg1Combo.setItems(FXCollections.observableArrayList(sortedImages));
             compareImg2Combo.setItems(FXCollections.observableArrayList(sortedImages));
+            
+            // Si on est en mode comparaison, mettre à jour les métriques
+            if (compareMode && compareImage1 != null && compareImage2 != null) {
+                updateMetrics(compareImage1, compareImage2);
+            }
         }
     }
 
@@ -298,10 +347,28 @@ public class ImageDisplay extends VBox {
         compareImage1 = image1;
         compareImage2 = image2;
         updateCenterDisplay();
+        // Mettre à jour les métriques avec les nouvelles images
+        if (compareImage1 != null && compareImage2 != null) {
+            updateMetrics(compareImage1, compareImage2);
+        }
         notifyModeChange();
     }
 
     public boolean isCompareMode() {
         return compareMode;
+    }
+
+    private void updateMetrics(String image1Path, String image2Path) {
+        try {
+            BufferedImage img1 = ImageIO.read(new File(image1Path));
+            BufferedImage img2 = ImageIO.read(new File(image2Path));
+            
+            double mse = ImageQualityMetrics.calculateMSE(img1, img2);
+            double psnr = ImageQualityMetrics.calculatePSNR(mse, 255);
+            
+            metricsLabel.setText(String.format("MSE: %.2f | PSNR: %.2f dB", mse, psnr));
+        } catch (Exception e) {
+            metricsLabel.setText("Impossible de calculer les métriques");
+        }
     }
 }
