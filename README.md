@@ -4,7 +4,7 @@ Projet réalisé en 2025 dans le cadre d'une SAE à CY Tech Pau.
 
 Implémentation en Java d'un algorithme de débruitage d'image basé sur l'Analyse en Composantes Principales (ACP / PCA).
 
-![Comparaison visuelle pour différents niveau de bruit sur l'image Lena](src/resources/demo.png)
+![Capture d'écran de l'interface graphique](src/resources/demo.png)
 
 ## ING1 Groupe 10
 - BIOUDI Matheo
@@ -283,3 +283,6 @@ java -jar image-denoising-PCA.jar prompt
 - `Les images doivent avoir les mêmes dimensions` : Les dimensions des deux images ne correspondent pas
 - `Format d'image non supporté` : L'extension du fichier n'est pas reconnue
 - `Métrique non supportée` : La métrique spécifiée n'est pas valide (utilisez 'mse', 'psnr' ou 'both')
+
+# Comparaison entre images bruitées et débruitées
+![Comparaison entre images bruitées et débruitées](src/resources/comp.png)
