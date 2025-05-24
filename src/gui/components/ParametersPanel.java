@@ -48,8 +48,8 @@ public class ParametersPanel extends VBox {
         HBox modeBtnBox = new HBox(10);
         noiseBtn = new ToggleButton("Bruitage");
         denoiseBtn = new ToggleButton("Débruitage");
-        noiseBtn.getStyleClass().add("black-btn");
-        denoiseBtn.getStyleClass().add("black-btn");
+        noiseBtn.getStyleClass().add("action-btn");
+        denoiseBtn.getStyleClass().add("action-btn");
         noiseBtn.setMinWidth(120);
         denoiseBtn.setMinWidth(120);
         

@@ -210,11 +210,11 @@
 
 /* Boutons d'action (affichage/comparaison) */
 .action-btn {
-    -fx-background-color: #111;
-    -fx-text-fill: white;
+    -fx-background-color: white !important;
+    -fx-text-fill: #2196F3 !important;
     -fx-background-radius: 8px;
     -fx-border-radius: 8px;
-    -fx-border-color: #111;
+    -fx-border-color: #2196F3 !important;
     -fx-border-width: 1px;
     -fx-font-weight: 600;
     -fx-padding: 10 20;
