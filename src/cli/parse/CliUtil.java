@@ -114,7 +114,9 @@ public final class CliUtil {
         Usage: image-denoising-PCA [command] [options]
         
         Commandes disponibles:
-          gui      Lancer l'interface graphique
+          gui      Lancer l'interface graphique (défaut)
+          prompt   Mode interactif (sans GUI)
+
           noise    Ajouter du bruit à une image
           denoise  Débruiter une image
           eval     Évaluer la qualité du débruitage

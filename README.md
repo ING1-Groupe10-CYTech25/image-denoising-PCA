@@ -4,6 +4,8 @@ Projet réalisé en 2025 dans le cadre d'une SAE à CY Tech Pau.
 
 Implémentation en Java d'un algorithme de débruitage d'image basé sur l'Analyse en Composantes Principales (ACP / PCA).
 
+![Comparaison visuelle pour différents niveau de bruit sur l'image Lena](src/resources/demo.png)
+
 ## ING1 Groupe 10
 - BIOUDI Matheo
 - BOURGEAT Ewen
@@ -23,6 +25,7 @@ image-denoising-PCA/
 ├── src/
 │   ├── core/           # Code principal du débruitage
 │   └── cli/            # Interface en ligne de commande
+│   └── gui/            # Interface graphique
 ├── img/
 │   ├── original/       # Images originales (inclut lena.png et autres images de test)
 │   ├── img_noised/     # Images bruitées (générées automatiquement)
@@ -69,21 +72,13 @@ Toutes les commandes s'exécutent avec le fichier JAR généré :
 java -jar image-denoising-PCA.jar <commande> [options]
 ```
 
-## Mode Interactif
-
-Pour une utilisation guidée, lancez le programme sans arguments :
+# Lancer l'interface graphique
 
 ```bash
-java -jar image-denoising-PCA.jar
+java -jar image-denoising-PCA.jar gui
 ```
 
-Le programme vous guidera à travers les différentes options disponibles :
-1. Ajouter du bruit à une image (noise)
-2. Débruiter une image (denoise)
-3. Évaluer la qualité du débruitage (eval)
-4. Effectuer un benchmark complet (benchmark)
-
-### Commandes disponibles
+## Commandes disponibles
 
 #### 1. Ajouter du bruit à une image (`noise`)
 
@@ -249,10 +244,10 @@ eval --image1 <chemin> --image2 <chemin> [--metric <type>]
 
 ## Utilisation en mode interactif
 
-Pour une utilisation guidée, lancez le programme sans arguments :
+Pour une utilisation guidée, lancez le programme avec l'argument prompt :
 
 ```bash
-java -jar image-denoising-PCA.jar
+java -jar image-denoising-PCA.jar prompt
 ```
 
 1. Choisissez l'option 3 : "Évaluer la qualité du débruitage (eval)"

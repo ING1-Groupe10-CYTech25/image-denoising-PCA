@@ -53,11 +53,14 @@ public class Main {
             try {
                 switch (cmd) {
                     case "gui" -> gui.Main.main(args);
+                    case "prompt" -> runInteractiveMode();
+
                     case "noise" -> runNoise(NoiseArgs.parse(rest));
                     case "denoise" -> runDenoise(DenoiseArgs.parse(rest));
                     case "eval" -> runEval(EvalArgs.parse(rest));
                     case "benchmark" -> runBenchmark(BenchmarkArgs.parse(rest));
-                    case "--help", "-h" -> CliUtil.printGlobalHelp();
+                    case "--help", "-h", "help" -> CliUtil.printGlobalHelp();
+
                     default -> throw new IllegalArgumentException("Commande inconnue : " + cmd);
                 }
             } catch (IllegalArgumentException ex) {
