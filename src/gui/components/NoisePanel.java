@@ -1,14 +1,18 @@
 package gui.components;
 
+import java.io.File;
+import java.nio.file.Paths;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-
-import java.io.File;
-import java.nio.file.Paths;
 
 /**
  * Panneau de paramètres pour le bruitage d'images
@@ -43,7 +47,7 @@ public class NoisePanel extends VBox {
 
         Label sigmaNoiseLabel = new Label("Intensité du bruit (Sigma)");
 
-        sigmaNoiseSlider = new Slider(0, 50, 15);
+        sigmaNoiseSlider = new Slider(0, 50, 20);
         sigmaNoiseSlider.setShowTickMarks(true);
         sigmaNoiseSlider.setShowTickLabels(true);
         sigmaNoiseSlider.setMajorTickUnit(10);
@@ -51,7 +55,7 @@ public class NoisePanel extends VBox {
         sigmaNoiseSlider.setSnapToTicks(true);
         sigmaNoiseSlider.setMaxWidth(Double.MAX_VALUE);
 
-        sigmaValueLabel = new Label("15");
+        sigmaValueLabel = new Label("20");
 
         HBox sigmaBox = new HBox(10, sigmaNoiseSlider, sigmaValueLabel);
         sigmaBox.setAlignment(Pos.CENTER_LEFT);

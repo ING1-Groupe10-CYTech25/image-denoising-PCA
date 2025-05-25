@@ -1,26 +1,30 @@
 package gui.components;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.imageio.ImageIO;
+
+import core.eval.ImageQualityMetrics;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.ArrayList;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import javax.imageio.ImageIO;
-import core.eval.ImageQualityMetrics;
 
 /**
  * Composant responsable de l'affichage des images
@@ -207,6 +211,10 @@ public class ImageDisplay extends VBox {
         compareImg2Combo.setValue(compareImage2);
         compareImg1Combo.setMaxWidth(240);
         compareImg2Combo.setMaxWidth(240);
+
+        // Petite taille de font pour les nom de fichiers dans la ComboBox
+        compareImg1Combo.setStyle("-fx-font-size: 10px;");
+        compareImg2Combo.setStyle("-fx-font-size: 10px;");
         compareImg1Combo.setConverter(new javafx.util.StringConverter<>() {
             @Override
             public String toString(String path) {

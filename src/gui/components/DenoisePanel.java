@@ -1,15 +1,20 @@
 package gui.components;
 
+import java.io.File;
+import java.nio.file.Paths;
+
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.layout.Priority;
-
-import java.io.File;
-import java.nio.file.Paths;
+import javafx.scene.layout.VBox;
 
 /**
  * Panneau de paramètres pour le débruitage d'images
@@ -66,14 +71,14 @@ public class DenoisePanel extends VBox {
         shrinkMethodCombo.setMaxWidth(Double.MAX_VALUE);
 
         Label sigmaLabel = new Label("Sigma estimé");
-        sigmaSlider = new Slider(0, 50, 30);
+        sigmaSlider = new Slider(0, 50, 20);
         sigmaSlider.setShowTickMarks(true);
         sigmaSlider.setShowTickLabels(true);
         sigmaSlider.setMajorTickUnit(10);
         sigmaSlider.setMinorTickCount(1);
         sigmaSlider.setSnapToTicks(true);
         sigmaSlider.setMaxWidth(Double.MAX_VALUE);
-        denoiseSigmaValueLabel = new Label("30");
+        denoiseSigmaValueLabel = new Label("20");
         HBox denoiseSigmaBox = new HBox(10, sigmaSlider, denoiseSigmaValueLabel);
         denoiseSigmaBox.setAlignment(Pos.CENTER_LEFT);
         HBox.setHgrow(sigmaSlider, Priority.ALWAYS);
