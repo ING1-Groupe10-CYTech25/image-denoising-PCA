@@ -123,8 +123,8 @@ public class Main extends Application {
         });
 
         // Liaison mise à jour des métriques
-        imageDisplay.setMetricsUpdateListener((mse, psnr) -> {
-            metricsPanel.updateMetrics(mse, psnr);
+        imageDisplay.setMetricsUpdateListener((image1Path, image2Path, availableImages) -> {
+            metricsPanel.updateMetrics(image1Path, image2Path, availableImages);
         });
     }
 

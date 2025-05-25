@@ -37,7 +37,7 @@ public class ImageDisplay extends VBox {
 
     // Interface de callback pour la mise à jour des métriques
     public interface MetricsUpdateListener {
-        void onMetricsUpdate(double mse, double psnr);
+        void onMetricsUpdate(String image1Path, String image2Path, List<String> availableImages);
     }
 
     private ImageView centerImageView = new ImageView();
@@ -344,10 +344,11 @@ public class ImageDisplay extends VBox {
                 centerImageView.setImage(img);
                 centerImageNameLabel.setText(Paths.get(imagePath).getFileName().toString());
                 
-                // Basculer en mode affichage simple
+                // Basculer en mode affichage simple et mettre à jour le bouton
                 if (compareMode) {
                     compareMode = false;
-                    // updateCenterDisplay(); // Appelé après setImage
+                    displayBtnRef.setSelected(true);
+                    compareBtnRef.setSelected(false);
                     notifyModeChange();
                 }
             } catch (Exception ex) {
@@ -411,13 +412,13 @@ public class ImageDisplay extends VBox {
             double mse = ImageQualityMetrics.calculateMSE(img1, img2);
             double psnr = ImageQualityMetrics.calculatePSNR(mse, 255);
             
-            // Notifier le listener des métriques
+            // Notifier le listener des métriques avec les chemins des images et la liste des images disponibles
             if (metricsUpdateListener != null) {
-                metricsUpdateListener.onMetricsUpdate(mse, psnr);
+                metricsUpdateListener.onMetricsUpdate(image1Path, image2Path, availableImages);
             }
         } catch (Exception e) {
             if (metricsUpdateListener != null) {
-                metricsUpdateListener.onMetricsUpdate(0, 0);
+                metricsUpdateListener.onMetricsUpdate(null, null, availableImages);
             }
         }
     }
@@ -429,3 +430,4 @@ public class ImageDisplay extends VBox {
         }
     }
 }
+
