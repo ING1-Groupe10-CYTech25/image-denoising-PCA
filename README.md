@@ -40,6 +40,7 @@ image-denoising-PCA/
 ## Dépendances
 
 - Utilisation d'Apache Common Maths3 pour l'ACP
+- JavaFX 21.0.2 pour l'interface graphique
 
 ## Compilation et Installation
 
