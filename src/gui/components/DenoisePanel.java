@@ -166,21 +166,26 @@ public class DenoisePanel extends VBox {
                     ButtonType.OK,
                     new ButtonType("Comparer les images"));
             successAlert.setTitle("Débruitage terminé");
+            
+            // Sauvegarde du chemin de l'image originale avant qu'il ne soit modifié
+            final String originalImagePath = selectedImagePath;
+            
             successAlert.showAndWait().ifPresent(response -> {
+                // Notifier le listener pour ajouter l'image à la galerie dans tous les cas
+                if (processingListener != null) {
+                    processingListener.onImageProcessed(outPath);
+                }
+                
                 if (response.getText().equals("Comparer les images")) {
-                    // Notifier pour passer en mode comparaison
+                    // Notifier pour passer en mode comparaison en utilisant le chemin original
                     if (imageDisplay != null) {
-                        imageDisplay.switchToCompareMode(selectedImagePath, outPath);
+                        imageDisplay.switchToCompareMode(originalImagePath, outPath);
                         imageDisplay.forceCompareButtonSelected();
                     }
                 } else {
                     // Mettre à jour l'affichage central avec l'image débruitée
                     if (imageDisplay != null) {
                         imageDisplay.displayImage(outPath);
-                    }
-                    // Notifier le listener pour ajouter l'image à la galerie
-                    if (processingListener != null) {
-                        processingListener.onImageProcessed(outPath);
                     }
                 }
             });
